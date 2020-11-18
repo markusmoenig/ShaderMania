@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>ACE in Action</title>
+<meta name="viewport" content="initial-scale=1.0" />
+<style type="text/css" media="screen">
+
+    #editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    .ace_mobile-menu { display: none !important }
+</style>
+</head>
+<body style="background-color:#272823;">
+
+<div id="editor"></div>
+    
+<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/tomorrow_night");
+    editor.session.setMode("ace/mode/javascript");
+    
+    var reportChanges = true;
+    var delta = 0;
+    editor.on('change', function(d) {
+        if (reportChanges) {
+            delta = d;
+            window.webkit.messageHandlers.jsHandler.postMessage("update");
+        }
+    });
+</script>
+</body>
+</html>
