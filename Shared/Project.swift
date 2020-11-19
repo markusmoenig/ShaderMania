@@ -12,13 +12,7 @@ import MetalKit
 class Project
 {
     var texture         : MTLTexture? = nil
-    
     var black           : MTLTexture? = nil
-    
-    var slot0           : MTLTexture? = nil
-    var slot1           : MTLTexture? = nil
-    var slot2           : MTLTexture? = nil
-    var slot3           : MTLTexture? = nil
     
     var commandQueue    : MTLCommandQueue? = nil
     var commandBuffer   : MTLCommandBuffer? = nil
@@ -37,8 +31,19 @@ class Project
     
     deinit
     {
+        clear()
+    }
+    
+    func clear() {
         if black != nil { black!.setPurgeableState(.empty); black = nil }
         if texture != nil { texture!.setPurgeableState(.empty); texture = nil }
+        
+        for (id, _) in textureCache {
+            if textureCache[id] != nil {
+                textureCache[id]!.setPurgeableState(.empty)
+            }
+        }
+        textureCache = [:]
     }
     
     func render(assetFolder: AssetFolder, device: MTLDevice, time: Float, viewSize: SIMD2<Int>) -> MTLTexture?
@@ -65,6 +70,17 @@ class Project
                 texture = allocateTexture(device, width: size.x, height: size.y)
                 clear(texture!)
             }
+            checkTextures(device)
+            
+            for asset in assetFolder.assets {
+                if asset.type == .Buffer {
+                    if let outputId = asset.output {
+                        if let texture = textureCache[outputId] {
+                            drawShader(asset, texture, device)
+                        }
+                    }
+                }
+            }
             
             drawShader(final, texture!, device)
         }
@@ -72,9 +88,44 @@ class Project
         return texture
     }
     
+    /// Checks if all textures are loaded and makes sure they have the right size
+    func checkTextures(_ device: MTLDevice)
+    {
+        for asset in assetFolder!.assets {
+            if asset.type == .Texture {
+                if asset.data.count == 0 {
+                    // Empty Texture
+                    
+                    if textureCache[asset.id] == nil || textureCache[asset.id]!.width != size.x || textureCache[asset.id]!.height != size.y {
+                        if textureCache[asset.id] != nil {
+                            textureCache[asset.id]!.setPurgeableState(.empty)
+                            textureCache[asset.id] = nil
+                        }
+                        textureCache[asset.id] = allocateTexture(device, width: size.x, height: size.y)
+                        clear(textureCache[asset.id]!)
+                    }
+                } else {
+                    // Image Texture
+                    
+                    if textureLoader == nil {
+                        textureLoader = MTKTextureLoader(device: device)
+                    }
+                    
+                    if textureCache[asset.id] == nil {
+                        let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
+                        if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
+                            textureCache[asset.id] = texture
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     func drawShader(_ asset: Asset,_ texture: MTLTexture, _ device: MTLDevice)
     {
         if asset.shader == nil {
+            print("no shader for \(asset.name)")
             return
         }
         let rect = MMRect( 0, 0, Float(size.x), Float(size.y), scale: 1 )
@@ -100,35 +151,9 @@ class Project
             var hasBeenSet = false
             
             if let textureId = asset.slots[0] {
-                
                 if let texture = textureCache[textureId] {
                     renderEncoder.setFragmentTexture(texture, index: index)
                     hasBeenSet = true
-                } else
-                if let textureAsset = assetFolder?.getAssetById(textureId) {
-                    if textureAsset.data.count == 0 {
-                        // Empty Texture
-                        
-                        let texture = allocateTexture(device, width: size.x, height: size.y)
-                        renderEncoder.setFragmentTexture(texture, index: index)
-                        hasBeenSet = true
-                        textureCache[textureId] = texture
-                    } else {
-                        // Image Texture
-                        
-                        if textureLoader == nil {
-                            textureLoader = MTKTextureLoader(device: device)
-                        }
-                        
-                        let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
-                        if let texture  = try? textureLoader?.newTexture(data: textureAsset.data[0], options: texOptions) {
-                            renderEncoder.setFragmentTexture(texture, index: index)
-                            hasBeenSet = true
-                            textureCache[textureId] = texture
-                        }
-                    }
-                    
-                    renderEncoder.setFragmentTexture(black, index: index)
                 }
             }
             

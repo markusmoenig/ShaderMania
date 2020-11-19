@@ -216,7 +216,7 @@ class AssetFolder       : Codable
     // Compile the asset
     func assetCompile(_ asset: Asset)
     {
-        if asset.type == .Shader {
+        if asset.type == .Shader || asset.type == .Buffer {
             game.shaderCompiler.compile(asset: asset, cb: { (shader, errors) in
                 if shader == nil {
                     if Thread.isMainThread {
@@ -271,6 +271,15 @@ class AssetFolder       : Codable
         }
         return "Black"
     }
+    
+    func getOutputName(_ asset: Asset) -> String {
+        if let uuid = asset.output {
+            if let textureAsset = getAssetById(uuid) {
+                return textureAsset.name
+            }
+        }
+        return "None"
+    }
 }
 
 class Asset         : Codable, Equatable
@@ -301,6 +310,7 @@ class Asset         : Codable, Equatable
     // Texture In/Out
     
     var slots       : [Int: UUID] = [:]
+    var output      : UUID? = nil
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -309,6 +319,8 @@ class Asset         : Codable, Equatable
         case value
         case uuid
         case data
+        case slots
+        case output
     }
     
     init(type: AssetType, name: String, value: String = "", data: [Data] = [])
@@ -326,6 +338,12 @@ class Asset         : Codable, Equatable
         id = try container.decode(UUID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         value = try container.decode(String.self, forKey: .value)
+        if let slots = try container.decodeIfPresent([Int:UUID].self, forKey: .slots) {
+            self.slots = slots
+        }
+        if let output = try container.decodeIfPresent(UUID?.self, forKey: .output) {
+            self.output = output
+        }
         data = try container.decode([Data].self, forKey: .data)
     }
     
@@ -337,6 +355,8 @@ class Asset         : Codable, Equatable
         try container.encode(name, forKey: .name)
         try container.encode(value, forKey: .value)
         try container.encode(data, forKey: .data)
+        try container.encode(slots, forKey: .slots)
+        try container.encode(output, forKey: .output)
     }
     
     static func ==(lhs:Asset, rhs:Asset) -> Bool { // Implement Equatable

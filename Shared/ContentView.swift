@@ -7,6 +7,126 @@
 
 import SwiftUI
 
+struct BufferInputsView: View {
+    @State var document     : ShaderManiaDocument
+    @State var asset        : Asset
+    @Binding var updateView : Bool
+
+    var body: some View {
+        Section(header: Text("Inputs")) {
+            // Slot 0
+            Menu {
+                Button("Black", action: {
+                    asset.slots[0] = nil
+                    updateView.toggle()
+                })
+                ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                    if textureAsset.type == .Texture {
+                        Button(textureAsset.name, action: {
+                            asset.slots[0] = textureAsset.id
+                            updateView.toggle()
+                        })
+                    }
+                }
+            }
+            label: {
+                Text("Slot 0: \(document.game.assetFolder.getSlotName(asset, 0))")
+            }
+
+            // Slot1
+            Menu {
+                Button("Black", action: {
+                    asset.slots[1] = nil
+                    updateView.toggle()
+                })
+                ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                    if textureAsset.type == .Texture {
+                        Button(textureAsset.name, action: {
+                            asset.slots[1] = textureAsset.id
+                            updateView.toggle()
+                        })
+                    }
+                }
+            }
+            label: {
+                Text("Slot 1: \(document.game.assetFolder.getSlotName(asset, 1))")
+            }
+
+            // Slot2
+            Menu {
+                Button("Black", action: {
+                    asset.slots[2] = nil
+                    updateView.toggle()
+                })
+                ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                    if textureAsset.type == .Texture {
+                        Button(textureAsset.name, action: {
+                            asset.slots[2] = textureAsset.id
+                            updateView.toggle()
+                        })
+                    }
+                }
+            }
+            label: {
+                Text("Slot 2: \(document.game.assetFolder.getSlotName(asset, 2))")
+            }
+
+            // Slot3
+            Menu {
+                Button("Black", action: {
+                    asset.slots[3] = nil
+                    updateView.toggle()
+                })
+                ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                    if textureAsset.type == .Texture {
+                        Button(textureAsset.name, action: {
+                            asset.slots[3] = textureAsset.id
+                            updateView.toggle()
+                        })
+                    }
+                }
+            }
+            label: {
+                Text("Slot 3: \(document.game.assetFolder.getSlotName(asset, 3))")
+            }
+        }
+        .padding(4)
+        .padding(.top, 5)
+    }
+}
+
+struct BufferOutputView: View {
+    @State var document     : ShaderManiaDocument
+    @State var asset        : Asset
+    @Binding var updateView : Bool
+
+    var body: some View {
+        Section(header: Text("Output")) {
+            Menu {
+                Button("None", action: {
+                    asset.output = nil
+                    updateView.toggle()
+                })
+                
+                ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                    
+                    if textureAsset.type == .Texture {
+                        Button(textureAsset.name, action: {
+                            asset.output = textureAsset.id
+                            updateView.toggle()
+                        })
+                    }
+                }
+            }
+            label: {
+                Text("Output: \(document.game.assetFolder.getOutputName(asset))")
+            }
+        }
+        .padding(4)
+        .padding(.top, 5)
+    }
+}
+
 struct ContentView: View {
     @Binding var document                   : ShaderManiaDocument
 
@@ -303,26 +423,18 @@ struct ContentView: View {
                                 Button("Attach Image", action: {
                                     importingImage = true
                                 })
+                                .padding(4)
+                                .padding(.top, 10)
                             }
                             if asset.type == .Shader || asset.type == .Buffer {
-                                Menu {
-                                    Button("Black", action: {
-                                        asset.slots[0] = nil
-                                    })
-                                    ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
-                                        if textureAsset.type == .Texture {
-                                            Button(textureAsset.name, action: {
-                                                asset.slots[0] = textureAsset.id
-                                                updateView.toggle()
-                                            })
-                                        }
-                                    }
-                                }
-                                label: {
-                                    Text("Slot 0: \(document.game.assetFolder.getSlotName(asset, 0))")
+                                BufferInputsView(document: document, asset: asset, updateView: $updateView)
+
+                                if asset.type == .Buffer {
+                                    BufferOutputView(document: document, asset: asset, updateView: $updateView)
                                 }
                             }
                         }
+                        Spacer()
                     }
                     .frame(minWidth: 160, idealWidth: 160, maxWidth: 160)
                     .layoutPriority(0)
