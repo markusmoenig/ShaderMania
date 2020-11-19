@@ -241,10 +241,10 @@ class ShaderCompiler
             float2          size;
             float           time;
 
-            texture2d<half, access::read_write> slot0;
-            texture2d<half, access::read_write> slot1;
-            texture2d<half, access::read_write> slot2;
-            texture2d<half, access::read_write> slot3;
+            texture2d<float> slot0;
+            texture2d<float> slot1;
+            texture2d<float> slot2;
+            texture2d<float> slot3;
         } DataIn;
 
         typedef struct
@@ -279,10 +279,10 @@ class ShaderCompiler
 
         fragment float4 __shaderMain( RasterizerData in [[stage_in]],
                                       constant __MetalData &metalData [[buffer(0)]],
-                                      texture2d<half, access::read_write> slot0 [[ texture(1) ]],
-                                      texture2d<half, access::read_write> slot1 [[ texture(2) ]],
-                                      texture2d<half, access::read_write> slot2 [[ texture(3) ]],
-                                      texture2d<half, access::read_write> slot3 [[ texture(4) ]])
+                                      texture2d<float> slot0 [[ texture(1) ]],
+                                      texture2d<float> slot1 [[ texture(2) ]],
+                                      texture2d<float> slot2 [[ texture(3) ]],
+                                      texture2d<float> slot3 [[ texture(4) ]])
         {
             float2 uv = in.textureCoordinate;
             float2 size = in.viewportSize;

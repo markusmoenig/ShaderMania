@@ -28,8 +28,17 @@ class Project
 
     var assetFolder     : AssetFolder? = nil
     
+    var textureCache    : [UUID:MTLTexture] = [:]
+    var textureLoader   : MTKTextureLoader? = nil
+
     init()
     {
+    }
+    
+    deinit
+    {
+        if black != nil { black!.setPurgeableState(.empty); black = nil }
+        if texture != nil { texture!.setPurgeableState(.empty); texture = nil }
     }
     
     func render(assetFolder: AssetFolder, device: MTLDevice, time: Float, viewSize: SIMD2<Int>) -> MTLTexture?
@@ -42,8 +51,12 @@ class Project
         }
         commandBuffer = commandQueue!.makeCommandBuffer()
         
+        if black == nil {
+            texture = allocateTexture(device, width: 10, height: 10)
+            clear(texture!)
+        }
+        
         if let final = assetFolder.getAsset("Final", .Shader) {
-            
             size = viewSize
 
             // Make sure texture is of size size
@@ -56,17 +69,17 @@ class Project
                 clear(texture!)
             }
             
-            drawShader(final, texture!)
+            drawShader(final, texture!, device)
         }
         
         commandBuffer?.commit()
-        //self.commandQueue = nil
-        //self.commandBuffer = nil
+        commandQueue = nil
+        commandBuffer = nil
         
         return texture
     }
     
-    func drawShader(_ asset: Asset,_ texture: MTLTexture)
+    func drawShader(_ asset: Asset,_ texture: MTLTexture, _ device: MTLDevice)
     {
         if asset.shader == nil {
             return
@@ -89,6 +102,47 @@ class Project
         var metalData = MetalData()
         metalData.time = time
         renderEncoder.setFragmentBytes(&metalData, length: MemoryLayout<MetalData>.stride, index: 0)
+        
+        for index in 1..<5 {
+            var hasBeenSet = false
+            
+            if let textureId = asset.slots[0] {
+                
+                if let texture = textureCache[textureId] {
+                    renderEncoder.setFragmentTexture(texture, index: index)
+                    hasBeenSet = true
+                } else
+                if let textureAsset = assetFolder?.getAssetById(textureId) {
+                    if textureAsset.data.count == 0 {
+                        // Empty Texture
+                        
+                        let texture = allocateTexture(device, width: size.x, height: size.y)
+                        renderEncoder.setFragmentTexture(texture, index: index)
+                        hasBeenSet = true
+                        textureCache[textureId] = texture
+                    } else {
+                        // Image Texture
+                        
+                        if textureLoader == nil {
+                            textureLoader = MTKTextureLoader(device: device)
+                        }
+                        
+                        let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
+                        if let texture  = try? textureLoader?.newTexture(data: textureAsset.data[0], options: texOptions) {
+                            renderEncoder.setFragmentTexture(texture, index: index)
+                            hasBeenSet = true
+                            textureCache[textureId] = texture
+                        }
+                    }
+                    
+                    renderEncoder.setFragmentTexture(black, index: index)
+                }
+            }
+            
+            if hasBeenSet == false {
+                renderEncoder.setFragmentTexture(black, index: index)
+            }
+        }
 
         renderEncoder.setRenderPipelineState(asset.shader!.pipelineState)
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
@@ -97,12 +151,6 @@ class Project
     
     func allocateTexture(_ device: MTLDevice, width: Int, height: Int) -> MTLTexture?
     {
-        /*
-        if texture != nil {
-            texture!.setPurgeableState(.empty)
-            texture = nil
-        }*/
-            
         let textureDescriptor = MTLTextureDescriptor()
         textureDescriptor.textureType = MTLTextureType.type2D
         textureDescriptor.pixelFormat = MTLPixelFormat.bgra8Unorm
