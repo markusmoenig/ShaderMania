@@ -1,6 +1,6 @@
 //
 //  Asset.swift
-//  Metal-Z
+//  ShaderMania
 //
 //  Created by Markus Moenig on 26/8/20.
 //
@@ -31,7 +31,7 @@ class AssetFolder       : Codable
         }
         
         if let value = try? String(contentsOfFile: path, encoding: String.Encoding.utf8) {
-            assets.append(Asset(type: .Shader, name: "Output", value: value))
+            assets.append(Asset(type: .Shader, name: "Final", value: value))
             current = assets[0]
         }
     }
@@ -92,6 +92,27 @@ class AssetFolder       : Codable
                 asset.data.append(imageData)
             }
         }
+        
+        game.scriptEditor?.createSession(asset)
+        select(asset.id)
+    }
+    
+    func attachImage(_ asset: Asset, _ url: URL)
+    {
+        asset.data = []
+        if let imageData: Data = try? Data(contentsOf: url) {
+            asset.data.append(imageData)
+        }
+        
+        select(asset.id)
+    }
+    
+    func addTexture(_ name: String)
+    {
+        let asset: Asset
+            
+        asset = Asset(type: .Texture, name: name)
+        assets.append(asset)
         
         game.scriptEditor?.createSession(asset)
         select(asset.id)
@@ -241,12 +262,21 @@ class AssetFolder       : Codable
             }
         }
     }
+    
+    func getSlotName(_ asset: Asset, _ index: Int) -> String {
+        if let uuid = asset.slots[index] {
+            if let textureAsset = getAssetById(uuid) {
+                return textureAsset.name
+            }
+        }
+        return "Black"
+    }
 }
 
 class Asset         : Codable, Equatable
 {
     enum AssetType  : Int, Codable {
-        case Buffer, Image, Shader, Audio
+        case Buffer, Image, Shader, Audio, Texture
     }
     
     var type        : AssetType = .Shader
@@ -267,7 +297,11 @@ class Asset         : Codable, Equatable
 
     // If the asset has an error
     var hasError    : Bool = false
-            
+    
+    // Texture In/Out
+    
+    var slots       : [Int: UUID] = [:]
+
     private enum CodingKeys: String, CodingKey {
         case type
         case id

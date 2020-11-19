@@ -1,6 +1,6 @@
 //
 //  Game.swift
-//  Metal-Z
+//  ShaderMania
 //
 //  Created by Markus Moenig on 25/8/20.
 //
@@ -73,6 +73,8 @@ public class Game       : ObservableObject
     var showingDebugInfo: Bool = false
     
     var frameworkId     : String? = nil
+    
+    var project         : Project? = nil
 
     public init(_ frameworkId: String? = nil)
     {
@@ -99,6 +101,8 @@ public class Game       : ObservableObject
             print(error.localizedDescription)
         }
         #endif
+        
+        project = Project()
     }
     
     public func setupView(_ view: DMTKView)
@@ -205,9 +209,7 @@ public class Game       : ObservableObject
     
     public func draw()
     {
-        _Time.x += 1.0 / targetFPS
-        timeChanged.send(_Time.x)
-
+        /*
         if checkTexture() && state == .Idle {
             startDrawing()
             texture?.clear()
@@ -215,12 +217,32 @@ public class Game       : ObservableObject
             if let asset = assetFolder.current {
                 createPreview(asset)
             }
-        }
+        }*/
         
         guard let drawable = view.currentDrawable else {
             return
         }
         
+        if state == .Running {
+            _Time.x += 1.0 / targetFPS
+            //timeChanged.send(_Time.x)
+        }
+        
+        if let texture = project?.render(assetFolder: assetFolder, device: device, time: _Time.x, viewSize: SIMD2<Int>(Int(view.frame.width), Int(view.frame.height))) {
+            
+            startDrawing()
+            let renderPassDescriptor = view.currentRenderPassDescriptor
+            renderPassDescriptor?.colorAttachments[0].loadAction = .load
+            let renderEncoder = gameCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
+            
+            drawTexture(texture, renderEncoder: renderEncoder!)
+            renderEncoder?.endEncoding()
+            
+            gameCmdBuffer?.present(drawable)
+            stopDrawing()
+        }
+        
+        /*
         startDrawing()
 
         // Game Loop
@@ -282,7 +304,9 @@ public class Game       : ObservableObject
             //print("Behavior Time: ", (Double(Date().timeIntervalSince1970) - startTime) * 1000)
             //#endif
         }
+        */
                 
+        /*
         let renderPassDescriptor = view.currentRenderPassDescriptor
         renderPassDescriptor?.colorAttachments[0].loadAction = .load
         let renderEncoder = gameCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
@@ -291,7 +315,8 @@ public class Game       : ObservableObject
         renderEncoder?.endEncoding()
         
         gameCmdBuffer?.present(drawable)
-        stopDrawing()
+        */
+        //stopDrawing()
     }
     
     func startDrawing()
@@ -377,6 +402,51 @@ public class Game       : ObservableObject
                         }
                     }
                 }
+            } else if asset.type == .Texture {
+                
+                if asset.data.count == 0 {
+                    if let scriptEditor = self.scriptEditor {
+                        let text = """
+
+                        This texture will be automatically set to the output resolution.
+
+                        """
+                        scriptEditor.setAssetValue(asset, value: text)
+                    }
+                } else {
+                    let data = asset.data[0]
+                    
+                    let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
+                    if let texture  = try? textureLoader.newTexture(data: data, options: texOptions) {
+                        let texture2D = Texture2D(self, texture: texture)
+                        
+                        self.startDrawing()
+                        var options : [String:Any] = [:]
+                        options["texture"] = texture2D
+                        
+                        let width : Float = texture2D.width * Float(asset.dataScale)
+                        let height : Float = texture2D.height * Float(asset.dataScale)
+
+                        options["width"] = width
+                        options["height"] = height
+
+                        self.texture?.clear()
+                        self.texture?.drawTexture(options)
+                        self.stopDrawing()
+                        self.updateOnce()
+                                                                        
+                        if let scriptEditor = self.scriptEditor {
+                            let text = """
+
+                            Displaying image for texture \(asset.name)
+                            
+                            Image resolution \(Int(texture2D.width)) x \(Int(texture2D.height))
+
+                            """
+                            scriptEditor.setAssetValue(asset, value: text)
+                        }
+                    }
+                }
             }
         }
     }
@@ -411,14 +481,14 @@ public class Game       : ObservableObject
         #endif
     }
     
-    func drawTexture(renderEncoder: MTLRenderCommandEncoder)
+    func drawTexture(_ texture: MTLTexture, renderEncoder: MTLRenderCommandEncoder)
     {
-        let width : Float = Float(texture!.width)
-        let height: Float = Float(texture!.height)
+        let width : Float = Float(texture.width)
+        let height: Float = Float(texture.height)
 
         var settings = TextureUniform()
-        settings.screenSize.x = screenWidth
-        settings.screenSize.y = screenHeight
+        settings.screenSize.x = Float(texture.width)//screenWidth
+        settings.screenSize.y = Float(texture.height)//screenHeight
         settings.pos.x = 0
         settings.pos.y = 0
         settings.size.x = width * scaleFactor
@@ -426,13 +496,15 @@ public class Game       : ObservableObject
         settings.globalAlpha = 1
                 
         let rect = MMRect( 0, 0, width, height, scale: scaleFactor )
-        let vertexData = createVertexData(texture: texture!, rect: rect)
+        let vertexData = createVertexData(texture: texture, rect: rect)
         
+        var viewportSize = vector_uint2( UInt32(texture.width), UInt32(texture.height))
+
         renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
         renderEncoder.setVertexBytes(&viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
         
         renderEncoder.setFragmentBytes(&settings, length: MemoryLayout<TextureUniform>.stride, index: 0)
-        renderEncoder.setFragmentTexture(texture?.texture, index: 1)
+        renderEncoder.setFragmentTexture(texture, index: 1)
 
         renderEncoder.setRenderPipelineState(metalStates.getState(state: .CopyTexture))
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
@@ -445,6 +517,28 @@ public class Game       : ObservableObject
         let right: Float = left + rect.width//self.width / 2 - x
         
         let top: Float = texture.height / 2.0 - rect.y
+        let bottom: Float = top - rect.height
+
+        let quadVertices: [Float] = [
+            right, bottom, 1.0, 0.0,
+            left, bottom, 0.0, 0.0,
+            left, top, 0.0, 1.0,
+            
+            right, bottom, 1.0, 0.0,
+            left, top, 0.0, 1.0,
+            right, top, 1.0, 1.0,
+        ]
+        
+        return quadVertices
+    }
+    
+    /// Creates vertex data for the given rectangle
+    func createVertexData(texture: MTLTexture, rect: MMRect) -> [Float]
+    {
+        let left: Float  = -Float(texture.width) / 2.0 + rect.x
+        let right: Float = left + rect.width//self.width / 2 - x
+        
+        let top: Float = Float(texture.height) / 2.0 - rect.y
         let bottom: Float = top - rect.height
 
         let quadVertices: [Float] = [

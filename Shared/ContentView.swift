@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  Shared
+//  ShaderMania
 //
 //  Created by Markus Moenig on 18/11/20.
 //
@@ -15,14 +15,13 @@ struct ContentView: View {
     
     @State private var rightSideBarIsVisible: Bool = true
     
-    @State private var showImageItems       : Bool = true
+    @State private var showTextureItems     : Bool = true
     @State private var showBufferItems      : Bool = true
-    @State private var showShaderItems      : Bool = true
     @State private var updateView           : Bool = false
 
     @State private var helpIsVisible        : Bool = false
     
-    @State private var importingImages      : Bool = false
+    @State private var importingImage       : Bool = false
 
     @Environment(\.colorScheme) var deviceColorScheme: ColorScheme
 
@@ -44,7 +43,11 @@ struct ContentView: View {
                         }*/
 
                         Button(action: {
-                            importingImages = true
+                            //importingImages = true
+                            document.game.assetFolder.addTexture("New Texture")
+                            assetName = document.game.assetFolder.current!.name
+                            showAssetNamePopover = true
+                            updateView.toggle()
                         })
                         {
                             Label("", systemImage: "checkerboard.rectangle")
@@ -54,7 +57,7 @@ struct ContentView: View {
                         .padding(.bottom, 1)
                         
                         Button(action: {
-                            document.game.assetFolder.addBuffer("New Buffer")
+                            document.game.assetFolder.addBuffer("New Shader")
                             assetName = document.game.assetFolder.current!.name
                             showAssetNamePopover = true
                             updateView.toggle()
@@ -84,29 +87,11 @@ struct ContentView: View {
                             .frame(minWidth: 200)
                         }.padding()
                     }
-                    // Import Images
-                    .fileImporter(
-                        isPresented: $importingImages,
-                        allowedContentTypes: [.item],
-                        allowsMultipleSelection: true
-                    ) { result in
-                        do {
-                            let selectedFiles = try result.get()
-                            if selectedFiles.count > 0 {
-                                document.game.assetFolder.addImages(selectedFiles[0].deletingPathExtension().lastPathComponent, selectedFiles)
-                                assetName = document.game.assetFolder.current!.name
-                                showAssetNamePopover = true
-                                updateView.toggle()
-                            }
-                        } catch {
-                            // Handle failure.
-                        }
-                    }
                     Divider()
                     List() {
-                        DisclosureGroup("Textures", isExpanded: $showImageItems) {
+                        DisclosureGroup("Textures", isExpanded: $showTextureItems) {
                             ForEach(document.game.assetFolder.assets, id: \.id) { asset in
-                                if asset.type == .Image {
+                                if asset.type == .Texture {
                                     Button(action: {
                                         document.game.assetFolder.select(asset.id)
                                         document.game.createPreview(asset)
@@ -126,7 +111,7 @@ struct ContentView: View {
                                 }
                             }
                         }
-                        DisclosureGroup("Buffers", isExpanded: $showBufferItems) {
+                        DisclosureGroup("Shaders", isExpanded: $showBufferItems) {
                             ForEach(document.game.assetFolder.assets, id: \.id) { asset in
                                 if asset.type == .Buffer {
                                     Button(action: {
@@ -312,21 +297,27 @@ struct ContentView: View {
                 } else {
                     VStack {
                         if let asset = document.game.assetFolder.current {
-                            if asset.type == .Image || asset.type == .Buffer {
-                                Text("Channel")
-                                
+                            if asset.type == .Texture {
+                                Button("Attach Image", action: {
+                                    importingImage = true
+                                })
+                            }
+                            if asset.type == .Shader || asset.type == .Buffer {
                                 Menu {
-                                    Button("Channel 0", action: {
+                                    Button("Black", action: {
+                                        asset.slots[0] = nil
                                     })
-                                    Button("Channel 1", action: {
-                                    })
-                                    Button("Channel 2", action: {
-                                    })
-                                    Button("Channel 3", action: {
-                                    })
+                                    ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                                        if textureAsset.type == .Texture {
+                                            Button(textureAsset.name, action: {
+                                                asset.slots[0] = textureAsset.id
+                                                updateView.toggle()
+                                            })
+                                        }
+                                    }
                                 }
                                 label: {
-                                    Label("Channel", systemImage: "plus")
+                                    Text("Slot 0: \(document.game.assetFolder.getSlotName(asset, 0))")
                                 }
                             }
                         }
@@ -334,6 +325,29 @@ struct ContentView: View {
                     .frame(minWidth: 160, idealWidth: 160, maxWidth: 160)
                     .layoutPriority(0)
                     .animation(.easeInOut)
+                    
+                    // Import Image
+                    .fileImporter(
+                        isPresented: $importingImage,
+                        allowedContentTypes: [.item],
+                        allowsMultipleSelection: false
+                    ) { result in
+                        do {
+                            let selectedFiles = try result.get()
+                            if selectedFiles.count > 0 {
+                                if let asset = document.game.assetFolder.current {
+                                    document.game.assetFolder.attachImage(asset, selectedFiles[0])
+                                    //assetName = document.game.assetFolder.current!.name
+                                    //showAssetNamePopover = true
+                                    document.game.assetFolder.current = nil
+                                    document.game.assetFolder.select(asset.id)
+                                    updateView.toggle()
+                                }
+                            }
+                        } catch {
+                            // Handle failure.
+                        }
+                    }
                 }
             }
         }

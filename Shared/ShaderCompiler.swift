@@ -1,6 +1,6 @@
 //
 //  ShaderCompiler.swift
-//  Denrim
+//  ShaderMania
 //
 //  Created by Markus Moenig on 2/9/20.
 //
@@ -240,6 +240,11 @@ class ShaderCompiler
             float2          uv;
             float2          size;
             float           time;
+
+            texture2d<half, access::read_write> slot0;
+            texture2d<half, access::read_write> slot1;
+            texture2d<half, access::read_write> slot2;
+            texture2d<half, access::read_write> slot3;
         } DataIn;
 
         typedef struct
@@ -273,7 +278,11 @@ class ShaderCompiler
         float4 mainImage(DataIn);
 
         fragment float4 __shaderMain( RasterizerData in [[stage_in]],
-                                      constant __MetalData &metalData [[buffer(0)]])
+                                      constant __MetalData &metalData [[buffer(0)]],
+                                      texture2d<half, access::read_write> slot0 [[ texture(1) ]],
+                                      texture2d<half, access::read_write> slot1 [[ texture(2) ]],
+                                      texture2d<half, access::read_write> slot2 [[ texture(3) ]],
+                                      texture2d<half, access::read_write> slot3 [[ texture(4) ]])
         {
             float2 uv = in.textureCoordinate;
             float2 size = in.viewportSize;
@@ -282,6 +291,10 @@ class ShaderCompiler
             dataIn.uv = uv;
             dataIn.size = size;
             dataIn.time = metalData.time;
+            dataIn.slot0 = slot0;
+            dataIn.slot1 = slot1;
+            dataIn.slot2 = slot2;
+            dataIn.slot3 = slot3;
 
             float4 color = mainImage(dataIn);
             return color;

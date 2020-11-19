@@ -1,6 +1,6 @@
 //
 //  WebEditor.swift
-//  Metal-Z
+//  ShaderMania
 //
 //  Created by Markus Moenig on 25/8/20.
 //
@@ -33,7 +33,7 @@ class ScriptEditor
         self.game = game
         self.colorScheme = colorScheme
         
-        if let asset = game.assetFolder.getAsset("Output", .Shader) {
+        if let asset = game.assetFolder.getAsset("Final", .Shader) {
             game.assetFolder.select(asset.id)
             createSession(asset)
             setTheme(colorScheme)
@@ -86,7 +86,7 @@ class ScriptEditor
                     }
              })
         } else
-        if asset.type == .Image || asset.type == .Audio {
+        if asset.type == .Image || asset.type == .Audio || asset.type == .Texture {
             webView.evaluateJavaScript(
                 """
                 var \(asset.scriptName) = ace.createEditSession(`\(asset.value)`)

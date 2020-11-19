@@ -41,6 +41,8 @@
 		2B0EEAA32565DF9A00C84C6C /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA9D2565DF9A00C84C6C /* Font.swift */; };
 		2B0EEAA72565DFA800C84C6C /* Files in Resources */ = {isa = PBXBuildFile; fileRef = 2B0EEAA62565DFA800C84C6C /* Files */; };
 		2B0EEAA82565DFA800C84C6C /* Files in Resources */ = {isa = PBXBuildFile; fileRef = 2B0EEAA62565DFA800C84C6C /* Files */; };
+		2B0EEABB2566035700C84C6C /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEABA2566035700C84C6C /* Project.swift */; };
+		2B0EEABC2566035700C84C6C /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEABA2566035700C84C6C /* Project.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,6 +69,7 @@
 		2B0EEA9C2565DF9A00C84C6C /* Classes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Classes.swift; sourceTree = "<group>"; };
 		2B0EEA9D2565DF9A00C84C6C /* Font.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Font.swift; sourceTree = "<group>"; };
 		2B0EEAA62565DFA800C84C6C /* Files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Files; sourceTree = "<group>"; };
+		2B0EEABA2566035700C84C6C /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +116,7 @@
 				2B0EEA7E2565DF7800C84C6C /* ScriptEditor.swift */,
 				2B0EEA7A2565DF7800C84C6C /* ShaderCompiler.swift */,
 				2B0EEA7B2565DF7800C84C6C /* Utils.swift */,
+				2B0EEABA2566035700C84C6C /* Project.swift */,
 				2B0EEA9A2565DF9A00C84C6C /* Classes */,
 				2B0EEAA62565DFA800C84C6C /* Files */,
 				2B0EEA512565DF3A00C84C6C /* Assets.xcassets */,
@@ -270,6 +274,7 @@
 				2B0EEA8B2565DF7800C84C6C /* Game.swift in Sources */,
 				2B0EEA8F2565DF7800C84C6C /* ScriptEditor.swift in Sources */,
 				2B0EEA9E2565DF9A00C84C6C /* Texture2D.swift in Sources */,
+				2B0EEABB2566035700C84C6C /* Project.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,6 +297,7 @@
 				2B0EEA8C2565DF7800C84C6C /* Game.swift in Sources */,
 				2B0EEA902565DF7800C84C6C /* ScriptEditor.swift in Sources */,
 				2B0EEA9F2565DF9A00C84C6C /* Texture2D.swift in Sources */,
+				2B0EEABC2566035700C84C6C /* Project.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

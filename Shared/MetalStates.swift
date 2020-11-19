@@ -1,6 +1,6 @@
 //
 //  MetalStates.swift
-//  Denrim
+//  ShaderMania
 //
 //  Created by Markus Moenig on 30/8/20.
 //

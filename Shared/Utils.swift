@@ -1,6 +1,6 @@
 //
 //  Utils.swift
-//  Metal-Z
+//  ShaderMania
 //
 //  Created by Markus Moenig on 25/8/20.
 //
