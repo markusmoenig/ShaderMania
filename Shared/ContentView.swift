@@ -158,6 +158,8 @@ struct ContentView: View {
                     }
                     .layoutPriority(0)
                 }
+                .frame(minWidth: 160, idealWidth: 200, maxWidth: 200)
+                .layoutPriority(0)
                 
                 GeometryReader { geometry in
                     ZStack(alignment: .topTrailing) {

@@ -230,18 +230,17 @@ public class Game       : ObservableObject
         
         if let texture = project?.render(assetFolder: assetFolder, device: device, time: _Time.x, viewSize: SIMD2<Int>(Int(view.frame.width), Int(view.frame.height))) {
             
-            startDrawing()
             let renderPassDescriptor = view.currentRenderPassDescriptor
             renderPassDescriptor?.colorAttachments[0].loadAction = .load
-            let renderEncoder = gameCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
+            let renderEncoder = project!.commandBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
             
             drawTexture(texture, renderEncoder: renderEncoder!)
             renderEncoder?.endEncoding()
             
-            gameCmdBuffer?.present(drawable)
-            stopDrawing()
+            project!.commandBuffer!.present(drawable)
         }
-        
+        project?.stopDrawing()
+
         /*
         startDrawing()
 

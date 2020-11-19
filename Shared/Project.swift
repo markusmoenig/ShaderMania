@@ -46,16 +46,13 @@ class Project
         self.assetFolder = assetFolder
         self.time = time
 
-        if commandQueue == nil {
-            commandQueue = device.makeCommandQueue()
-        }
-        commandBuffer = commandQueue!.makeCommandBuffer()
-        
+        startDrawing(device)
+
         if black == nil {
             texture = allocateTexture(device, width: 10, height: 10)
             clear(texture!)
         }
-        
+
         if let final = assetFolder.getAsset("Final", .Shader) {
             size = viewSize
 
@@ -71,10 +68,6 @@ class Project
             
             drawShader(final, texture!, device)
         }
-        
-        commandBuffer?.commit()
-        commandQueue = nil
-        commandBuffer = nil
         
         return texture
     }
@@ -147,6 +140,21 @@ class Project
         renderEncoder.setRenderPipelineState(asset.shader!.pipelineState)
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         renderEncoder.endEncoding()
+    }
+    
+    func startDrawing(_ device: MTLDevice)
+    {
+        if commandQueue == nil {
+            commandQueue = device.makeCommandQueue()
+        }
+        commandBuffer = commandQueue!.makeCommandBuffer()
+    }
+    
+    func stopDrawing()
+    {
+        commandBuffer?.commit()
+        commandQueue = nil
+        commandBuffer = nil
     }
     
     func allocateTexture(_ device: MTLDevice, width: Int, height: Int) -> MTLTexture?
