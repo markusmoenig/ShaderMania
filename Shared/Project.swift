@@ -182,9 +182,19 @@ class Project
         commandBuffer = commandQueue!.makeCommandBuffer()
     }
     
-    func stopDrawing()
+    func stopDrawing(syncronize: Bool =  false, waitUntilCompleted: Bool = false)
     {
+        #if os(OSX)
+        if syncronize {
+            let blitEncoder = commandBuffer!.makeBlitCommandEncoder()!
+            blitEncoder.synchronize(texture: texture!, slice: 0, level: 0)
+            blitEncoder.endEncoding()
+        }
+        #endif
         commandBuffer?.commit()
+        if waitUntilCompleted {
+            commandBuffer?.waitUntilCompleted()
+        }
         commandQueue = nil
         commandBuffer = nil
     }
