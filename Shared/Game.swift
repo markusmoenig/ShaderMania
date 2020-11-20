@@ -182,7 +182,7 @@ public class Game       : ObservableObject
         view.isPaused = true
         
         _Time.x = 0
-        timeChanged.send(_Time.x)
+        //timeChanged.send(_Time.x)
     }
     
     @discardableResult func checkTexture() -> Bool
@@ -216,18 +216,12 @@ public class Game       : ObservableObject
         guard let drawable = view.currentDrawable else {
             return
         }
-        
+                
         if state == .Idle {
             if let asset = assetFolder.current {
+                checkTexture()
                 if asset.type == .Texture {
-                    checkTexture()
-                    startDrawing()
-                    texture?.clear()
-                    stopDrawing()
-                    
-                    if asset.data.count > 0 {
-                        createPreview(asset)
-                    }
+                    createPreview(asset, false)
             
                     startDrawing()
                     let renderPassDescriptor = view.currentRenderPassDescriptor
@@ -260,82 +254,6 @@ public class Game       : ObservableObject
             project!.commandBuffer!.present(drawable)
         }
         project?.stopDrawing()
-
-        /*
-        startDrawing()
-
-        // Game Loop
-        if state == .Running {
-            
-            //gameCmdBuffer?.addCompletedHandler { cb in
-            //    print("GPU Time:", (cb.gpuEndTime - cb.gpuStartTime) * 1000)
-            //}
-            
-            //#if DEBUG
-            //let startTime = Double(Date().timeIntervalSince1970)
-            //#endif
-
-            texture?.clear()
-            
-            let rect = MMRect( 0, 0, self.texture!.width, self.texture!.height, scale: 1 )
-            texture?.clear()
-            let asset = assetFolder.assets[0]
-            texture?.drawShader(asset.shader!, rect)
-
-            //if let context = gameAsset?.behavior {
-            //    context.execute(name: "update")
-            //}
-            
-            /*
-            if let mapAsset = self.currentMap {
-                if let map = mapAsset.map {
-                    for (_, b) in map.behavior {
-                        if let instances = b.instances {
-                            for inst in instances.pairs {
-                                if let context = inst.1.behaviorAsset.behavior {
-                                    context.execute(name: "update")
-                                }
-                            }
-                        } else {
-                            if let context = b.behaviorAsset.behavior {
-                                context.execute(name: "update")
-                            }
-                        }
-                    }
-                    if let scene = self.currentScene {
-                        map.drawScene(0, 0, scene)
-                    }
-                }
-            }
-        
-            // Display failures when have editor
-            if let asset = assetFolder.current, scriptEditor != nil {
-                var error = CompileError()
-                error.error = ""
-                error.column = 0
-                if let context = asset.behavior {
-                    scriptEditor?.clearAnnotations()
-                    scriptEditor?.setFailures(context.failedAt)
-                }
-            }*/
-
-            //#if DEBUG
-            //print("Behavior Time: ", (Double(Date().timeIntervalSince1970) - startTime) * 1000)
-            //#endif
-        }
-        */
-                
-        /*
-        let renderPassDescriptor = view.currentRenderPassDescriptor
-        renderPassDescriptor?.colorAttachments[0].loadAction = .load
-        let renderEncoder = gameCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
-        
-        drawTexture(renderEncoder: renderEncoder!)
-        renderEncoder?.endEncoding()
-        
-        gameCmdBuffer?.present(drawable)
-        */
-        //stopDrawing()
     }
     
     func startDrawing()
@@ -357,7 +275,7 @@ public class Game       : ObservableObject
     }
     
     /// Create a preview for the current asset
-    func createPreview(_ asset: Asset)
+    func createPreview(_ asset: Asset, _ update: Bool = true)
     {
         if state == .Idle {
             clearLocalAudio()
@@ -406,7 +324,9 @@ public class Game       : ObservableObject
                         self.texture?.clear()
                         self.texture?.drawTexture(options)
                         self.stopDrawing()
-                        self.updateOnce()
+                        if update {
+                            self.updateOnce()
+                        }
                                                                         
                         if let scriptEditor = self.scriptEditor {
                             let text = """
@@ -434,6 +354,14 @@ public class Game       : ObservableObject
 
                         """
                         scriptEditor.setAssetValue(asset, value: text)
+                        
+                        self.startDrawing()
+                        self.texture?.clear()
+                        self.stopDrawing()
+
+                        if update {
+                            self.updateOnce()
+                        }
                     }
                 } else {
                     let data = asset.data[0]
@@ -455,8 +383,10 @@ public class Game       : ObservableObject
                         self.texture?.clear()
                         self.texture?.drawTexture(options)
                         self.stopDrawing()
-                        self.updateOnce()
-                                                                        
+                        if update {
+                            self.updateOnce()
+                        }
+                        
                         if let scriptEditor = self.scriptEditor {
                             let text = """
 
