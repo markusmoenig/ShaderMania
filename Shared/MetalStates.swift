@@ -13,12 +13,17 @@ class MetalStates {
         case DrawDisc, CopyTexture, DrawTexture, DrawBox, DrawBoxExt, DrawTextChar, DrawBackPattern
     }
     
+    enum ComputeStates : Int {
+        case MakeCGIImage
+    }
+    
     var defaultLibrary          : MTLLibrary!
 
     let pipelineStateDescriptor : MTLRenderPipelineDescriptor
     
     var states                  : [Int:MTLRenderPipelineState] = [:]
-    
+    var computeStates           : [Int:MTLComputePipelineState] = [:]
+
     var game                    : Game
     
     init(_ game: Game)
@@ -58,9 +63,11 @@ class MetalStates {
         states[States.DrawBoxExt.rawValue] = createQuadState(name: "m4mBoxDrawableExt")
         states[States.DrawTextChar.rawValue] = createQuadState(name: "m4mTextDrawable")
         states[States.DrawBackPattern.rawValue] = createQuadState(name: "m4mBoxPatternDrawable")
+        
+        computeStates[ComputeStates.MakeCGIImage.rawValue] = createComputeState(name: "makeCGIImage")
     }
     
-    /// Creates a quod state from an optional library and the function name
+    /// Creates a quad state from an optional library and the function name
     func createQuadState( library: MTLLibrary? = nil, name: String ) -> MTLRenderPipelineState?
     {
         let function : MTLFunction?
@@ -85,8 +92,40 @@ class MetalStates {
         return renderPipelineState
     }
     
+    /// Creates a compute state from an optional library and the function name
+    func createComputeState( library: MTLLibrary? = nil, name: String ) -> MTLComputePipelineState?
+    {
+        let function : MTLFunction?
+            
+        if library != nil {
+            function = library!.makeFunction( name: name )
+        } else {
+            function = defaultLibrary!.makeFunction( name: name )
+        }
+        
+        var computePipelineState : MTLComputePipelineState?
+        
+        if function == nil {
+            return nil
+        }
+        
+        do {
+            computePipelineState = try game.device.makeComputePipelineState( function: function! )
+        } catch {
+            print( "computePipelineState failed" )
+            return nil
+        }
+
+        return computePipelineState
+    }
+    
     func getState(state: States) -> MTLRenderPipelineState
     {
         return states[state.rawValue]!
+    }
+    
+    func getComputeState(state: ComputeStates) -> MTLComputePipelineState
+    {
+        return computeStates[state.rawValue]!
     }
 }

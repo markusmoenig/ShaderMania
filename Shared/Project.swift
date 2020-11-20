@@ -13,7 +13,8 @@ class Project
 {
     var texture         : MTLTexture? = nil
     var black           : MTLTexture? = nil
-    
+    var temp            : MTLTexture? = nil
+
     var commandQueue    : MTLCommandQueue? = nil
     var commandBuffer   : MTLCommandBuffer? = nil
     
@@ -37,7 +38,8 @@ class Project
     func clear() {
         if black != nil { black!.setPurgeableState(.empty); black = nil }
         if texture != nil { texture!.setPurgeableState(.empty); texture = nil }
-        
+        if temp != nil { temp!.setPurgeableState(.empty); temp = nil }
+
         for (id, _) in textureCache {
             if textureCache[id] != nil {
                 textureCache[id]!.setPurgeableState(.empty)
@@ -182,12 +184,12 @@ class Project
         commandBuffer = commandQueue!.makeCommandBuffer()
     }
     
-    func stopDrawing(syncronize: Bool =  false, waitUntilCompleted: Bool = false)
+    func stopDrawing(syncTexture: MTLTexture? = nil, waitUntilCompleted: Bool = false)
     {
         #if os(OSX)
-        if syncronize {
+        if let texture = syncTexture {
             let blitEncoder = commandBuffer!.makeBlitCommandEncoder()!
-            blitEncoder.synchronize(texture: texture!, slice: 0, level: 0)
+            blitEncoder.synchronize(texture: texture, slice: 0, level: 0)
             blitEncoder.endEncoding()
         }
         #endif
@@ -195,7 +197,6 @@ class Project
         if waitUntilCompleted {
             commandBuffer?.waitUntilCompleted()
         }
-        commandQueue = nil
         commandBuffer = nil
     }
     
@@ -242,5 +243,78 @@ class Project
         renderPassDescriptor.colorAttachments[0].loadAction = .clear
         let renderEncoder = commandBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
         renderEncoder.endEncoding()
+    }
+    
+    func makeCGIImage(_ device: MTLDevice,_ state: MTLComputePipelineState,_ texture: MTLTexture) -> MTLTexture?
+    {
+        if temp != nil { temp!.setPurgeableState(.empty); temp = nil }
+
+        temp = allocateTexture(device, width: texture.width, height: texture.height)
+        runComputeState(device, state, outTexture: temp!, inTexture: texture, syncronize: true)
+        return temp
+    }
+    
+    /// Run the given state
+    func runComputeState(_ device: MTLDevice,_ state: MTLComputePipelineState?, outTexture: MTLTexture, inBuffer: MTLBuffer? = nil, inTexture: MTLTexture? = nil, inTextures: [MTLTexture] = [], outTextures: [MTLTexture] = [], inBuffers: [MTLBuffer] = [], syncronize: Bool = false, finishedCB: ((Double)->())? = nil )
+    {
+        // Compute the threads and thread groups for the given state and texture
+        func calculateThreadGroups(_ state: MTLComputePipelineState, _ encoder: MTLComputeCommandEncoder,_ width: Int,_ height: Int, limitThreads: Bool = false)
+        {
+            let w = limitThreads ? 1 : state.threadExecutionWidth
+            let h = limitThreads ? 1 : state.maxTotalThreadsPerThreadgroup / w
+            let threadsPerThreadgroup = MTLSizeMake(w, h, 1)
+
+            let threadgroupsPerGrid = MTLSize(width: (width + w - 1) / w, height: (height + h - 1) / h, depth: 1)
+            encoder.dispatchThreadgroups(threadgroupsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
+        }
+        
+        startDrawing(device)
+        
+        let computeEncoder = commandBuffer?.makeComputeCommandEncoder()!
+        
+        computeEncoder?.setComputePipelineState( state! )
+        
+        computeEncoder?.setTexture( outTexture, index: 0 )
+        
+        if let buffer = inBuffer {
+            computeEncoder?.setBuffer(buffer, offset: 0, index: 1)
+        }
+        
+        var texStartIndex : Int = 2
+        
+        if let texture = inTexture {
+            computeEncoder?.setTexture(texture, index: 2)
+            texStartIndex = 3
+        }
+        
+        for (index,texture) in inTextures.enumerated() {
+            computeEncoder?.setTexture(texture, index: texStartIndex + index)
+        }
+        
+        texStartIndex += inTextures.count
+
+        for (index,texture) in outTextures.enumerated() {
+            computeEncoder?.setTexture(texture, index: texStartIndex + index)
+        }
+        
+        texStartIndex += outTextures.count
+
+        for (index,buffer) in inBuffers.enumerated() {
+            computeEncoder?.setBuffer(buffer, offset: 0, index: texStartIndex + index)
+        }
+        
+        calculateThreadGroups(state!, computeEncoder!, outTexture.width, outTexture.height)
+        computeEncoder?.endEncoding()
+
+        stopDrawing(syncTexture: outTexture, waitUntilCompleted: true)
+        
+        /*
+        if let finished = finishedCB {
+            commandBuffer?.addCompletedHandler { cb in
+                let executionDuration = cb.gpuEndTime - cb.gpuStartTime
+                //print(executionDuration)
+                finished(executionDuration)
+            }
+        } */
     }
 }

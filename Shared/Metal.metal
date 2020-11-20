@@ -292,3 +292,14 @@ fragment float4 m4mTextDrawable(RasterizerData in [[stage_in]],
     float w = clamp(d/fwidth(d) + 0.5, 0.0, 1.0);
     return float4( data->color.x, data->color.y, data->color.z, w * data->color.w );
 }
+
+kernel void makeCGIImage(
+texture2d<half, access::write>          outTexture  [[texture(0)]],
+texture2d<half, access::read>           inTexture [[texture(2)]],
+uint2 gid                               [[thread_position_in_grid]])
+{
+    //float2 size = float2( outTexture.get_width(), outTexture.get_height() );
+    half4 color = inTexture.read(gid).zyxw;
+    color.xyz = pow(color.xyz, 2.2);
+    outTexture.write(color, gid);
+}

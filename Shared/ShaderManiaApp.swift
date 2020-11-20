@@ -37,12 +37,14 @@ struct ShaderManiaApp: App {
                         if let project = game.project {
                             if let texture = project.render(assetFolder: game.assetFolder, device: game.device, time: 0, viewSize: SIMD2<Int>(Int(game.view.frame.width), Int(game.view.frame.height))) {
                                 
-                                project.stopDrawing(syncronize: true, waitUntilCompleted: true)
+                                project.stopDrawing(syncTexture: texture, waitUntilCompleted: true)
                                 
-                                if let image = makeCGIImage(texture: texture, forImage: true) {
-                                    if let imageDestination = CGImageDestinationCreateWithURL(url as CFURL, kUTTypePNG, 1, nil) {
-                                        CGImageDestinationAddImage(imageDestination, image, nil)
-                                        CGImageDestinationFinalize(imageDestination)
+                                if let cgiTexture = project.makeCGIImage(game.device, game.metalStates.getComputeState(state: .MakeCGIImage), texture) {
+                                    if let image = makeCGIImage(texture: cgiTexture, forImage: true) {
+                                        if let imageDestination = CGImageDestinationCreateWithURL(url as CFURL, kUTTypePNG, 1, nil) {
+                                            CGImageDestinationAddImage(imageDestination, image, nil)
+                                            CGImageDestinationFinalize(imageDestination)
+                                        }
                                     }
                                 }
                             }
