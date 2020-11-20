@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+#if os(iOS)
+import MobileCoreServices
+#endif
+
 struct BufferInputsView: View {
     @State var document     : ShaderManiaDocument
     @Binding var updateView : Bool
@@ -154,6 +158,8 @@ struct ContentView: View {
     @State private var helpIsVisible        : Bool = false
     
     @State private var importingImage       : Bool = false
+    @State private var exportingImage       : Bool = false
+
 
     @Environment(\.colorScheme) var deviceColorScheme: ColorScheme
 
@@ -396,6 +402,11 @@ struct ContentView: View {
                             })
                             .keyboardShortcut("6")
                         }
+                        Section(header: Text("Export")) {
+                            Button("Export Image...", action: {
+                                exportingImage = true
+                            })
+                        }
                     }
                     label: {
                         //Text("Preview")
@@ -434,6 +445,10 @@ struct ContentView: View {
                 if let asset = document.game.assetFolder.current {
                     document.game.createPreview(asset)
                 }
+            }
+            
+            .onReceive(self.document.exportImage) { value in
+                exportingImage = true
             }
         
             if rightSideBarIsVisible == true {
@@ -484,6 +499,36 @@ struct ContentView: View {
                                     document.game.assetFolder.current = nil
                                     document.game.assetFolder.select(asset.id)
                                     updateView.toggle()
+                                }
+                            }
+                        } catch {
+                            // Handle failure.
+                        }
+                    }
+                    
+                    // Export Image
+                    .fileExporter(
+                        isPresented: $exportingImage,
+                        document: document,
+                        contentType: .png,
+                        defaultFilename: "Image"
+                    ) { result in
+                        do {
+                            let url = try result.get()
+                            let game = document.game
+                            if let project = game.project {
+                                if let texture = project.render(assetFolder: game.assetFolder, device: game.device, time: 0, viewSize: SIMD2<Int>(Int(game.view.frame.width), Int(game.view.frame.height))) {
+                                    
+                                    project.stopDrawing(syncTexture: texture, waitUntilCompleted: true)
+                                    
+                                    if let cgiTexture = project.makeCGIImage(game.device, game.metalStates.getComputeState(state: .MakeCGIImage), texture) {
+                                        if let image = makeCGIImage(texture: cgiTexture, forImage: true) {
+                                            if let imageDestination = CGImageDestinationCreateWithURL(url as CFURL, kUTTypePNG, 1, nil) {
+                                                CGImageDestinationAddImage(imageDestination, image, nil)
+                                                CGImageDestinationFinalize(imageDestination)
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         } catch {

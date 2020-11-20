@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import Combine
 
 extension UTType {
     static var shaderManiaShader: UTType {
@@ -16,6 +17,8 @@ extension UTType {
 
 struct ShaderManiaDocument: FileDocument {
     @ObservedObject var game = Game()
+    
+    let exportImage          = PassthroughSubject<Void, Never>()
 
     init() {
     }
