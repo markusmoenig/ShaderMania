@@ -28,7 +28,7 @@ struct ShaderManiaApp: App {
                 .fileExporter(
                     isPresented: $exportingImage,
                     document: file.document,
-                    contentType: .image,
+                    contentType: .png,
                     defaultFilename: "Image"
                 ) { result in
                     do {

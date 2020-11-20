@@ -21,7 +21,7 @@ struct ShaderManiaDocument: FileDocument {
     }
 
     static var readableContentTypes: [UTType] { [.shaderManiaShader] }
-    static var writableContentTypes: [UTType] { [.image] }
+    static var writableContentTypes: [UTType] { [.png] }
 
     /*
     init(configuration: ReadConfiguration) throws {
