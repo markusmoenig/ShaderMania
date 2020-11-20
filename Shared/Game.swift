@@ -219,11 +219,13 @@ public class Game       : ObservableObject
                 
         if state == .Idle {
             if let asset = assetFolder.current {
-                checkTexture()
                 if asset.type == .Texture {
-                    createPreview(asset, false)
-            
                     startDrawing()
+                    
+                    if checkTexture() {
+                        createPreview(asset, false)
+                    }
+            
                     let renderPassDescriptor = view.currentRenderPassDescriptor
                     renderPassDescriptor?.colorAttachments[0].loadAction = .load
                     let renderEncoder = gameCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
@@ -345,7 +347,7 @@ public class Game       : ObservableObject
                     }
                 }
             } else if asset.type == .Texture {
-                
+                checkTexture()
                 if asset.data.count == 0 {
                     if let scriptEditor = self.scriptEditor {
                         let text = """
@@ -355,12 +357,15 @@ public class Game       : ObservableObject
                         """
                         scriptEditor.setAssetValue(asset, value: text)
                         
-                        self.startDrawing()
+                        if update {
+                            startDrawing()
+                        }
+                        
                         self.texture?.clear()
-                        self.stopDrawing()
 
                         if update {
-                            self.updateOnce()
+                            stopDrawing()
+                            updateOnce()
                         }
                     }
                 } else {
@@ -370,7 +375,10 @@ public class Game       : ObservableObject
                     if let texture  = try? textureLoader.newTexture(data: data, options: texOptions) {
                         let texture2D = Texture2D(self, texture: texture)
                         
-                        self.startDrawing()
+                        if update {
+                            startDrawing()
+                        }
+                        
                         var options : [String:Any] = [:]
                         options["texture"] = texture2D
                         
@@ -380,13 +388,13 @@ public class Game       : ObservableObject
                         options["width"] = width
                         options["height"] = height
 
-                        self.texture?.clear()
+                        //self.texture?.clear()
                         self.texture?.drawTexture(options)
-                        self.stopDrawing()
                         if update {
-                            self.updateOnce()
+                            stopDrawing()
+                            updateOnce()
                         }
-                        
+                                                
                         if let scriptEditor = self.scriptEditor {
                             let text = """
 
