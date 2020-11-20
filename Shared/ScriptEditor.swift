@@ -27,6 +27,8 @@ class ScriptEditor
     var sessions        : Int = 0
     var colorScheme     : ColorScheme
     
+    var helpText        : String = ""
+    
     init(_ view: WKWebView, _ game: Game,_ colorScheme: ColorScheme)
     {
         self.webView = view
@@ -38,6 +40,37 @@ class ScriptEditor
             createSession(asset)
             setTheme(colorScheme)
         }
+        
+        createHelpSession()
+    }
+    
+    func createHelpSession()
+    {
+        guard let path = Bundle.main.path(forResource: "help", ofType: "cpp", inDirectory: "Files") else {
+            return
+        }
+        
+        if let value = try? String(contentsOfFile: path, encoding: String.Encoding.utf8) {
+            helpText = value
+        }
+        
+        webView.evaluateJavaScript(
+            """
+            var helpSession = ace.createEditSession(``)
+            helpSession.setMode("ace/mode/c_cpp");
+            """, completionHandler: { (value, error ) in
+         })
+    }
+    
+    func activateHelpSession()
+    {
+        game.showingDebugInfo = true
+        webView.evaluateJavaScript(
+            """
+            helpSession.setValue(`\(helpText)`)
+            editor.setSession(helpSession)
+            """, completionHandler: { (value, error ) in
+         })
     }
     
     func setTheme(_ colorScheme: ColorScheme)

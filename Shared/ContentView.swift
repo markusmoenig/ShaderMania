@@ -404,6 +404,13 @@ struct ContentView: View {
                         .opacity(0)
 
                     Button(action: {
+                        if helpIsVisible == false {
+                            document.game.scriptEditor!.activateHelpSession()
+                        } else {
+                            if let asset = document.game.assetFolder.current {
+                                document.game.assetFolder.select(asset.id)
+                            }
+                        }
                         helpIsVisible.toggle()
                     }) {
                         //Text(!helpIsVisible ? "Help" : "Hide")
