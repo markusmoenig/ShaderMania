@@ -46,7 +46,7 @@ class Project
         textureCache = [:]
     }
     
-    func render(assetFolder: AssetFolder, device: MTLDevice, time: Float, viewSize: SIMD2<Int>) -> MTLTexture?
+    func render(assetFolder: AssetFolder, device: MTLDevice, time: Float, viewSize: SIMD2<Int>, breakAsset: Asset? = nil) -> MTLTexture?
     {
         self.assetFolder = assetFolder
         self.time = time
@@ -72,16 +72,23 @@ class Project
             }
             checkTextures(device)
             
+            // Do buffers
             for asset in assetFolder.assets {
                 if asset.type == .Buffer {
-                    if let outputId = asset.output {
-                        if let texture = textureCache[outputId] {
-                            drawShader(asset, texture, device)
+                    if asset === breakAsset {
+                        drawShader(asset, texture!, device)
+                        return texture
+                    } else {
+                        if let outputId = asset.output {
+                            if let texture = textureCache[outputId] {
+                                drawShader(asset, texture, device)
+                            }
                         }
                     }
                 }
             }
             
+            // Final Shader
             drawShader(final, texture!, device)
         }
         

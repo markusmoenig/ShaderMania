@@ -217,17 +217,19 @@ public class Game       : ObservableObject
             return
         }
         
-        /*
         if state == .Idle {
-            if checkTexture() {
-                if let asset = assetFolder.current {
+            if let asset = assetFolder.current {
+                if asset.type == .Texture {
+                    checkTexture()
                     startDrawing()
                     texture?.clear()
                     stopDrawing()
-                    createPreview(asset)
+                    
+                    if asset.data.count > 0 {
+                        createPreview(asset)
+                    }
             
                     startDrawing()
-
                     let renderPassDescriptor = view.currentRenderPassDescriptor
                     renderPassDescriptor?.colorAttachments[0].loadAction = .load
                     let renderEncoder = gameCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
@@ -241,14 +243,12 @@ public class Game       : ObservableObject
                     return
                 }
             }
-        }*/
-                
-        if state == .Running {
+        } else {
             _Time.x += 1.0 / targetFPS
             //timeChanged.send(_Time.x)
         }
-        
-        if let texture = project?.render(assetFolder: assetFolder, device: device, time: _Time.x, viewSize: SIMD2<Int>(Int(view.frame.width), Int(view.frame.height))) {
+                
+        if let texture = project?.render(assetFolder: assetFolder, device: device, time: _Time.x, viewSize: SIMD2<Int>(Int(view.frame.width), Int(view.frame.height)), breakAsset: state == .Idle ? assetFolder.current : nil) {
             
             let renderPassDescriptor = view.currentRenderPassDescriptor
             renderPassDescriptor?.colorAttachments[0].loadAction = .load
@@ -361,6 +361,9 @@ public class Game       : ObservableObject
     {
         if state == .Idle {
             clearLocalAudio()
+            if asset.type == .Buffer || asset.type == .Shader {
+                updateOnce()
+            } else
             if asset.type == .Shader {
                 if let shader = asset.shader {
                     startDrawing()

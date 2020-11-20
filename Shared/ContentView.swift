@@ -230,7 +230,7 @@ struct ContentView: View {
                                         updateView.toggle()
                                     })
                                     {
-                                        Label(asset.name, systemImage: "checkerboard.rectangle")
+                                        Label(asset.name, systemImage: asset.data.isEmpty ? "checkerboard.rectangle" : "photo")
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .contentShape(Rectangle())
                                     }
