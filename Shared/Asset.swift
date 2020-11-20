@@ -148,10 +148,6 @@ class AssetFolder       : Codable
                 }
                 game.scriptEditor?.setAssetSession(asset)
                 
-                if game.state == .Idle {
-                    assetCompile(asset)
-                }
-                
                 current = asset
                 break
             }
@@ -213,7 +209,7 @@ class AssetFolder       : Codable
         }
     }
     
-    // Compile the asset
+    /// Compiles the Buffer or Shader asset
     func assetCompile(_ asset: Asset)
     {
         if asset.type == .Shader || asset.type == .Buffer {
@@ -241,6 +237,14 @@ class AssetFolder       : Codable
                     }
                 }
             })
+        }
+    }
+    
+    /// Compiles all assets, used after loading the project
+    func assetCompileAll()
+    {
+        for asset in assets {
+            assetCompile(asset)
         }
     }
     

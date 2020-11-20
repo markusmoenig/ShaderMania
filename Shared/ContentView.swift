@@ -9,121 +9,133 @@ import SwiftUI
 
 struct BufferInputsView: View {
     @State var document     : ShaderManiaDocument
-    @State var asset        : Asset
     @Binding var updateView : Bool
 
     var body: some View {
-        Section(header: Text("Inputs")) {
-            // Slot 0
-            Menu {
-                Button("Black", action: {
-                    asset.slots[0] = nil
-                    updateView.toggle()
-                })
-                ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
-                    if textureAsset.type == .Texture {
-                        Button(textureAsset.name, action: {
-                            asset.slots[0] = textureAsset.id
-                            updateView.toggle()
-                        })
+        if let asset = document.game.assetFolder.current {
+            Section(header: Text("Inputs")) {
+                // Slot 0
+                Menu {
+                    Button("Black", action: {
+                        asset.slots[0] = nil
+                        updateView.toggle()
+                        document.game.createPreview.send()
+                    })
+                    ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                        if textureAsset.type == .Texture {
+                            Button(textureAsset.name, action: {
+                                asset.slots[0] = textureAsset.id
+                                updateView.toggle()
+                                document.game.createPreview.send()
+                            })
+                        }
                     }
                 }
-            }
-            label: {
-                Text("Slot 0: \(document.game.assetFolder.getSlotName(asset, 0))")
-            }
+                label: {
+                    Text("Slot 0: \(document.game.assetFolder.getSlotName(asset, 0))")
+                }
 
-            // Slot1
-            Menu {
-                Button("Black", action: {
-                    asset.slots[1] = nil
-                    updateView.toggle()
-                })
-                ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
-                    if textureAsset.type == .Texture {
-                        Button(textureAsset.name, action: {
-                            asset.slots[1] = textureAsset.id
-                            updateView.toggle()
-                        })
+                // Slot1
+                Menu {
+                    Button("Black", action: {
+                        asset.slots[1] = nil
+                        updateView.toggle()
+                        document.game.createPreview.send()
+                    })
+                    ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                        if textureAsset.type == .Texture {
+                            Button(textureAsset.name, action: {
+                                asset.slots[1] = textureAsset.id
+                                updateView.toggle()
+                                document.game.createPreview.send()
+                            })
+                        }
                     }
                 }
-            }
-            label: {
-                Text("Slot 1: \(document.game.assetFolder.getSlotName(asset, 1))")
-            }
+                label: {
+                    Text("Slot 1: \(document.game.assetFolder.getSlotName(asset, 1))")
+                }
 
-            // Slot2
-            Menu {
-                Button("Black", action: {
-                    asset.slots[2] = nil
-                    updateView.toggle()
-                })
-                ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
-                    if textureAsset.type == .Texture {
-                        Button(textureAsset.name, action: {
-                            asset.slots[2] = textureAsset.id
-                            updateView.toggle()
-                        })
+                // Slot2
+                Menu {
+                    Button("Black", action: {
+                        asset.slots[2] = nil
+                        updateView.toggle()
+                        document.game.createPreview.send()
+                    })
+                    ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                        if textureAsset.type == .Texture {
+                            Button(textureAsset.name, action: {
+                                asset.slots[2] = textureAsset.id
+                                updateView.toggle()
+                                document.game.createPreview.send()
+                            })
+                        }
                     }
                 }
-            }
-            label: {
-                Text("Slot 2: \(document.game.assetFolder.getSlotName(asset, 2))")
-            }
+                label: {
+                    Text("Slot 2: \(document.game.assetFolder.getSlotName(asset, 2))")
+                }
 
-            // Slot3
-            Menu {
-                Button("Black", action: {
-                    asset.slots[3] = nil
-                    updateView.toggle()
-                })
-                ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
-                    if textureAsset.type == .Texture {
-                        Button(textureAsset.name, action: {
-                            asset.slots[3] = textureAsset.id
-                            updateView.toggle()
-                        })
+                // Slot3
+                Menu {
+                    Button("Black", action: {
+                        asset.slots[3] = nil
+                        updateView.toggle()
+                        document.game.createPreview.send()
+                    })
+                    ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                        if textureAsset.type == .Texture {
+                            Button(textureAsset.name, action: {
+                                asset.slots[3] = textureAsset.id
+                                updateView.toggle()
+                                document.game.createPreview.send()
+                            })
+                        }
                     }
                 }
+                label: {
+                    Text("Slot 3: \(document.game.assetFolder.getSlotName(asset, 3))")
+                }
             }
-            label: {
-                Text("Slot 3: \(document.game.assetFolder.getSlotName(asset, 3))")
-            }
+            .padding(4)
+            .padding(.top, 5)
         }
-        .padding(4)
-        .padding(.top, 5)
     }
 }
 
 struct BufferOutputView: View {
     @State var document     : ShaderManiaDocument
-    @State var asset        : Asset
     @Binding var updateView : Bool
 
     var body: some View {
-        Section(header: Text("Output")) {
-            Menu {
-                Button("None", action: {
-                    asset.output = nil
-                    updateView.toggle()
-                })
-                
-                ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+        if let asset = document.game.assetFolder.current {
+            Section(header: Text("Output")) {
+                Menu {
+                    Button("None", action: {
+                        asset.output = nil
+                        updateView.toggle()
+                        document.game.createPreview.send()
+                    })
                     
-                    if textureAsset.type == .Texture {
-                        Button(textureAsset.name, action: {
-                            asset.output = textureAsset.id
-                            updateView.toggle()
-                        })
+                    ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                        
+                        if textureAsset.type == .Texture && textureAsset.data.count == 0 {
+                            Button(textureAsset.name, action: {
+                                asset.output = textureAsset.id
+                                updateView.toggle()
+                                document.game.createPreview.send()
+                            })
+                        }
                     }
                 }
+                label: {
+                    Text("Output: \(document.game.assetFolder.getOutputName(asset))")
+                }
             }
-            label: {
-                Text("Output: \(document.game.assetFolder.getOutputName(asset))")
-            }
+            .padding(4)
+            .padding(.top, 5)
         }
-        .padding(4)
-        .padding(.top, 5)
     }
 }
 
@@ -407,6 +419,12 @@ struct ContentView: View {
             //.onReceive(self.document.game.timeChanged) { value in
             //    timeString = String(format: "%.02f", value)
             //}
+            
+            .onReceive(self.document.game.createPreview) { value in
+                if let asset = document.game.assetFolder.current {
+                    document.game.createPreview(asset)
+                }
+            }
         
             if rightSideBarIsVisible == true {
                 if helpIsVisible == true {
@@ -427,10 +445,10 @@ struct ContentView: View {
                                 .padding(.top, 10)
                             }
                             if asset.type == .Shader || asset.type == .Buffer {
-                                BufferInputsView(document: document, asset: asset, updateView: $updateView)
+                                BufferInputsView(document: document, updateView: $updateView)
 
                                 if asset.type == .Buffer {
-                                    BufferOutputView(document: document, asset: asset, updateView: $updateView)
+                                    BufferOutputView(document: document, updateView: $updateView)
                                 }
                             }
                         }

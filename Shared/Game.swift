@@ -61,6 +61,8 @@ public class Game       : ObservableObject
     
     let timeChanged     = PassthroughSubject<Float, Never>()
 
+    let createPreview   = PassthroughSubject<Void, Never>()
+
     var helpText        : String = ""
     let helpTextChanged = PassthroughSubject<Void, Never>()
 
@@ -129,6 +131,8 @@ public class Game       : ObservableObject
         
         view.platformInit()
         checkTexture()
+        
+        assetFolder.assetCompileAll()
     }
     
     public func load(_ data: Data)
@@ -209,20 +213,36 @@ public class Game       : ObservableObject
     
     public func draw()
     {
-        /*
-        if checkTexture() && state == .Idle {
-            startDrawing()
-            texture?.clear()
-            stopDrawing()
-            if let asset = assetFolder.current {
-                createPreview(asset)
-            }
-        }*/
-        
         guard let drawable = view.currentDrawable else {
             return
         }
         
+        /*
+        if state == .Idle {
+            if checkTexture() {
+                if let asset = assetFolder.current {
+                    startDrawing()
+                    texture?.clear()
+                    stopDrawing()
+                    createPreview(asset)
+            
+                    startDrawing()
+
+                    let renderPassDescriptor = view.currentRenderPassDescriptor
+                    renderPassDescriptor?.colorAttachments[0].loadAction = .load
+                    let renderEncoder = gameCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
+                    
+                    drawTexture(texture!.texture!, renderEncoder: renderEncoder!)
+                    renderEncoder?.endEncoding()
+                    
+                    gameCmdBuffer?.present(drawable)
+                    stopDrawing()
+
+                    return
+                }
+            }
+        }*/
+                
         if state == .Running {
             _Time.x += 1.0 / targetFPS
             //timeChanged.send(_Time.x)
