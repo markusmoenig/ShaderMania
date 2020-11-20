@@ -348,6 +348,9 @@ struct ContentView: View {
                     
                     Button(action: {
                         document.game.stop()
+                        if let asset = document.game.assetFolder.current {
+                            document.game.createPreview(asset)
+                        }
                         updateView.toggle()
                     }) {
                         Label("Stop", systemImage: "stop.fill")
