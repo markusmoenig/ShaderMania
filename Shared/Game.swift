@@ -257,7 +257,7 @@ public class Game       : ObservableObject
             if project!.resChanged {
                 if didSend == false {
                     didSend = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self.updateUI.send()
                         self.didSend = false
                     }

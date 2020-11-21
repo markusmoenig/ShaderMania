@@ -6,6 +6,7 @@
 //
 
 import MetalKit
+import CloudKit
 
 class AssetFolder       : Codable
 {
@@ -20,6 +21,18 @@ class AssetFolder       : Codable
     
     init()
     {
+        /*
+        CKContainer.default().requestApplicationPermission(.userDiscoverability) { (status, error) in
+                    CKContainer.default().fetchUserRecordID { (record, error) in
+                        CKContainer.default().discoverUserIdentity(withUserRecordID: record!, completionHandler: { (userID, error) in
+                            print(userID?.hasiCloudAccount)
+                            print(userID?.lookupInfo?.phoneNumber)
+                            print(userID?.lookupInfo?.emailAddress)
+                            print((userID?.nameComponents?.givenName)! + " " + (userID?.nameComponents?.familyName)!)
+                        })
+                    }
+                }
+        */
     }
     
     func setup(_ game: Game)

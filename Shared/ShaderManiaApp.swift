@@ -12,13 +12,16 @@ import Combine
 struct ShaderManiaApp: App {
     
     private let exportAsImage               = PassthroughSubject<Void, Never>()
-    //@State private var exportingImage       : Bool = false
+    private let help                        = PassthroughSubject<Void, Never>()
 
     var body: some Scene {
         DocumentGroup(newDocument: ShaderManiaDocument()) { file in
             ContentView(document: file.$document)
                 .onReceive(exportAsImage) { _ in
                     file.document.exportImage.send()
+                }
+                .onReceive(help) { _ in
+                    file.document.help.send()
                 }
         }
         .commands {
@@ -27,7 +30,7 @@ struct ShaderManiaApp: App {
             
             CommandGroup(replacing: .help) {
                 Button(action: {
-                    print("Help")
+                    help.send()
                 }) {
                     Text("Help")
                 }

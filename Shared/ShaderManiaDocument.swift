@@ -19,6 +19,7 @@ struct ShaderManiaDocument: FileDocument {
     @ObservedObject var game = Game()
     
     let exportImage          = PassthroughSubject<Void, Never>()
+    let help                 = PassthroughSubject<Void, Never>()
 
     init() {
     }

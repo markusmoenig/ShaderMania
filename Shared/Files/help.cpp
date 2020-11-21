@@ -1,6 +1,6 @@
 
 
-                                                                         
+
 typedef struct
 {
     float2              uv;         // UV coordinate 0..1

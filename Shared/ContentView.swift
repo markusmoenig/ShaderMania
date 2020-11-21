@@ -444,16 +444,8 @@ struct ContentView: View {
                         .opacity(0)
 
                     Button(action: {
-                        if helpIsVisible == false {
-                            document.game.scriptEditor!.activateHelpSession()
-                        } else {
-                            if let asset = document.game.assetFolder.current {
-                                document.game.assetFolder.select(asset.id)
-                            }
-                        }
-                        helpIsVisible.toggle()
+                        document.help.send()
                     }) {
-                        //Text(!helpIsVisible ? "Help" : "Hide")
                         Label("Help", systemImage: "questionmark")
                     }
                     .keyboardShortcut("h")
@@ -467,17 +459,28 @@ struct ContentView: View {
             //    timeString = String(format: "%.02f", value)
             //}
             
-            .onReceive(self.document.game.createPreview) { _ in
+            .onReceive(self.document.game.createPreview) { value in
                 if let asset = document.game.assetFolder.current {
                     document.game.createPreview(asset)
                 }
             }
             
-            .onReceive(self.document.exportImage) { _ in
+            .onReceive(self.document.help) { value in
+                if self.helpIsVisible == false {
+                    self.document.game.scriptEditor!.activateHelpSession()
+                } else {
+                    if let asset = document.game.assetFolder.current {
+                        self.document.game.assetFolder.select(asset.id)
+                    }
+                }
+                self.helpIsVisible.toggle()
+            }
+            
+            .onReceive(self.document.exportImage) { value in
                 exportingImage = true
             }
             
-            .onReceive(self.document.game.updateUI) { _ in
+            .onReceive(self.document.game.updateUI) { value in
                 updateView.toggle()
             }
         
