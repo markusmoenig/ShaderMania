@@ -147,8 +147,12 @@ struct ContentView: View {
     @Binding var document                   : ShaderManiaDocument
 
     @State private var showAssetNamePopover : Bool = false
-    @State private var assetName            : String    = ""
+    @State private var assetName            : String = ""
     
+    @State private var showCustomResPopover : Bool = false
+    @State private var customResWidth       : String = ""
+    @State private var customResHeight      : String = ""
+
     @State private var rightSideBarIsVisible: Bool = true
     
     @State private var showTextureItems     : Bool = true
@@ -271,6 +275,7 @@ struct ContentView: View {
                                 }
                             }
                         }
+                        Divider()
                         //DisclosureGroup("Final", isExpanded: $showShaderItems) {
                             ForEach(document.game.assetFolder.assets, id: \.id) { asset in
                                 if asset.type == .Shader {
@@ -339,33 +344,6 @@ struct ContentView: View {
                     Text(timeString)
                         .frame(width: 50, alignment: .leading)
                     */
-
-                    // Game Controls
-                    Button(action: {
-                        document.game.stop()
-                        document.game.start()
-                        helpIsVisible = false
-                        updateView.toggle()
-                    })
-                    {
-                        Label("Run", systemImage: "play.fill")
-                    }
-                    .keyboardShortcut("r")
-                    
-                    Button(action: {
-                        document.game.stop()
-                        if let asset = document.game.assetFolder.current {
-                            document.game.createPreview(asset)
-                        }
-                        updateView.toggle()
-                    }) {
-                        Label("Stop", systemImage: "stop.fill")
-                    }.keyboardShortcut("t")
-                    .disabled(document.game.state == .Idle)
-                    
-                    Divider()
-                        .padding(.horizontal, 20)
-                        .opacity(0)
                     
                     Menu {
                         Section(header: Text("Preview")) {
@@ -384,6 +362,27 @@ struct ContentView: View {
                                 updateView.toggle()
                             })
                             .keyboardShortcut("3")
+                            Button("Set Custom", action: {
+                                
+                                if let project = document.game.project {
+                                    customResWidth = String(project.size.x)
+                                    customResHeight = String(project.size.y)
+                                }
+                                
+                                showCustomResPopover = true
+                                updateView.toggle()
+                            })
+                            
+                            Button("Clear Custom", action: {
+                                
+                                if let final = document.game.assetFolder.getAsset("Final", .Shader) {
+                                    final.size = nil
+                                    if let asset = document.game.assetFolder.current {
+                                        document.game.createPreview(asset)
+                                    }
+                                }
+                                updateView.toggle()
+                            })
                         }
                         Section(header: Text("Opacity")) {
                             Button("Opacity Off", action: {
@@ -409,9 +408,36 @@ struct ContentView: View {
                         }
                     }
                     label: {
-                        //Text("Preview")
-                        Label("View", systemImage: "viewfinder")
+                        Text("\(document.game.project!.size.x) x \(document.game.project!.size.y)")
+                        //Label("View", systemImage: "viewfinder")
                     }
+                    
+                    Divider()
+                        .padding(.horizontal, 20)
+                        .opacity(0)
+                    
+                    // Game Controls
+                    Button(action: {
+                        document.game.stop()
+                        document.game.start()
+                        helpIsVisible = false
+                        updateView.toggle()
+                    })
+                    {
+                        Label("Run", systemImage: "play.fill")
+                    }
+                    .keyboardShortcut("r")
+                    
+                    Button(action: {
+                        document.game.stop()
+                        if let asset = document.game.assetFolder.current {
+                            document.game.createPreview(asset)
+                        }
+                        updateView.toggle()
+                    }) {
+                        Label("Stop", systemImage: "stop.fill")
+                    }.keyboardShortcut("t")
+                    .disabled(document.game.state == .Idle)
                     
                     Divider()
                         .padding(.horizontal, 20)
@@ -441,14 +467,18 @@ struct ContentView: View {
             //    timeString = String(format: "%.02f", value)
             //}
             
-            .onReceive(self.document.game.createPreview) { value in
+            .onReceive(self.document.game.createPreview) { _ in
                 if let asset = document.game.assetFolder.current {
                     document.game.createPreview(asset)
                 }
             }
             
-            .onReceive(self.document.exportImage) { value in
+            .onReceive(self.document.exportImage) { _ in
                 exportingImage = true
+            }
+            
+            .onReceive(self.document.game.updateUI) { _ in
+                updateView.toggle()
             }
         
             if rightSideBarIsVisible == true {
@@ -482,6 +512,40 @@ struct ContentView: View {
                     .frame(minWidth: 160, idealWidth: 160, maxWidth: 160)
                     .layoutPriority(0)
                     .animation(.easeInOut)
+                    
+                    // Custom Resolution Popover
+                    .popover(isPresented: self.$showCustomResPopover,
+                             arrowEdge: .top
+                    ) {
+                        VStack(alignment: .leading) {
+                            Text("Resolution:")
+                            TextField("Width", text: $customResWidth, onEditingChanged: { (changed) in
+                                if let width = Int(customResWidth), width > 0 {
+                                    if let height = Int(customResHeight), height > 0 {
+                                        if let final = document.game.assetFolder.getAsset("Final", .Shader) {
+                                            final.size = SIMD2<Int>(width, height)
+                                            if let asset = document.game.assetFolder.current {
+                                                document.game.createPreview(asset)
+                                            }
+                                        }
+                                    }
+                                }
+                            })
+                            TextField("Height", text: $customResHeight, onEditingChanged: { (changed) in
+                                if let width = Int(customResWidth), width > 0 {
+                                    if let height = Int(customResHeight), height > 0 {
+                                        if let final = document.game.assetFolder.getAsset("Final", .Shader) {
+                                            final.size = SIMD2<Int>(width, height)
+                                            if let asset = document.game.assetFolder.current {
+                                                document.game.createPreview(asset)
+                                            }
+                                        }
+                                    }
+                                }
+                            })
+                            .frame(minWidth: 200)
+                        }.padding()
+                    }
                     
                     // Import Image
                     .fileImporter(

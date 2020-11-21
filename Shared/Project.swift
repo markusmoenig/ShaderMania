@@ -25,6 +25,8 @@ class Project
     
     var textureCache    : [UUID:MTLTexture] = [:]
     var textureLoader   : MTKTextureLoader? = nil
+    
+    var resChanged      : Bool = false
 
     init()
     {
@@ -62,6 +64,10 @@ class Project
 
         if let final = assetFolder.getAsset("Final", .Shader) {
             size = viewSize
+            
+            if let customSize = final.size {
+                size = customSize
+            }
 
             // Make sure texture is of size size
             if texture == nil || texture!.width != size.x || texture!.height != size.y {
@@ -71,6 +77,7 @@ class Project
                 }
                 texture = allocateTexture(device, width: size.x, height: size.y)
                 clear(texture!)
+                resChanged = true
             }
             checkTextures(device)
             
@@ -182,6 +189,7 @@ class Project
             commandQueue = device.makeCommandQueue()
         }
         commandBuffer = commandQueue!.makeCommandBuffer()
+        resChanged = false
     }
     
     func stopDrawing(syncTexture: MTLTexture? = nil, waitUntilCompleted: Bool = false)

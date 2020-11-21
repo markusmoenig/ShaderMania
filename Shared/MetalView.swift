@@ -265,7 +265,6 @@ struct MetalView: NSViewRepresentable {
         }
         
         func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-            //parent.game.assetFolder.createPreview()
         }
         
         func draw(in view: MTKView) {
@@ -301,9 +300,7 @@ struct MetalView: UIViewRepresentable {
         mtkView.drawableSize = mtkView.frame.size
         mtkView.enableSetNeedsDisplay = true
         mtkView.isPaused = true
-        
-        //MetalView.game = Game(mtkView)
-        
+                
         game.setupView(mtkView)
         
         return mtkView

@@ -301,6 +301,8 @@ class Asset         : Codable, Equatable
     var data        : [Data] = []
     var dataIndex   : Int = 0
     var dataScale   : Double = 1
+    
+    var size        : SIMD2<Int>? = nil
 
     // For the script based assets
     var scriptName  = ""

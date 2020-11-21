@@ -64,7 +64,7 @@ class ScriptEditor
     
     func activateHelpSession()
     {
-        game.showingDebugInfo = true
+        game.showingHelp = true
         webView.evaluateJavaScript(
             """
             helpSession.setValue(`\(helpText)`)
@@ -165,7 +165,7 @@ class ScriptEditor
     
     func setAssetSession(_ asset: Asset)
     {
-        game.showingDebugInfo = false
+        game.showingHelp = false
         func setSession()
         {
             let cmd = """

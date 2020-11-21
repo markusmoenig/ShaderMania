@@ -55,9 +55,8 @@ public class Game       : ObservableObject
     var previewFactor   : CGFloat = 4
     var previewOpacity  : Double = 0.5
     
-    var contextText     : String = ""
-    var contextKey      : String = ""
-    let contextTextChanged = PassthroughSubject<String, Never>()
+    let updateUI        = PassthroughSubject<Void, Never>()
+    var didSend         = false
     
     let timeChanged     = PassthroughSubject<Float, Never>()
 
@@ -72,7 +71,7 @@ public class Game       : ObservableObject
     var localAudioPlayers: [String:AVAudioPlayer] = [:]
     var globalAudioPlayers: [String:AVAudioPlayer] = [:]
     
-    var showingDebugInfo: Bool = false
+    var showingHelp     : Bool = false
     
     var frameworkId     : String? = nil
     
@@ -254,6 +253,16 @@ public class Game       : ObservableObject
             renderEncoder?.endEncoding()
             
             project!.commandBuffer!.present(drawable)
+            
+            if project!.resChanged {
+                if didSend == false {
+                    didSend = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        self.updateUI.send()
+                        self.didSend = false
+                    }
+                }
+            }
         }
         project?.stopDrawing()
     }
