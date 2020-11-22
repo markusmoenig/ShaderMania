@@ -241,11 +241,13 @@ class ShaderCompiler
             float2          size;
             float           time;
 
+            float4          outColor;
+
             texture2d<float> slot0;
             texture2d<float> slot1;
             texture2d<float> slot2;
             texture2d<float> slot3;
-        } DataIn;
+        } Data;
 
         typedef struct
         {
@@ -275,7 +277,7 @@ class ShaderCompiler
             return out;
         }
         
-        float4 mainImage(DataIn);
+        void mainImage(thread Data &data);
 
         fragment float4 __shaderMain( RasterizerData in [[stage_in]],
                                       constant __MetalData &metalData [[buffer(0)]],
@@ -287,17 +289,19 @@ class ShaderCompiler
             float2 uv = in.textureCoordinate;
             float2 size = in.viewportSize;
 
-            DataIn dataIn;
-            dataIn.uv = uv;
-            dataIn.size = size;
-            dataIn.time = metalData.time;
-            dataIn.slot0 = slot0;
-            dataIn.slot1 = slot1;
-            dataIn.slot2 = slot2;
-            dataIn.slot3 = slot3;
+            Data data;
+            data.uv = uv;
+            data.size = size;
+            data.time = metalData.time;
+            data.outColor = float4(0,0,0,1);
 
-            float4 color = mainImage(dataIn);
-            return color;
+            data.slot0 = slot0;
+            data.slot1 = slot1;
+            data.slot2 = slot2;
+            data.slot3 = slot3;
+
+            mainImage(data);
+            return data.outColor;
         }
         
         """
