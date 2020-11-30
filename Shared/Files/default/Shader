@@ -1,15 +1,6 @@
 
-/**
-* typedef struct
-* {
-*     float2          uv;   // UV coordinate 0..1
-*     float2          size; // Viewport size
-*     float           time; // Global time
-* } DataIn;
-**/
-
-float4 mainImage( DataIn in )
+void mainImage(thread Data &data)
 {
 
-    return float4(in.uv, 0, 1);
+    data.outColor = float4(in.uv, 0, 1);
 }

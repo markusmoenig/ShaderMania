@@ -39,6 +39,14 @@ class AssetFolder       : Codable
     {
         self.game = game
         
+        guard let commonPath = Bundle.main.path(forResource: "Common", ofType: "", inDirectory: "Files/default") else {
+            return
+        }
+        
+        if let value = try? String(contentsOfFile: commonPath, encoding: String.Encoding.utf8) {
+            assets.append(Asset(type: .Common, name: "Common", value: value))
+        }
+        
         guard let path = Bundle.main.path(forResource: "Shader", ofType: "", inDirectory: "Files/default") else {
             return
         }
@@ -216,7 +224,12 @@ class AssetFolder       : Codable
             if asset.id == id {
                 asset.value = value
                 if game.state == .Idle {
-                    assetCompile(asset)
+                    if asset.type == .Common {
+                        assetCompile(asset)
+                        //assetCompileAll()
+                    } else {
+                        assetCompile(asset)
+                    }
                 }
             }
         }
@@ -225,7 +238,7 @@ class AssetFolder       : Codable
     /// Compiles the Buffer or Shader asset
     func assetCompile(_ asset: Asset)
     {
-        if asset.type == .Shader || asset.type == .Buffer {
+        if asset.type == .Shader || asset.type == .Buffer || asset.type == .Common {
             game.shaderCompiler.compile(asset: asset, cb: { (shader, errors) in
                 if shader == nil {
                     if Thread.isMainThread {
@@ -302,7 +315,7 @@ class AssetFolder       : Codable
 class Asset         : Codable, Equatable
 {
     enum AssetType  : Int, Codable {
-        case Buffer, Image, Shader, Audio, Texture
+        case Buffer, Image, Shader, Audio, Texture, Common
     }
     
     var type        : AssetType = .Shader

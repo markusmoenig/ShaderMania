@@ -94,20 +94,8 @@ class ScriptEditor
             asset.scriptName = "session" + String(sessions)
             sessions += 1
         }
-                
-        if asset.type == .Buffer {
-            webView.evaluateJavaScript(
-                """
-                var \(asset.scriptName) = ace.createEditSession(`\(asset.value)`)
-                editor.setSession(\(asset.scriptName))
-                editor.session.setMode("ace/mode/c_cpp");
-                """, completionHandler: { (value, error ) in
-                    if let cb = cb {
-                        cb()
-                    }
-             })
-        } else
-        if asset.type == .Shader {
+
+        if asset.type == .Shader || asset.type == .Common || asset.type == .Buffer {
             webView.evaluateJavaScript(
                 """
                 var \(asset.scriptName) = ace.createEditSession(`\(asset.value)`)

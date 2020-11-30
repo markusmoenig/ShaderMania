@@ -20,6 +20,7 @@ class Project
     
     var size            = SIMD2<Int>(0,0)
     var time            = Float(0)
+    var frame           = UInt32(0)
 
     var assetFolder     : AssetFolder? = nil
     
@@ -50,7 +51,7 @@ class Project
         textureCache = [:]
     }
     
-    func render(assetFolder: AssetFolder, device: MTLDevice, time: Float, viewSize: SIMD2<Int>, breakAsset: Asset? = nil) -> MTLTexture?
+    func render(assetFolder: AssetFolder, device: MTLDevice, time: Float, frame: UInt32, viewSize: SIMD2<Int>, breakAsset: Asset? = nil) -> MTLTexture?
     {
         self.assetFolder = assetFolder
         self.time = time
@@ -161,6 +162,7 @@ class Project
 
         var metalData = MetalData()
         metalData.time = time
+        metalData.frame = frame
         renderEncoder.setFragmentBytes(&metalData, length: MemoryLayout<MetalData>.stride, index: 0)
         
         for index in 1..<5 {

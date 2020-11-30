@@ -44,9 +44,17 @@ class ShaderCompiler
     
     func compile(asset: Asset, cb: @escaping (Shader?, [CompileError]) -> ())
     {
-        let code = getHeaderCode()
+        var code = getHeaderCode()
         
-        var ns = self.getHeaderCode() as NSString
+        if asset.type != .Common {
+            for asset in game.assetFolder.assets {
+                if asset.type == .Common {
+                    code += asset.value
+                }
+            }
+        }
+        
+        var ns = code as NSString
         var lineNumbers  : Int32 = 0
         
         ns.enumerateLines { (str, _) in
@@ -233,6 +241,7 @@ class ShaderCompiler
         typedef struct
         {
             float           time;
+            unsigned int    frame;
         } __MetalData;
 
         typedef struct
@@ -240,6 +249,7 @@ class ShaderCompiler
             float2          uv;
             float2          size;
             float           time;
+            unsigned int    frame;
 
             float4          outColor;
 
@@ -293,6 +303,7 @@ class ShaderCompiler
             data.uv = uv;
             data.size = size;
             data.time = metalData.time;
+            data.frame = metalData.frame;
             data.outColor = float4(0,0,0,1);
 
             data.slot0 = slot0;

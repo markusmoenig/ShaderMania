@@ -276,16 +276,16 @@ struct ContentView: View {
                             }
                         }
                         Divider()
-                        //DisclosureGroup("Final", isExpanded: $showShaderItems) {
+                            //DisclosureGroup("Final", isExpanded: $showShaderItems) {
                             ForEach(document.game.assetFolder.assets, id: \.id) { asset in
-                                if asset.type == .Shader {
+                                if asset.type == .Shader || asset.type == .Common {
                                     Button(action: {
                                         document.game.assetFolder.select(asset.id)
                                         document.game.createPreview(asset)
                                         updateView.toggle()
                                     })
                                     {
-                                        Label(asset.name, systemImage: "fx")
+                                        Label(asset.name, systemImage: asset.type == .Shader ? "fx" : "")
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .contentShape(Rectangle())
                                     }
@@ -584,7 +584,7 @@ struct ContentView: View {
                             let url = try result.get()
                             let game = document.game
                             if let project = game.project {
-                                if let texture = project.render(assetFolder: game.assetFolder, device: game.device, time: 0, viewSize: SIMD2<Int>(Int(game.view.frame.width), Int(game.view.frame.height))) {
+                                if let texture = project.render(assetFolder: game.assetFolder, device: game.device, time: 0, frame: 0, viewSize: SIMD2<Int>(Int(game.view.frame.width), Int(game.view.frame.height))) {
                                     
                                     project.stopDrawing(syncTexture: texture, waitUntilCompleted: true)
                                     

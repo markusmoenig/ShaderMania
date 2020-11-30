@@ -46,7 +46,8 @@ public class Game       : ObservableObject
     var fonts           : [Font] = []
     
     var _Time           = Float1(0)
-    var _Aspect          = Float2(1,1)
+    var _Aspect         = Float2(1,1)
+    var _Frame          = UInt32(0)
     var targetFPS       : Float = 60
     
     var gameAsset       : Asset? = nil
@@ -160,6 +161,7 @@ public class Game       : ObservableObject
             
         _Time.x = 0
         targetFPS = 60
+        _Frame = 0
     }
     
     func stop()
@@ -181,6 +183,7 @@ public class Game       : ObservableObject
         view.isPaused = true
         
         _Time.x = 0
+        _Frame = 0
         //timeChanged.send(_Time.x)
     }
     
@@ -239,11 +242,11 @@ public class Game       : ObservableObject
                 }
             }
         } else {
-            _Time.x += 1.0 / targetFPS
+            //_Time.x += 1.0 / targetFPS
             //timeChanged.send(_Time.x)
         }
                 
-        if let texture = project?.render(assetFolder: assetFolder, device: device, time: _Time.x, viewSize: SIMD2<Int>(Int(view.frame.width), Int(view.frame.height)), breakAsset: state == .Idle ? assetFolder.current : nil) {
+        if let texture = project?.render(assetFolder: assetFolder, device: device, time: _Time.x, frame: _Frame, viewSize: SIMD2<Int>(Int(view.frame.width), Int(view.frame.height)), breakAsset: state == .Idle ? assetFolder.current : nil) {
             
             let renderPassDescriptor = view.currentRenderPassDescriptor
             renderPassDescriptor?.colorAttachments[0].loadAction = .load
@@ -265,6 +268,11 @@ public class Game       : ObservableObject
             }
         }
         project?.stopDrawing()
+        
+        if state == .Running {
+            _Time.x += 1.0 / targetFPS
+            _Frame += 1
+        }
     }
     
     func startDrawing()
