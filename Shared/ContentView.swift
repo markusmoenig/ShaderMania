@@ -285,7 +285,7 @@ struct ContentView: View {
                                         updateView.toggle()
                                     })
                                     {
-                                        Label(asset.name, systemImage: asset.type == .Shader ? "fx" : "")
+                                        Label(asset.name, systemImage: asset.type == .Shader ? "fx" : "fx")
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .contentShape(Rectangle())
                                     }

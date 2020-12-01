@@ -44,7 +44,7 @@ class ShaderCompiler
     
     func compile(asset: Asset, cb: @escaping (Shader?, [CompileError]) -> ())
     {
-        var code = getHeaderCode()
+        var code = getHeaderCode(noOp: asset.type == .Common)
         
         if asset.type != .Common {
             for asset in game.assetFolder.assets {
@@ -164,21 +164,21 @@ class ShaderCompiler
         }
                 
         let compiledCB : MTLNewLibraryCompletionHandler = { (library, error) in
-            if let error = error, library == nil {
-                var errors: [CompileError] = []
-                
-                print(error.localizedDescription)
+            
+            var errors: [CompileError] = []
+            
+            if let error = error {
                 let str = error.localizedDescription
                 let arr = str.components(separatedBy: "program_source:")
                 for str in arr {
-                    if str.contains("error:") || str.contains("warning:") {
+                    if str.starts(with: "Compilation failed:") == false && (str.contains("error:") || str.contains("warning:")) {
                         let arr = str.split(separator: ":")
                         let errorArr = String(arr[3].trimmingCharacters(in: .whitespaces)).split(separator: "\n")
                         var errorText = ""
                         if errorArr.count > 0 {
                             errorText = String(errorArr[0])
                         }
-                        if arr.count == 4 {
+                        if arr.count >= 4 {
                             var er = CompileError()
                             er.asset = asset
                             er.line = Int32(arr[0])! - lineNumbers - 1
@@ -189,7 +189,10 @@ class ShaderCompiler
                         }
                     }
                 }
-                
+            }
+            
+            if let error = error, library == nil {
+                print(error.localizedDescription)
                 cb(nil, errors)
             } else
             if let library = library {
@@ -215,7 +218,7 @@ class ShaderCompiler
                 }
 
                 if shader.isValid == true {
-                    cb(shader, [])
+                    cb(shader, errors)
                 }
             }
         }
@@ -223,7 +226,7 @@ class ShaderCompiler
         game.device.makeLibrary(source: parsedCode, options: nil, completionHandler: compiledCB)
     }
     
-    func getHeaderCode() -> String
+    func getHeaderCode(noOp: Bool = false) -> String
     {
         return """
         
@@ -311,7 +314,7 @@ class ShaderCompiler
             data.slot2 = slot2;
             data.slot3 = slot3;
 
-            mainImage(data);
+            \(noOp ? "//" : "")mainImage(data);
             return data.outColor;
         }
         

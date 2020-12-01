@@ -254,11 +254,13 @@ class AssetFolder       : Codable
                     
                     if Thread.isMainThread {
                         self.game.createPreview(asset)
-                        self.game.scriptEditor?.clearAnnotations()
+                        //self.game.scriptEditor?.clearAnnotations()
+                        self.game.scriptEditor?.setErrors(errors)
                     } else {
                         DispatchQueue.main.sync {
                             self.game.createPreview(asset)
-                            self.game.scriptEditor?.clearAnnotations()
+                            //self.game.scriptEditor?.clearAnnotations()
+                            self.game.scriptEditor?.setErrors(errors)
                         }
                     }
                 }

@@ -1,5 +1,12 @@
 
+// ShaderMania 1.0
 
+// To learn more about shader development:
+
+// The Book Of Shaders                  https://thebookofshaders.com
+// The Art of Code YouTube Channel      https://www.youtube.com/channel/UCcAlTqd9zID6aNX3TzwxJXg
+
+// Incoming Data structure
 
 typedef struct
 {
@@ -15,3 +22,13 @@ typedef struct
     texture2d<float>    slot2;
     texture2d<float>    slot3;
 } DataIn;
+
+/*
+ *
+ * To read from a texture slot:
+ *
+ *  constexpr sampler textureSampler(mag_filter::linear, min_filter::linear);
+ *
+ *  float4 sample = data.slot0.sample(textureSampler, data.uv);
+ *
+ */
