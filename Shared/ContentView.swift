@@ -338,12 +338,6 @@ struct ContentView: View {
             }
             .toolbar {
                 ToolbarItemGroup(placement: .automatic) {
-                           
-                    /*
-                    Text("Time")
-                    Text(timeString)
-                        .frame(width: 50, alignment: .leading)
-                    */
                     
                     Menu {
                         Section(header: Text("Preview")) {

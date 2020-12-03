@@ -130,6 +130,17 @@ class ScriptEditor
          })
     }
     
+    func setSilentMode(_ silent: Bool = false)
+    {
+        webView.evaluateJavaScript(
+            """
+            editor.setOptions({
+                cursorStyle: \(silent ? "'wide'" : "'ace'") // "ace"|"slim"|"smooth"|"wide"
+            });
+            """, completionHandler: { (value, error) in
+         })
+    }
+    
     func getAssetValue(_ asset: Asset,_ cb: @escaping (String)->() )
     {
         webView.evaluateJavaScript(

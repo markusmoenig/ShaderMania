@@ -23,6 +23,8 @@ public class Game       : ObservableObject
     var texture         : Texture2D? = nil
     var metalStates     : MetalStates!
     
+    var file            : File? = nil
+
     var viewportSize    : vector_uint2
     var scaleFactor     : Float
     
@@ -90,6 +92,8 @@ public class Game       : ObservableObject
         scaleFactor = Float(UIScreen.main.scale)
         #endif
                 
+        file = File()
+
         assetFolder = AssetFolder()
         assetFolder.setup(self)
         
@@ -162,6 +166,10 @@ public class Game       : ObservableObject
         _Time.x = 0
         targetFPS = 60
         _Frame = 0
+        
+        //if let scriptEditor = scriptEditor {
+        //    scriptEditor.setSilentMode(true)
+        //}
     }
     
     func stop()
@@ -169,9 +177,9 @@ public class Game       : ObservableObject
         clearLocalAudio()
         clearGlobalAudio()
         
-        if let scriptEditor = scriptEditor {
-            scriptEditor.setReadOnly(false)
-        }
+        //if let scriptEditor = scriptEditor {
+        //    scriptEditor.setSilentMode(false)
+        //}
         
         gameAsset = nil
                 

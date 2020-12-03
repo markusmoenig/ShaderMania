@@ -59,8 +59,8 @@ class Project
         startDrawing(device)
 
         if black == nil {
-            texture = allocateTexture(device, width: 10, height: 10)
-            clear(texture!)
+            black = allocateTexture(device, width: 10, height: 10)
+            clear(black!)
         }
 
         if let final = assetFolder.getAsset("Final", .Shader) {

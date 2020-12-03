@@ -21,7 +21,7 @@ typedef struct
     texture2d<float>    slot1;
     texture2d<float>    slot2;
     texture2d<float>    slot3;
-} DataIn;
+} Data;
 
 /*
  *
