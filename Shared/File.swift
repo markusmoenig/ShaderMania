@@ -17,7 +17,6 @@ class File : NSObject
     {
         super.init()
         
-        //print(containerUrl)
         // --- Check for iCloud container existence
         if let url = self.containerUrl, !FileManager.default.fileExists(atPath: url.path, isDirectory: nil) {
             do {
@@ -53,7 +52,7 @@ class File : NSObject
             
             /*
             do {
-                let mapHelpIndex = try FileManager.default.contentsOfDirectory(atPath: url.path)
+                let mapHelpIndex = try FileManager.default.contentsOfDirectory(atPath: containerUrl!.path)
                 print(mapHelpIndex)
             } catch {
             }*/
