@@ -1,5 +1,7 @@
 # ShaderMania
 
+[![AppStore](images/appstore.svg)](https://apps.apple.com/us/app/shadermania/id1541065830)
+
 ![screenshot](images/screen.png)
 
 ShaderMania is an editor for procedural Metal fragment shaders featuring realtime preview and playback.
