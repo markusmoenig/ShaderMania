@@ -275,29 +275,29 @@ struct ContentView: View {
                                 }
                             }
                         }
+                        #if os(macOS)
                         Divider()
-                            //DisclosureGroup("Final", isExpanded: $showShaderItems) {
-                            ForEach(document.game.assetFolder.assets, id: \.id) { asset in
-                                if asset.type == .Shader || asset.type == .Common {
-                                    Button(action: {
-                                        document.game.assetFolder.select(asset.id)
-                                        document.game.createPreview(asset)
-                                        updateView.toggle()
-                                    })
-                                    {
-                                        Label(asset.name, systemImage: asset.type == .Shader ? "fx" : "fx")
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .contentShape(Rectangle())
-                                    }
-                                    .buttonStyle(PlainButtonStyle())
-                                    .listRowBackground(Group {
-                                        if document.game.assetFolder.current!.id == asset.id {
-                                            Color.gray.mask(RoundedRectangle(cornerRadius: 4))
-                                        } else { Color.clear }
-                                    })
+                        #endif
+                        ForEach(document.game.assetFolder.assets, id: \.id) { asset in
+                            if asset.type == .Shader || asset.type == .Common {
+                                Button(action: {
+                                    document.game.assetFolder.select(asset.id)
+                                    document.game.createPreview(asset)
+                                    updateView.toggle()
+                                })
+                                {
+                                    Label(asset.name, systemImage: asset.type == .Shader ? "fx" : "fx")
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .contentShape(Rectangle())
                                 }
+                                .buttonStyle(PlainButtonStyle())
+                                .listRowBackground(Group {
+                                    if document.game.assetFolder.current!.id == asset.id {
+                                        Color.gray.mask(RoundedRectangle(cornerRadius: 4))
+                                    } else { Color.clear }
+                                })
                             }
-                        //}
+                        }                        
                     }
                     .layoutPriority(0)
                 }
