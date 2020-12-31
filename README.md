@@ -10,7 +10,7 @@ macOS Big Sur or iOS 14.x is required.
 
 Features:
 
-* Realtime syntax check and compilation of your shaders with realtime preview.
+* Syntax check and compilation of your shaders with realtime preview.
 * Render to custom resolutions and export your shader output to PNG.
 * Display of syntax errors and warnings.
 * Add textures to your project by importing images.
