@@ -321,6 +321,10 @@ struct ContentView: View {
                             .zIndex(0)
                             .frame(maxWidth: .infinity)
                             .layoutPriority(2)
+                            
+                            .onReceive(self.document.game.contentChanged) { state in
+                                document.updated.toggle()
+                            }
                         }
                         
                         MetalView(document.game)

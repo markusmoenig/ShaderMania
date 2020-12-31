@@ -223,6 +223,7 @@ class AssetFolder       : Codable
         for asset in assets {
             if asset.id == id {
                 asset.value = value
+                game.contentChanged.send()
                 if game.state == .Idle {
                     if asset.type == .Common {
                         assetCompile(asset)

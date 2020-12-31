@@ -16,7 +16,9 @@ extension UTType {
 }
 
 struct ShaderManiaDocument: FileDocument {
-    @ObservedObject var game = Game()
+    
+    var game = Game()
+    var updated = false
     
     let exportImage          = PassthroughSubject<Void, Never>()
     let help                 = PassthroughSubject<Void, Never>()
