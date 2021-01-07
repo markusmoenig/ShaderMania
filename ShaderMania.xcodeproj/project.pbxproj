@@ -44,6 +44,8 @@
 		2B0EEABB2566035700C84C6C /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEABA2566035700C84C6C /* Project.swift */; };
 		2B0EEABC2566035700C84C6C /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEABA2566035700C84C6C /* Project.swift */; };
 		2B0EEAC3256619D000C84C6C /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B0EEAC2256619D000C84C6C /* CloudKit.framework */; };
+		2B3D4C7925A68ECA00D2F8EA /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D4C7825A68ECA00D2F8EA /* Views.swift */; };
+		2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D4C7825A68ECA00D2F8EA /* Views.swift */; };
 		2B77B7BB25773978002D99C0 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B77B7BA25773978002D99C0 /* File.swift */; };
 		2B77B7BC25773978002D99C0 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B77B7BA25773978002D99C0 /* File.swift */; };
 /* End PBXBuildFile section */
@@ -74,6 +76,7 @@
 		2B0EEAA62565DFA800C84C6C /* Files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Files; sourceTree = "<group>"; };
 		2B0EEABA2566035700C84C6C /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 		2B0EEAC2256619D000C84C6C /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		2B3D4C7825A68ECA00D2F8EA /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		2B77B7BA25773978002D99C0 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -113,6 +116,7 @@
 				2B0EEA4E2565DF3900C84C6C /* ShaderManiaApp.swift */,
 				2B0EEA4F2565DF3900C84C6C /* ShaderManiaDocument.swift */,
 				2B0EEA772565DF7800C84C6C /* ContentView.swift */,
+				2B3D4C7825A68ECA00D2F8EA /* Views.swift */,
 				2B0EEA782565DF7800C84C6C /* Asset.swift */,
 				2B0EEA7C2565DF7800C84C6C /* Game.swift */,
 				2B0EEA7D2565DF7800C84C6C /* MathLibrary.swift */,
@@ -283,6 +287,7 @@
 				2B0EEA8D2565DF7800C84C6C /* MathLibrary.swift in Sources */,
 				2B0EEA852565DF7800C84C6C /* Asset.swift in Sources */,
 				2B0EEA892565DF7800C84C6C /* Utils.swift in Sources */,
+				2B3D4C7925A68ECA00D2F8EA /* Views.swift in Sources */,
 				2B0EEA872565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA02565DF9A00C84C6C /* Classes.swift in Sources */,
 				2B0EEA832565DF7800C84C6C /* ContentView.swift in Sources */,
@@ -307,6 +312,7 @@
 				2B0EEA8E2565DF7800C84C6C /* MathLibrary.swift in Sources */,
 				2B0EEA862565DF7800C84C6C /* Asset.swift in Sources */,
 				2B0EEA8A2565DF7800C84C6C /* Utils.swift in Sources */,
+				2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */,
 				2B0EEA882565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA12565DF9A00C84C6C /* Classes.swift in Sources */,
 				2B0EEA842565DF7800C84C6C /* ContentView.swift in Sources */,
@@ -447,6 +453,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.01;
 				PRODUCT_BUNDLE_IDENTIFIER = com.moenig.shadermania;
 				PRODUCT_NAME = ShaderMania;
 				SDKROOT = iphoneos;
@@ -470,6 +477,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.01;
 				PRODUCT_BUNDLE_IDENTIFIER = com.moenig.shadermania;
 				PRODUCT_NAME = ShaderMania;
 				SDKROOT = iphoneos;
@@ -498,6 +506,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MARKETING_VERSION = 1.01;
 				PRODUCT_BUNDLE_IDENTIFIER = com.moenig.shadermania;
 				PRODUCT_NAME = ShaderMania;
 				SDKROOT = macosx;
@@ -524,6 +533,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MARKETING_VERSION = 1.01;
 				PRODUCT_BUNDLE_IDENTIFIER = com.moenig.shadermania;
 				PRODUCT_NAME = ShaderMania;
 				SDKROOT = macosx;
