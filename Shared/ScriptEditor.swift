@@ -23,20 +23,20 @@ import Combine
 class ScriptEditor
 {
     var webView         : WKWebView
-    var game            : Game
+    var core            : Core
     var sessions        : Int = 0
     var colorScheme     : ColorScheme
     
     var helpText        : String = ""
     
-    init(_ view: WKWebView, _ game: Game,_ colorScheme: ColorScheme)
+    init(_ view: WKWebView, _ core: Core,_ colorScheme: ColorScheme)
     {
         self.webView = view
-        self.game = game
+        self.core = core
         self.colorScheme = colorScheme
         
-        if let asset = game.assetFolder.getAsset("Final", .Shader) {
-            game.assetFolder.select(asset.id)
+        if let asset = core.assetFolder.getAsset("Final", .Shader) {
+            core.assetFolder.select(asset.id)
             createSession(asset)
             setTheme(colorScheme)
         }
@@ -64,7 +64,7 @@ class ScriptEditor
     
     func activateHelpSession()
     {
-        game.showingHelp = true
+        core.showingHelp = true
         webView.evaluateJavaScript(
             """
             helpSession.setValue(`\(helpText)`)
@@ -164,7 +164,7 @@ class ScriptEditor
     
     func setAssetSession(_ asset: Asset)
     {
-        game.showingHelp = false
+        core.showingHelp = false
         func setSession()
         {
             let cmd = """
@@ -295,11 +295,11 @@ class ScriptEditor
     
     func updated()
     {
-        if let asset = game.assetFolder.current {
+        if let asset = core.assetFolder.current {
             getAssetValue(asset, { (value) in
-                self.game.assetFolder.assetUpdated(id: asset.id, value: value)
+                self.core.assetFolder.assetUpdated(id: asset.id, value: value)
                 //self.getChangeDelta({ (from, to) in
-                //    self.game.assetFolder.assetUpdated(id: asset.id, value: value, deltaStart: from, deltaEnd: to)
+                //    self.core.assetFolder.assetUpdated(id: asset.id, value: value, deltaStart: from, deltaEnd: to)
                 //})
             })
         }
@@ -316,7 +316,7 @@ class WebViewModel: ObservableObject {
 #if os(OSX)
 struct SwiftUIWebView: NSViewRepresentable {
     public typealias NSViewType = WKWebView
-    var game        : Game!
+    var core        : Core!
     var colorScheme : ColorScheme
 
     private let webView: WKWebView = WKWebView()
@@ -338,22 +338,22 @@ struct SwiftUIWebView: NSViewRepresentable {
     public func updateNSView(_ nsView: WKWebView, context: NSViewRepresentableContext<SwiftUIWebView>) { }
 
     public func makeCoordinator() -> Coordinator {
-        return Coordinator(game, colorScheme)
+        return Coordinator(core, colorScheme)
     }
     
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         
-        private var game        : Game
+        private var core        : Core
         private var colorScheme : ColorScheme
 
-        init(_ game: Game,_ colorScheme: ColorScheme) {
-            self.game = game
+        init(_ core: Core,_ colorScheme: ColorScheme) {
+            self.core = core
             self.colorScheme = colorScheme
         }
         
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if message.name == "jsHandler" {
-                if let scriptEditor = game.scriptEditor {
+                if let scriptEditor = core.scriptEditor {
                     scriptEditor.updated()
                 }
             }
@@ -365,7 +365,7 @@ struct SwiftUIWebView: NSViewRepresentable {
 
         //After the webpage is loaded, assign the data in WebViewModel class
         public func webView(_ web: WKWebView, didFinish: WKNavigation!) {
-            game.scriptEditor = ScriptEditor(web, game, colorScheme)
+            core.scriptEditor = ScriptEditor(web, core, colorScheme)
             web.isHidden = false
         }
 
@@ -379,7 +379,7 @@ struct SwiftUIWebView: NSViewRepresentable {
 #else
 struct SwiftUIWebView: UIViewRepresentable {
     public typealias UIViewType = WKWebView
-    var game        : Game!
+    var core        : Core!
     var colorScheme : ColorScheme
     
     private let webView: WKWebView = WKWebView()
@@ -401,22 +401,22 @@ struct SwiftUIWebView: UIViewRepresentable {
     public func updateUIView(_ uiView: WKWebView, context: UIViewRepresentableContext<SwiftUIWebView>) { }
 
     public func makeCoordinator() -> Coordinator {
-        return Coordinator(game, colorScheme)
+        return Coordinator(core, colorScheme)
     }
     
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         
-        private var game        : Game
+        private var core        : Core
         private var colorScheme : ColorScheme
         
-        init(_ game: Game,_ colorScheme: ColorScheme) {
-            self.game = game
+        init(_ core: Core,_ colorScheme: ColorScheme) {
+            self.core = core
             self.colorScheme = colorScheme
         }
         
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if message.name == "jsHandler" {
-                if let scriptEditor = game.scriptEditor {
+                if let scriptEditor = core.scriptEditor {
                     scriptEditor.updated()
                 }
             }
@@ -428,7 +428,7 @@ struct SwiftUIWebView: UIViewRepresentable {
 
         //After the webpage is loaded, assign the data in WebViewModel class
         public func webView(_ web: WKWebView, didFinish: WKNavigation!) {
-            game.scriptEditor = ScriptEditor(web, game, colorScheme)
+            core.scriptEditor = ScriptEditor(web, core, colorScheme)
         }
 
         public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) { }
@@ -443,16 +443,16 @@ struct SwiftUIWebView: UIViewRepresentable {
 #endif
 
 struct WebView  : View {
-    var game        : Game
+    var core        : Core
     var colorScheme : ColorScheme
 
-    init(_ game: Game,_ colorScheme: ColorScheme) {
-        self.game = game
+    init(_ core: Core,_ colorScheme: ColorScheme) {
+        self.core = core
         self.colorScheme = colorScheme
     }
     
     var body: some View {
-        SwiftUIWebView(game: game, colorScheme: colorScheme)
+        SwiftUIWebView(core: core, colorScheme: colorScheme)
     }
 }
 

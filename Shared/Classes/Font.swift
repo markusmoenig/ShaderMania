@@ -37,15 +37,15 @@ class Font
     var uuid        = UUID()
     
     var name        : String
-    var game        : Game
+    var core        : Core
     
     var atlas       : MTLTexture?
     var bmFont      : BMFont?
 
-    init(name: String, game: Game)
+    init(name: String, core: Core)
     {
         self.name = name
-        self.game = game
+        self.core = core
                 
         atlas = loadTexture( name )
         
@@ -104,7 +104,7 @@ class Font
         
         let options: [MTKTextureLoader.Option : Any] = [.generateMipmaps : mipmaps, .SRGB : sRGB]
         
-        return try? game.textureLoader.newTexture(data: data, options: options)
+        return try? core.textureLoader.newTexture(data: data, options: options)
     }
     
     func getLineHeight(_ fontScale: Float) -> Float

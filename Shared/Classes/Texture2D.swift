@@ -14,28 +14,28 @@ class Texture2D                 : NSObject
     var width                   : Float = 0
     var height                  : Float = 0
     
-    var game                    : Game!
+    var core                    : Core!
 
     ///
-    init(_ game: Game)
+    init(_ core: Core)
     {
-        self.game = game
+        self.core = core
         
         super.init()
-        allocateTexture(width: Int(game.view.frame.width), height: Int(game.view.frame.height))
+        allocateTexture(width: Int(core.view.frame.width), height: Int(core.view.frame.height))
     }
     
-    init(_ game: Game, width: Int, height: Int)
+    init(_ core: Core, width: Int, height: Int)
     {
-        self.game = game
+        self.core = core
         
         super.init()
         allocateTexture(width: width, height: height)
     }
     
-    init(_ game: Game, texture: MTLTexture)
+    init(_ core: Core, texture: MTLTexture)
     {
-        self.game = game
+        self.core = core
         self.texture = texture
         
         width = Float(texture.width)
@@ -71,7 +71,7 @@ class Texture2D                 : NSObject
         
         textureDescriptor.usage = MTLTextureUsage.unknown
         
-        texture = game.device.makeTexture(descriptor: textureDescriptor)
+        texture = core.device.makeTexture(descriptor: textureDescriptor)
     }
     
     /*
@@ -92,16 +92,16 @@ class Texture2D                 : NSObject
         DispatchQueue.main.async {
             let main = context?.objectForKeyedSubscript("_mT")?.toObject() as! Texture2D
             var texture : Texture2D? = nil
-            let game = main.game!
+            let core = main.core!
             
             if let imageName = object["name"] as? String {
              
-                if let asset = game.assetFolder.getAsset(imageName, .Image) {
+                if let asset = core.assetFolder.getAsset(imageName, .Image) {
                     let options: [MTKTextureLoader.Option : Any] = [.generateMipmaps : true, .SRGB : false]
 
-                    if let mtlTexture = try? game.textureLoader.newTexture(data: asset.data[0], options: options) {
-                        texture = Texture2D(game, texture: mtlTexture)
-                        game.resources.append(texture!)
+                    if let mtlTexture = try? core.textureLoader.newTexture(data: asset.data[0], options: options) {
+                        texture = Texture2D(core, texture: mtlTexture)
+                        core.resources.append(texture!)
                         promise.success(value: texture)
                     } else {
                         promise.fail(error: "Image cannot be decoded")
@@ -114,7 +114,7 @@ class Texture2D                 : NSObject
             }
             
             if texture == nil {
-                texture = Texture2D(main.game, width: 10, height: 10)
+                texture = Texture2D(main.core, width: 10, height: 10)
             }
         }
         
@@ -130,7 +130,7 @@ class Texture2D                 : NSObject
         renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(Double(color.x), Double(color.y), Double(color.z), Double(color.w))
         renderPassDescriptor.colorAttachments[0].texture = texture
         renderPassDescriptor.colorAttachments[0].loadAction = .clear
-        let renderEncoder = game.gameCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+        let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
         renderEncoder.endEncoding()
     }
     
@@ -138,8 +138,8 @@ class Texture2D                 : NSObject
     {
         var x : Float = 0
         var y : Float = 0
-        let width : Float = self.width * game.scaleFactor
-        let height : Float = self.height * game.scaleFactor
+        let width : Float = self.width * core.scaleFactor
+        let height : Float = self.height * core.scaleFactor
         let round : Float = 0
         let border : Float = 0
         let rotation : Float = 0
@@ -147,14 +147,14 @@ class Texture2D                 : NSObject
         let fillColor : SIMD4<Float> = SIMD4<Float>(0.306, 0.310, 0.314, 1.000)
         let borderColor : SIMD4<Float> = SIMD4<Float>(0.216, 0.220, 0.224, 1.000)
 
-        x /= game.scaleFactor
-        y /= game.scaleFactor
+        x /= core.scaleFactor
+        y /= core.scaleFactor
 
         var data = BoxUniform()
-        data.onion = onion / game.scaleFactor
-        data.size = float2(width / game.scaleFactor, height / game.scaleFactor)
-        data.round = round / game.scaleFactor
-        data.borderSize = border / game.scaleFactor
+        data.onion = onion / core.scaleFactor
+        data.size = float2(width / core.scaleFactor, height / core.scaleFactor)
+        data.round = round / core.scaleFactor
+        data.borderSize = border / core.scaleFactor
         data.fillColor = fillColor
         data.borderColor = borderColor
         
@@ -162,21 +162,21 @@ class Texture2D                 : NSObject
         renderPassDescriptor.colorAttachments[0].texture = texture
         renderPassDescriptor.colorAttachments[0].loadAction = .load
         
-        let renderEncoder = game.gameCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+        let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
 
         data.pos.x = x
         data.pos.y = y
         data.rotation = rotation.degreesToRadians
-        data.screenSize = float2(self.width / game.scaleFactor, self.height / game.scaleFactor)
+        data.screenSize = float2(self.width / core.scaleFactor, self.height / core.scaleFactor)
 
-        let rect = MMRect(0, 0, self.width / game.scaleFactor, self.height / game.scaleFactor, scale: game.scaleFactor)
-        let vertexData = game.createVertexData(texture: self, rect: rect)
+        let rect = MMRect(0, 0, self.width / core.scaleFactor, self.height / core.scaleFactor, scale: core.scaleFactor)
+        let vertexData = core.createVertexData(texture: self, rect: rect)
                                 
         renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
-        renderEncoder.setVertexBytes(&game.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
+        renderEncoder.setVertexBytes(&core.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
 
         renderEncoder.setFragmentBytes(&data, length: MemoryLayout<BoxUniform>.stride, index: 0)
-        renderEncoder.setRenderPipelineState(game.metalStates.getState(state: .DrawBackPattern))
+        renderEncoder.setRenderPipelineState(core.metalStates.getState(state: .DrawBackPattern))
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         
         renderEncoder.endEncoding()
@@ -192,30 +192,30 @@ class Texture2D                 : NSObject
         let borderColor : SIMD4<Float>; if let v = options["bordercolor"] as? Float4 { borderColor = v.toSIMD() } else { borderColor = SIMD4<Float>(0,0,0,0) }
         
         position.y = -position.y
-        position.x /= game.scaleFactor
-        position.y /= game.scaleFactor
+        position.x /= core.scaleFactor
+        position.y /= core.scaleFactor
         
         var data = DiscUniform()
-        data.borderSize = border / game.scaleFactor
-        data.radius = radius / game.scaleFactor
+        data.borderSize = border / core.scaleFactor
+        data.radius = radius / core.scaleFactor
         data.fillColor = fillColor
         data.borderColor = borderColor
-        data.onion = onion / game.scaleFactor
+        data.onion = onion / core.scaleFactor
 
-        let rect = MMRect(position.x - data.borderSize / 2, position.y - data.borderSize / 2, data.radius * 2 + data.borderSize * 2, data.radius * 2 + data.borderSize * 2, scale: game.scaleFactor )
-        let vertexData = game.createVertexData(texture: self, rect: rect)
+        let rect = MMRect(position.x - data.borderSize / 2, position.y - data.borderSize / 2, data.radius * 2 + data.borderSize * 2, data.radius * 2 + data.borderSize * 2, scale: core.scaleFactor )
+        let vertexData = core.createVertexData(texture: self, rect: rect)
         
         let renderPassDescriptor = MTLRenderPassDescriptor()
         renderPassDescriptor.colorAttachments[0].texture = texture
         renderPassDescriptor.colorAttachments[0].loadAction = .load
         
-        let renderEncoder = game.gameCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+        let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
                 
         renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
-        renderEncoder.setVertexBytes(&game.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
+        renderEncoder.setVertexBytes(&core.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
         
         renderEncoder.setFragmentBytes(&data, length: MemoryLayout<DiscUniform>.stride, index: 0)
-        renderEncoder.setRenderPipelineState(game.metalStates.getState(state: .DrawDisc))
+        renderEncoder.setRenderPipelineState(core.metalStates.getState(state: .DrawDisc))
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         renderEncoder.endEncoding()
     }
@@ -232,14 +232,14 @@ class Texture2D                 : NSObject
         let borderColor : SIMD4<Float>; if let v = options["bordercolor"] as? Float4 { borderColor = v.toSIMD() } else { borderColor = SIMD4<Float>(0,0,0,0) }
 
         position.y = -position.y;
-        position.x /= game.scaleFactor
-        position.y /= game.scaleFactor
+        position.x /= core.scaleFactor
+        position.y /= core.scaleFactor
 
         var data = BoxUniform()
-        data.onion = onion / game.scaleFactor
-        data.size = float2(size.x / game.scaleFactor, size.y / game.scaleFactor)
-        data.round = round / game.scaleFactor
-        data.borderSize = border / game.scaleFactor
+        data.onion = onion / core.scaleFactor
+        data.size = float2(size.x / core.scaleFactor, size.y / core.scaleFactor)
+        data.round = round / core.scaleFactor
+        data.borderSize = border / core.scaleFactor
         data.fillColor = fillColor
         data.borderColor = borderColor
         
@@ -247,31 +247,31 @@ class Texture2D                 : NSObject
         renderPassDescriptor.colorAttachments[0].texture = texture
         renderPassDescriptor.colorAttachments[0].loadAction = .load
         
-        let renderEncoder = game.gameCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+        let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
 
         if rotation == 0 {
-            let rect = MMRect(position.x, position.y, data.size.x, data.size.y, scale: game.scaleFactor)
-            let vertexData = game.createVertexData(texture: self, rect: rect)
+            let rect = MMRect(position.x, position.y, data.size.x, data.size.y, scale: core.scaleFactor)
+            let vertexData = core.createVertexData(texture: self, rect: rect)
             renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
-            renderEncoder.setVertexBytes(&game.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
+            renderEncoder.setVertexBytes(&core.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
 
             renderEncoder.setFragmentBytes(&data, length: MemoryLayout<BoxUniform>.stride, index: 0)
-            renderEncoder.setRenderPipelineState(game.metalStates.getState(state: .DrawBox))
+            renderEncoder.setRenderPipelineState(core.metalStates.getState(state: .DrawBox))
             renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         } else {
             data.pos.x = position.x
             data.pos.y = position.y
             data.rotation = rotation.degreesToRadians
-            data.screenSize = float2(self.width / game.scaleFactor, self.height / game.scaleFactor)
+            data.screenSize = float2(self.width / core.scaleFactor, self.height / core.scaleFactor)
 
-            let rect = MMRect(0, 0, self.width / game.scaleFactor, self.height / game.scaleFactor, scale: game.scaleFactor)
-            let vertexData = game.createVertexData(texture: self, rect: rect)
+            let rect = MMRect(0, 0, self.width / core.scaleFactor, self.height / core.scaleFactor, scale: core.scaleFactor)
+            let vertexData = core.createVertexData(texture: self, rect: rect)
                                     
             renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
-            renderEncoder.setVertexBytes(&game.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
+            renderEncoder.setVertexBytes(&core.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
 
             renderEncoder.setFragmentBytes(&data, length: MemoryLayout<BoxUniform>.stride, index: 0)
-            renderEncoder.setRenderPipelineState(game.metalStates.getState(state: .DrawBoxExt))
+            renderEncoder.setRenderPipelineState(core.metalStates.getState(state: .DrawBoxExt))
             renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         }
         renderEncoder.endEncoding()
@@ -289,11 +289,11 @@ class Texture2D                 : NSObject
             let subRect : Rect2D?; if let v = options["rect"] as? Rect2D { subRect = v } else { subRect = nil }
 
             position.y = -position.y;
-            position.x /= game.scaleFactor
-            position.y /= game.scaleFactor
+            position.x /= core.scaleFactor
+            position.y /= core.scaleFactor
             
-            width /= game.scaleFactor
-            height /= game.scaleFactor
+            width /= core.scaleFactor
+            height /= core.scaleFactor
             
             var data = TextureUniform()
             data.globalAlpha = alpha
@@ -301,8 +301,8 @@ class Texture2D                 : NSObject
             if let subRect = subRect {
                 data.pos.x = subRect.x / sourceTexture.width
                 data.pos.y = subRect.y / sourceTexture.height
-                data.size.x = subRect.width / sourceTexture.width// / game.scaleFactor
-                data.size.y = subRect.height / sourceTexture.height// / game.scaleFactor
+                data.size.x = subRect.width / sourceTexture.width// / core.scaleFactor
+                data.size.y = subRect.height / sourceTexture.height// / core.scaleFactor
             } else {
                 data.pos.x = 0
                 data.pos.y = 0
@@ -310,23 +310,23 @@ class Texture2D                 : NSObject
                 data.size.y = 1
             }
                     
-            let rect = MMRect( position.x, position.y, width, height, scale: game.scaleFactor )
-            let vertexData = game.createVertexData(texture: self, rect: rect)
+            let rect = MMRect( position.x, position.y, width, height, scale: core.scaleFactor )
+            let vertexData = core.createVertexData(texture: self, rect: rect)
             
             let renderPassDescriptor = MTLRenderPassDescriptor()
             renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0, 0, 0, 1)
             renderPassDescriptor.colorAttachments[0].texture = texture
             renderPassDescriptor.colorAttachments[0].loadAction = .clear
             
-            let renderEncoder = game.gameCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+            let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
 
             renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
-            renderEncoder.setVertexBytes(&game.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
+            renderEncoder.setVertexBytes(&core.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
             
             renderEncoder.setFragmentBytes(&data, length: MemoryLayout<TextureUniform>.stride, index: 0)
             renderEncoder.setFragmentTexture(sourceTexture.texture, index: 1)
 
-            renderEncoder.setRenderPipelineState(game.metalStates.getState(state: .DrawTexture))
+            renderEncoder.setRenderPipelineState(core.metalStates.getState(state: .DrawTexture))
             renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
             renderEncoder.endEncoding()
         }
@@ -334,19 +334,19 @@ class Texture2D                 : NSObject
     
     func drawShader(_ shader: Shader, _ rect: MMRect)
     {
-        let vertexData = game.createVertexData(texture: self, rect: rect)
+        let vertexData = core.createVertexData(texture: self, rect: rect)
         
         let renderPassDescriptor = MTLRenderPassDescriptor()
         renderPassDescriptor.colorAttachments[0].texture = texture
         renderPassDescriptor.colorAttachments[0].loadAction = .load
         
-        let renderEncoder = game.gameCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+        let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
 
         renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
-        renderEncoder.setVertexBytes(&game.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
+        renderEncoder.setVertexBytes(&core.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
 
         var metalData = MetalData()
-        metalData.time = game._Time.x;
+        metalData.time = core._Time.x;
         renderEncoder.setFragmentBytes(&metalData, length: MemoryLayout<MetalData>.stride, index: 0)
 
         renderEncoder.setRenderPipelineState(shader.pipelineState)
@@ -365,7 +365,7 @@ class Texture2D                 : NSObject
             if let subRect = subRect {
                 rect = MMRect(subRect.x, subRect.y, subRect.width, subRect.height, scale: 1)
             } else {
-                rect = MMRect( 0, 0, self.width, self.height, scale: game.scaleFactor )
+                rect = MMRect( 0, 0, self.width, self.height, scale: core.scaleFactor )
             }
             
             drawShader(shader, rect)
@@ -382,7 +382,7 @@ class Texture2D                 : NSObject
         let color : SIMD4<Float>; if let v = options["color"] as? Float4 { color = v.toSIMD() } else { color = SIMD4<Float>(1,1,1,1) }
 
         position.y = -position.y;
-        let scaleFactor : Float = game.scaleFactor
+        let scaleFactor : Float = core.scaleFactor
         
         func drawChar(char: BMChar, x: Float, y: Float, adjScale: Float)
         {
@@ -397,21 +397,21 @@ class Texture2D                 : NSObject
             data.color = color
 
             let rect = MMRect(x, y, char.width * adjScale, char.height * adjScale, scale: scaleFactor)
-            let vertexData = game.createVertexData(texture: self, rect: rect)
+            let vertexData = core.createVertexData(texture: self, rect: rect)
             
             let renderPassDescriptor = MTLRenderPassDescriptor()
             renderPassDescriptor.colorAttachments[0].texture = texture
             renderPassDescriptor.colorAttachments[0].loadAction = .load
             
-            let renderEncoder = game.gameCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+            let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
 
             renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
-            renderEncoder.setVertexBytes(&game.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
+            renderEncoder.setVertexBytes(&core.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
 
             renderEncoder.setFragmentBytes(&data, length: MemoryLayout<TextUniform>.stride, index: 0)
             renderEncoder.setFragmentTexture(font!.atlas, index: 1)
 
-            renderEncoder.setRenderPipelineState(game.metalStates.getState(state: .DrawTextChar))
+            renderEncoder.setRenderPipelineState(core.metalStates.getState(state: .DrawTextChar))
             renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
             renderEncoder.endEncoding()
         }
@@ -421,8 +421,8 @@ class Texture2D                 : NSObject
             let scale : Float = (1.0 / font.bmFont!.common.lineHeight) * size
             let adjScale : Float = scale// / 2
             
-            var posX = position.x / game.scaleFactor
-            let posY = position.y / game.scaleFactor
+            var posX = position.x / core.scaleFactor
+            let posY = position.y / core.scaleFactor
 
             for c in text {
                 let bmChar = font.getItemForChar( c )

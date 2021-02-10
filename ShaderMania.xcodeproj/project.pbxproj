@@ -23,8 +23,8 @@
 		2B0EEA882565DF7800C84C6C /* ShaderCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA7A2565DF7800C84C6C /* ShaderCompiler.swift */; };
 		2B0EEA892565DF7800C84C6C /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA7B2565DF7800C84C6C /* Utils.swift */; };
 		2B0EEA8A2565DF7800C84C6C /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA7B2565DF7800C84C6C /* Utils.swift */; };
-		2B0EEA8B2565DF7800C84C6C /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA7C2565DF7800C84C6C /* Game.swift */; };
-		2B0EEA8C2565DF7800C84C6C /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA7C2565DF7800C84C6C /* Game.swift */; };
+		2B0EEA8B2565DF7800C84C6C /* Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA7C2565DF7800C84C6C /* Core.swift */; };
+		2B0EEA8C2565DF7800C84C6C /* Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA7C2565DF7800C84C6C /* Core.swift */; };
 		2B0EEA8D2565DF7800C84C6C /* MathLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA7D2565DF7800C84C6C /* MathLibrary.swift */; };
 		2B0EEA8E2565DF7800C84C6C /* MathLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA7D2565DF7800C84C6C /* MathLibrary.swift */; };
 		2B0EEA8F2565DF7800C84C6C /* ScriptEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA7E2565DF7800C84C6C /* ScriptEditor.swift */; };
@@ -65,7 +65,7 @@
 		2B0EEA792565DF7800C84C6C /* Metal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Metal.h; sourceTree = "<group>"; };
 		2B0EEA7A2565DF7800C84C6C /* ShaderCompiler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShaderCompiler.swift; sourceTree = "<group>"; };
 		2B0EEA7B2565DF7800C84C6C /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
-		2B0EEA7C2565DF7800C84C6C /* Game.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
+		2B0EEA7C2565DF7800C84C6C /* Core.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Core.swift; sourceTree = "<group>"; };
 		2B0EEA7D2565DF7800C84C6C /* MathLibrary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MathLibrary.swift; sourceTree = "<group>"; };
 		2B0EEA7E2565DF7800C84C6C /* ScriptEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScriptEditor.swift; sourceTree = "<group>"; };
 		2B0EEA7F2565DF7800C84C6C /* Metal.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Metal.metal; sourceTree = "<group>"; };
@@ -118,7 +118,7 @@
 				2B0EEA772565DF7800C84C6C /* ContentView.swift */,
 				2B3D4C7825A68ECA00D2F8EA /* Views.swift */,
 				2B0EEA782565DF7800C84C6C /* Asset.swift */,
-				2B0EEA7C2565DF7800C84C6C /* Game.swift */,
+				2B0EEA7C2565DF7800C84C6C /* Core.swift */,
 				2B0EEA7D2565DF7800C84C6C /* MathLibrary.swift */,
 				2B0EEA792565DF7800C84C6C /* Metal.h */,
 				2B0EEA7F2565DF7800C84C6C /* Metal.metal */,
@@ -293,7 +293,7 @@
 				2B0EEA832565DF7800C84C6C /* ContentView.swift in Sources */,
 				2B77B7BB25773978002D99C0 /* File.swift in Sources */,
 				2B0EEA622565DF3A00C84C6C /* ShaderManiaApp.swift in Sources */,
-				2B0EEA8B2565DF7800C84C6C /* Game.swift in Sources */,
+				2B0EEA8B2565DF7800C84C6C /* Core.swift in Sources */,
 				2B0EEA8F2565DF7800C84C6C /* ScriptEditor.swift in Sources */,
 				2B0EEA9E2565DF9A00C84C6C /* Texture2D.swift in Sources */,
 				2B0EEABB2566035700C84C6C /* Project.swift in Sources */,
@@ -318,7 +318,7 @@
 				2B0EEA842565DF7800C84C6C /* ContentView.swift in Sources */,
 				2B77B7BC25773978002D99C0 /* File.swift in Sources */,
 				2B0EEA632565DF3A00C84C6C /* ShaderManiaApp.swift in Sources */,
-				2B0EEA8C2565DF7800C84C6C /* Game.swift in Sources */,
+				2B0EEA8C2565DF7800C84C6C /* Core.swift in Sources */,
 				2B0EEA902565DF7800C84C6C /* ScriptEditor.swift in Sources */,
 				2B0EEA9F2565DF9A00C84C6C /* Texture2D.swift in Sources */,
 				2B0EEABC2566035700C84C6C /* Project.swift in Sources */,

@@ -24,21 +24,21 @@ class MetalStates {
     var states                  : [Int:MTLRenderPipelineState] = [:]
     var computeStates           : [Int:MTLComputePipelineState] = [:]
 
-    var game                    : Game
+    var core                    : Core
     
-    init(_ game: Game)
+    init(_ core: Core)
     {
-        self.game = game
+        self.core = core
         
-        if let frameworkId = game.frameworkId {
+        if let frameworkId = core.frameworkId {
             for b in Bundle.allFrameworks {
                 if b.bundleIdentifier == frameworkId {
-                    defaultLibrary = try? game.device.makeDefaultLibrary(bundle: b)
+                    defaultLibrary = try? core.device.makeDefaultLibrary(bundle: b)
                     break
                 }
             }
         } else {
-            defaultLibrary = game.device.makeDefaultLibrary()
+            defaultLibrary = core.device.makeDefaultLibrary()
         }
         
         let vertexFunction = defaultLibrary!.makeFunction( name: "m4mQuadVertexShader" )
@@ -83,7 +83,7 @@ class MetalStates {
         do {
             //renderPipelineState = try device.makeComputePipelineState( function: function! )
             pipelineStateDescriptor.fragmentFunction = function
-            renderPipelineState = try game.device.makeRenderPipelineState( descriptor: pipelineStateDescriptor )
+            renderPipelineState = try core.device.makeRenderPipelineState( descriptor: pipelineStateDescriptor )
         } catch {
             print( "computePipelineState failed" )
             return nil
@@ -110,7 +110,7 @@ class MetalStates {
         }
         
         do {
-            computePipelineState = try game.device.makeComputePipelineState( function: function! )
+            computePipelineState = try core.device.makeComputePipelineState( function: function! )
         } catch {
             print( "computePipelineState failed" )
             return nil

@@ -17,7 +17,7 @@ extension UTType {
 
 struct ShaderManiaDocument: FileDocument {
     
-    var game = Game()
+    var core    = Core()
     var updated = false
     
     let exportImage          = PassthroughSubject<Void, Never>()
@@ -46,12 +46,12 @@ struct ShaderManiaDocument: FileDocument {
             throw CocoaError(.fileReadCorruptFile)
         }
         if data.isEmpty == false {
-            game.assetFolder = folder
-            game.assetFolder.game = game
+            core.assetFolder = folder
+            core.assetFolder.core = core
             
             // Make sure there is a selected asset
-            if game.assetFolder.assets.count > 0 {
-                game.assetFolder.current = game.assetFolder.assets[0]
+            if core.assetFolder.assets.count > 0 {
+                core.assetFolder.current = core.assetFolder.assets[0]
             }
         }
     }
@@ -65,7 +65,7 @@ struct ShaderManiaDocument: FileDocument {
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
         var data = Data()
         
-        let encodedData = try? JSONEncoder().encode(game.assetFolder)
+        let encodedData = try? JSONEncoder().encode(core.assetFolder)
         if let json = String(data: encodedData!, encoding: .utf8) {
             data = json.data(using: .utf8)!
         }

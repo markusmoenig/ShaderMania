@@ -35,11 +35,11 @@ class Shader                : NSObject
 
 class ShaderCompiler
 {
-    let game            : Game
+    let core            : Core
     
-    init(_ game: Game)
+    init(_ core: Core)
     {
-        self.game = game
+        self.core = core
     }
     
     func compile(asset: Asset, cb: @escaping (Shader?, [CompileError]) -> ())
@@ -47,7 +47,7 @@ class ShaderCompiler
         var code = getHeaderCode(noOp: asset.type == .Common)
         
         if asset.type != .Common {
-            for asset in game.assetFolder.assets {
+            for asset in core.assetFolder.assets {
                 if asset.type == .Common {
                     code += asset.value
                 }
@@ -211,7 +211,7 @@ class ShaderCompiler
                 shader.pipelineStateDesc.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
                 
                 do {
-                    shader.pipelineState = try self.game.device.makeRenderPipelineState(descriptor: shader.pipelineStateDesc)
+                    shader.pipelineState = try self.core.device.makeRenderPipelineState(descriptor: shader.pipelineStateDesc)
                     shader.isValid = true
                 } catch {
                     shader.isValid = false
@@ -223,7 +223,7 @@ class ShaderCompiler
             }
         }
         
-        game.device.makeLibrary(source: parsedCode, options: nil, completionHandler: compiledCB)
+        core.device.makeLibrary(source: parsedCode, options: nil, completionHandler: compiledCB)
     }
     
     func getHeaderCode(noOp: Bool = false) -> String

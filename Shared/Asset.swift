@@ -11,7 +11,7 @@ import CloudKit
 class AssetFolder       : Codable
 {
     var assets          : [Asset] = []
-    var game            : Game!
+    var core            : Core!
     var current         : Asset? = nil
         
     private enum CodingKeys: String, CodingKey {
@@ -35,9 +35,9 @@ class AssetFolder       : Codable
         */
     }
     
-    func setup(_ game: Game)
+    func setup(_ core: Core)
     {
-        self.game = game
+        self.core = core
         
         guard let commonPath = Bundle.main.path(forResource: "Common", ofType: "", inDirectory: "Files/default") else {
             return
@@ -79,7 +79,7 @@ class AssetFolder       : Codable
             let asset = Asset(type: .Buffer, name: name, value: shaderTemplate)
             assets.append(asset)
             select(asset.id)
-            game.scriptEditor?.createSession(asset)
+            core.scriptEditor?.createSession(asset)
         }
     }
     
@@ -93,7 +93,7 @@ class AssetFolder       : Codable
             let asset = Asset(type: .Shader, name: name, value: shaderTemplate)
             assets.append(asset)
             select(asset.id)
-            game.scriptEditor?.createSession(asset)
+            core.scriptEditor?.createSession(asset)
         }
     }
     
@@ -114,7 +114,7 @@ class AssetFolder       : Codable
             }
         }
         
-        game.scriptEditor?.createSession(asset)
+        core.scriptEditor?.createSession(asset)
         select(asset.id)
     }
     
@@ -135,7 +135,7 @@ class AssetFolder       : Codable
         asset = Asset(type: .Texture, name: name)
         assets.append(asset)
         
-        game.scriptEditor?.createSession(asset)
+        core.scriptEditor?.createSession(asset)
         select(asset.id)
     }
     
@@ -156,7 +156,7 @@ class AssetFolder       : Codable
             }
         }
         
-        game.scriptEditor?.createSession(asset)
+        core.scriptEditor?.createSession(asset)
         select(asset.id)
     }
     
@@ -165,9 +165,9 @@ class AssetFolder       : Codable
         for asset in assets {
             if asset.id == id {
                 if asset.scriptName.isEmpty {
-                    game.scriptEditor?.createSession(asset)
+                    core.scriptEditor?.createSession(asset)
                 }
-                game.scriptEditor?.setAssetSession(asset)
+                core.scriptEditor?.setAssetSession(asset)
                 
                 current = asset
                 break
@@ -212,7 +212,7 @@ class AssetFolder       : Codable
                 let data = asset.data[index]
                 
                 let options: [MTKTextureLoader.Option : Any] = [.generateMipmaps : false, .SRGB : false]                
-                return try? game.textureLoader.newTexture(data: data, options: options)
+                return try? core.textureLoader.newTexture(data: data, options: options)
             }
         }
         return nil
@@ -223,8 +223,8 @@ class AssetFolder       : Codable
         for asset in assets {
             if asset.id == id {
                 asset.value = value
-                game.contentChanged.send()
-                if game.state == .Idle {
+                core.contentChanged.send()
+                if core.state == .Idle {
                     if asset.type == .Common {
                         assetCompile(asset)
                         //assetCompileAll()
@@ -240,13 +240,13 @@ class AssetFolder       : Codable
     func assetCompile(_ asset: Asset)
     {
         if asset.type == .Shader || asset.type == .Buffer || asset.type == .Common {
-            game.shaderCompiler.compile(asset: asset, cb: { (shader, errors) in
+            core.shaderCompiler.compile(asset: asset, cb: { (shader, errors) in
                 if shader == nil {
                     if Thread.isMainThread {
-                        self.game.scriptEditor?.setErrors(errors)
+                        self.core.scriptEditor?.setErrors(errors)
                     } else {
                         DispatchQueue.main.sync {
-                            self.game.scriptEditor?.setErrors(errors)
+                            self.core.scriptEditor?.setErrors(errors)
                         }
                     }
                 } else {
@@ -254,14 +254,14 @@ class AssetFolder       : Codable
                     asset.shader = shader
                     
                     if Thread.isMainThread {
-                        self.game.createPreview(asset)
-                        //self.game.scriptEditor?.clearAnnotations()
-                        self.game.scriptEditor?.setErrors(errors)
+                        self.core.createPreview(asset)
+                        //self.core.scriptEditor?.clearAnnotations()
+                        self.core.scriptEditor?.setErrors(errors)
                     } else {
                         DispatchQueue.main.sync {
-                            self.game.createPreview(asset)
-                            //self.game.scriptEditor?.clearAnnotations()
-                            self.game.scriptEditor?.setErrors(errors)
+                            self.core.createPreview(asset)
+                            //self.core.scriptEditor?.clearAnnotations()
+                            self.core.scriptEditor?.setErrors(errors)
                         }
                     }
                 }
@@ -291,7 +291,7 @@ class AssetFolder       : Codable
     {
         if let asset = current {
             if asset.type == .Shader {
-                self.game.createPreview(asset)
+                self.core.createPreview(asset)
             }
         }
     }

@@ -1,5 +1,5 @@
 //
-//  Game.swift
+//  Core.swift
 //  ShaderMania
 //
 //  Created by Markus Moenig on 25/8/20.
@@ -9,7 +9,7 @@ import MetalKit
 import Combine
 import AVFoundation
 
-public class Game       : ObservableObject
+public class Core       : ObservableObject
 {
     enum State {
         case Idle, Running, Paused
@@ -33,9 +33,9 @@ public class Game       : ObservableObject
     var screenWidth     : Float = 0
     var screenHeight    : Float = 0
 
-    var gameCmdQueue    : MTLCommandQueue? = nil
-    var gameCmdBuffer   : MTLCommandBuffer? = nil
-    var gameScissorRect : MTLScissorRect? = nil
+    var coreCmdQueue    : MTLCommandQueue? = nil
+    var coreCmdBuffer   : MTLCommandBuffer? = nil
+    var coreScissorRect : MTLScissorRect? = nil
     
     var scriptEditor    : ScriptEditor? = nil
 
@@ -52,7 +52,7 @@ public class Game       : ObservableObject
     var _Frame          = UInt32(0)
     var targetFPS       : Float = 60
     
-    var gameAsset       : Asset? = nil
+    var coreAsset       : Asset? = nil
 
     // Preview Size, UI only
     var previewFactor   : CGFloat = 4
@@ -71,7 +71,7 @@ public class Game       : ObservableObject
     let contentChanged  = PassthroughSubject<Void, Never>()
 
     var assetError      = CompileError()
-    let gameError       = PassthroughSubject<Void, Never>()
+    let coreError       = PassthroughSubject<Void, Never>()
     
     var localAudioPlayers: [String:AVAudioPlayer] = [:]
     var globalAudioPlayers: [String:AVAudioPlayer] = [:]
@@ -124,14 +124,14 @@ public class Game       : ObservableObject
         } else {
             print("Cannot initialize Metal!")
         }
-        view.game = self
+        view.core = self
         
         metalStates = MetalStates(self)
         textureLoader = MTKTextureLoader(device: device)
         
         /*
         for fontName in availableFonts {
-            let font = Font(name: fontName, game: self)
+            let font = Font(name: fontName, core: self)
             fonts.append(font)
         }*/
         
@@ -183,7 +183,7 @@ public class Game       : ObservableObject
         //    scriptEditor.setSilentMode(false)
         //}
         
-        gameAsset = nil
+        coreAsset = nil
                 
         if let scriptEditor = scriptEditor, assetError.error == nil {
             scriptEditor.clearAnnotations()
@@ -213,10 +213,10 @@ public class Game       : ObservableObject
             screenWidth = Float(texture!.width)
             screenHeight = Float(texture!.height)
             
-            gameScissorRect = MTLScissorRect(x: 0, y: 0, width: texture!.texture.width, height: texture!.texture.height)
+            coreScissorRect = MTLScissorRect(x: 0, y: 0, width: texture!.texture.width, height: texture!.texture.height)
                         
             //if let map = currentMap?.map {
-            //    map.setup(game: self)
+            //    map.setup(core: self)
             //}
             return true
         }
@@ -240,12 +240,12 @@ public class Game       : ObservableObject
             
                     let renderPassDescriptor = view.currentRenderPassDescriptor
                     renderPassDescriptor?.colorAttachments[0].loadAction = .load
-                    let renderEncoder = gameCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
+                    let renderEncoder = coreCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
                     
                     drawTexture(texture!.texture!, renderEncoder: renderEncoder!)
                     renderEncoder?.endEncoding()
                     
-                    gameCmdBuffer?.present(drawable)
+                    coreCmdBuffer?.present(drawable)
                     stopDrawing()
 
                     return
@@ -287,20 +287,20 @@ public class Game       : ObservableObject
     
     func startDrawing()
     {
-        if gameCmdQueue == nil {
-            gameCmdQueue = view.device!.makeCommandQueue()
+        if coreCmdQueue == nil {
+            coreCmdQueue = view.device!.makeCommandQueue()
         }
-        gameCmdBuffer = gameCmdQueue!.makeCommandBuffer()
+        coreCmdBuffer = coreCmdQueue!.makeCommandBuffer()
     }
     
     func stopDrawing(deleteQueue: Bool = false)
     {
-        gameCmdBuffer?.commit()
+        coreCmdBuffer?.commit()
 
         if deleteQueue {
-            self.gameCmdQueue = nil
+            self.coreCmdQueue = nil
         }
-        self.gameCmdBuffer = nil
+        self.coreCmdBuffer = nil
     }
     
     /// Create a preview for the current asset

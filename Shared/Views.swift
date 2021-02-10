@@ -26,8 +26,8 @@ struct LeftPanelView: View {
 
                 Button(action: {
                     //importingImages = true
-                    document.game.assetFolder.addTexture("New Texture")
-                    assetName = document.game.assetFolder.current!.name
+                    document.core.assetFolder.addTexture("New Texture")
+                    assetName = document.core.assetFolder.current!.name
                     showAssetNamePopover = true
                     updateView.toggle()
                 })
@@ -39,10 +39,10 @@ struct LeftPanelView: View {
                 .padding(.bottom, 1)
                 
                 Button(action: {
-                    document.game.assetFolder.addBuffer("New Shader")
-                    assetName = document.game.assetFolder.current!.name
+                    document.core.assetFolder.addBuffer("New Shader")
+                    assetName = document.core.assetFolder.current!.name
                     showAssetNamePopover = true
-                    document.game.assetFolder.assetCompile(document.game.assetFolder.current!)
+                    document.core.assetFolder.assetCompile(document.core.assetFolder.current!)
                     updateView.toggle()
                 })
                 {
@@ -59,7 +59,7 @@ struct LeftPanelView: View {
                 VStack(alignment: .leading) {
                     Text("Name:")
                     TextField("Name", text: $assetName, onEditingChanged: { (changed) in
-                        if let asset = document.game.assetFolder.current {
+                        if let asset = document.core.assetFolder.current {
                             asset.name = assetName
                             self.updateView.toggle()
                         }
@@ -70,11 +70,11 @@ struct LeftPanelView: View {
             Divider()
             List() {
                 DisclosureGroup("Textures", isExpanded: $showTextureItems) {
-                    ForEach(document.game.assetFolder.assets, id: \.id) { asset in
+                    ForEach(document.core.assetFolder.assets, id: \.id) { asset in
                         if asset.type == .Texture {
                             Button(action: {
-                                document.game.assetFolder.select(asset.id)
-                                document.game.createPreview(asset)
+                                document.core.assetFolder.select(asset.id)
+                                document.core.createPreview(asset)
                                 updateView.toggle()
                             })
                             {
@@ -84,7 +84,7 @@ struct LeftPanelView: View {
                             }
                             .contextMenu {
                                 Button(action: {
-                                    document.game.assetFolder.select(asset.id)
+                                    document.core.assetFolder.select(asset.id)
                                     assetName = asset.name
                                     showAssetNamePopover = true
                                 })
@@ -93,7 +93,7 @@ struct LeftPanelView: View {
                                 }
                                 
                                 Button(action: {
-                                    document.game.assetFolder.select(asset.id)
+                                    document.core.assetFolder.select(asset.id)
                                     showDeleteAssetAlert = true
                                 })
                                 {
@@ -102,7 +102,7 @@ struct LeftPanelView: View {
                             }
                             .buttonStyle(PlainButtonStyle())
                             .listRowBackground(Group {
-                                if document.game.assetFolder.current!.id == asset.id {
+                                if document.core.assetFolder.current!.id == asset.id {
                                     Color.gray.mask(RoundedRectangle(cornerRadius: 4))
                                 } else { Color.clear }
                             })
@@ -110,16 +110,16 @@ struct LeftPanelView: View {
                     }
                     // Drag and drop
                     .onMove { indexSet, newOffset in
-                        document.game.assetFolder.assets.move(fromOffsets: indexSet, toOffset: newOffset)
+                        document.core.assetFolder.assets.move(fromOffsets: indexSet, toOffset: newOffset)
                         updateView.toggle()
                     }
                 }
                 DisclosureGroup("Shaders", isExpanded: $showBufferItems) {
-                    ForEach(document.game.assetFolder.assets, id: \.id) { asset in
+                    ForEach(document.core.assetFolder.assets, id: \.id) { asset in
                         if asset.type == .Buffer {
                             Button(action: {
-                                document.game.assetFolder.select(asset.id)
-                                document.game.createPreview(asset)
+                                document.core.assetFolder.select(asset.id)
+                                document.core.createPreview(asset)
                                 updateView.toggle()
                             })
                             {
@@ -129,7 +129,7 @@ struct LeftPanelView: View {
                             }
                             .contextMenu {
                                 Button(action: {
-                                    document.game.assetFolder.select(asset.id)
+                                    document.core.assetFolder.select(asset.id)
                                     assetName = asset.name
                                     showAssetNamePopover = true
                                 })
@@ -138,7 +138,7 @@ struct LeftPanelView: View {
                                 }
                                 
                                 Button(action: {
-                                    document.game.assetFolder.select(asset.id)
+                                    document.core.assetFolder.select(asset.id)
                                     showDeleteAssetAlert = true
                                 })
                                 {
@@ -147,7 +147,7 @@ struct LeftPanelView: View {
                             }
                             .buttonStyle(PlainButtonStyle())
                             .listRowBackground(Group {
-                                if document.game.assetFolder.current!.id == asset.id {
+                                if document.core.assetFolder.current!.id == asset.id {
                                     Color.gray.mask(RoundedRectangle(cornerRadius: 4))
                                 } else { Color.clear }
                             })
@@ -155,18 +155,18 @@ struct LeftPanelView: View {
                     }
                     // Drag and drop
                     .onMove { indexSet, newOffset in
-                        document.game.assetFolder.assets.move(fromOffsets: indexSet, toOffset: newOffset)
+                        document.core.assetFolder.assets.move(fromOffsets: indexSet, toOffset: newOffset)
                         updateView.toggle()
                     }
                 }
                 #if os(macOS)
                 Divider()
                 #endif
-                ForEach(document.game.assetFolder.assets, id: \.id) { asset in
+                ForEach(document.core.assetFolder.assets, id: \.id) { asset in
                     if asset.type == .Shader || asset.type == .Common {
                         Button(action: {
-                            document.game.assetFolder.select(asset.id)
-                            document.game.createPreview(asset)
+                            document.core.assetFolder.select(asset.id)
+                            document.core.createPreview(asset)
                             updateView.toggle()
                         })
                         {
@@ -176,7 +176,7 @@ struct LeftPanelView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                         .listRowBackground(Group {
-                            if document.game.assetFolder.current!.id == asset.id {
+                            if document.core.assetFolder.current!.id == asset.id {
                                 Color.gray.mask(RoundedRectangle(cornerRadius: 4))
                             } else { Color.clear }
                         })
@@ -194,27 +194,27 @@ struct BufferInputsView: View {
     @Binding var updateView : Bool
 
     var body: some View {
-        if let asset = document.game.assetFolder.current {
+        if let asset = document.core.assetFolder.current {
             Section(header: Text("Inputs")) {
                 // Slot 0
                 Menu {
                     Button("Black", action: {
                         asset.slots[0] = nil
                         updateView.toggle()
-                        document.game.createPreview.send()
+                        document.core.createPreview.send()
                     })
-                    ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                    ForEach(document.core.assetFolder.assets, id: \.id) { textureAsset in
                         if textureAsset.type == .Texture {
                             Button(textureAsset.name, action: {
                                 asset.slots[0] = textureAsset.id
                                 updateView.toggle()
-                                document.game.createPreview.send()
+                                document.core.createPreview.send()
                             })
                         }
                     }
                 }
                 label: {
-                    Text("Slot 0: \(document.game.assetFolder.getSlotName(asset, 0))")
+                    Text("Slot 0: \(document.core.assetFolder.getSlotName(asset, 0))")
                 }
 
                 // Slot1
@@ -222,20 +222,20 @@ struct BufferInputsView: View {
                     Button("Black", action: {
                         asset.slots[1] = nil
                         updateView.toggle()
-                        document.game.createPreview.send()
+                        document.core.createPreview.send()
                     })
-                    ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                    ForEach(document.core.assetFolder.assets, id: \.id) { textureAsset in
                         if textureAsset.type == .Texture {
                             Button(textureAsset.name, action: {
                                 asset.slots[1] = textureAsset.id
                                 updateView.toggle()
-                                document.game.createPreview.send()
+                                document.core.createPreview.send()
                             })
                         }
                     }
                 }
                 label: {
-                    Text("Slot 1: \(document.game.assetFolder.getSlotName(asset, 1))")
+                    Text("Slot 1: \(document.core.assetFolder.getSlotName(asset, 1))")
                 }
 
                 // Slot2
@@ -243,20 +243,20 @@ struct BufferInputsView: View {
                     Button("Black", action: {
                         asset.slots[2] = nil
                         updateView.toggle()
-                        document.game.createPreview.send()
+                        document.core.createPreview.send()
                     })
-                    ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                    ForEach(document.core.assetFolder.assets, id: \.id) { textureAsset in
                         if textureAsset.type == .Texture {
                             Button(textureAsset.name, action: {
                                 asset.slots[2] = textureAsset.id
                                 updateView.toggle()
-                                document.game.createPreview.send()
+                                document.core.createPreview.send()
                             })
                         }
                     }
                 }
                 label: {
-                    Text("Slot 2: \(document.game.assetFolder.getSlotName(asset, 2))")
+                    Text("Slot 2: \(document.core.assetFolder.getSlotName(asset, 2))")
                 }
 
                 // Slot3
@@ -264,20 +264,20 @@ struct BufferInputsView: View {
                     Button("Black", action: {
                         asset.slots[3] = nil
                         updateView.toggle()
-                        document.game.createPreview.send()
+                        document.core.createPreview.send()
                     })
-                    ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                    ForEach(document.core.assetFolder.assets, id: \.id) { textureAsset in
                         if textureAsset.type == .Texture {
                             Button(textureAsset.name, action: {
                                 asset.slots[3] = textureAsset.id
                                 updateView.toggle()
-                                document.game.createPreview.send()
+                                document.core.createPreview.send()
                             })
                         }
                     }
                 }
                 label: {
-                    Text("Slot 3: \(document.game.assetFolder.getSlotName(asset, 3))")
+                    Text("Slot 3: \(document.core.assetFolder.getSlotName(asset, 3))")
                 }
             }
             .padding(4)
@@ -292,28 +292,28 @@ struct BufferOutputView: View {
     @Binding var updateView : Bool
 
     var body: some View {
-        if let asset = document.game.assetFolder.current {
+        if let asset = document.core.assetFolder.current {
             Section(header: Text("Output")) {
                 Menu {
                     Button("None", action: {
                         asset.output = nil
                         updateView.toggle()
-                        document.game.createPreview.send()
+                        document.core.createPreview.send()
                     })
                     
-                    ForEach(document.game.assetFolder.assets, id: \.id) { textureAsset in
+                    ForEach(document.core.assetFolder.assets, id: \.id) { textureAsset in
                         
                         if textureAsset.type == .Texture && textureAsset.data.count == 0 {
                             Button(textureAsset.name, action: {
                                 asset.output = textureAsset.id
                                 updateView.toggle()
-                                document.game.createPreview.send()
+                                document.core.createPreview.send()
                             })
                         }
                     }
                 }
                 label: {
-                    Text("Output: \(document.game.assetFolder.getOutputName(asset))")
+                    Text("Output: \(document.core.assetFolder.getOutputName(asset))")
                 }
             }
             .padding(4)

@@ -50,31 +50,31 @@ struct ContentView: View {
                         GeometryReader { geometry in
                             ScrollView {
 
-                                WebView(document.game, deviceColorScheme).tabItem {
+                                WebView(document.core, deviceColorScheme).tabItem {
                                 }
                                     .frame(height: geometry.size.height)
                                     .tag(1)
                                     .onChange(of: deviceColorScheme) { newValue in
-                                        document.game.scriptEditor?.setTheme(newValue)
+                                        document.core.scriptEditor?.setTheme(newValue)
                                     }
                             }
                             .zIndex(0)
                             .frame(maxWidth: .infinity)
                             .layoutPriority(2)
                             
-                            .onReceive(self.document.game.contentChanged) { state in
+                            .onReceive(self.document.core.contentChanged) { state in
                                 document.updated.toggle()
                             }
                         }
                         
-                        MetalView(document.game)
+                        MetalView(document.core)
                             .zIndex(2)
                             .frame(minWidth: 0,
-                                   maxWidth: geometry.size.width / document.game.previewFactor,
+                                   maxWidth: geometry.size.width / document.core.previewFactor,
                                    minHeight: 0,
-                                   maxHeight: geometry.size.height / document.game.previewFactor,
+                                   maxHeight: geometry.size.height / document.core.previewFactor,
                                    alignment: .topTrailing)
-                            .opacity(helpIsVisible ? 0 : (document.game.state == .Running ? 1 : document.game.previewOpacity))
+                            .opacity(helpIsVisible ? 0 : (document.core.state == .Running ? 1 : document.core.previewOpacity))
                             .animation(.default)
                             .allowsHitTesting(false)
                     }
@@ -86,23 +86,23 @@ struct ContentView: View {
                     Menu {
                         Section(header: Text("Preview")) {
                             Button("Small", action: {
-                                document.game.previewFactor = 4
+                                document.core.previewFactor = 4
                                 updateView.toggle()
                             })
                             .keyboardShortcut("1")
                             Button("Medium", action: {
-                                document.game.previewFactor = 2
+                                document.core.previewFactor = 2
                                 updateView.toggle()
                             })
                             .keyboardShortcut("2")
                             Button("Large", action: {
-                                document.game.previewFactor = 1
+                                document.core.previewFactor = 1
                                 updateView.toggle()
                             })
                             .keyboardShortcut("3")
                             Button("Set Custom", action: {
                                 
-                                if let project = document.game.project {
+                                if let project = document.core.project {
                                     customResWidth = String(project.size.x)
                                     customResHeight = String(project.size.y)
                                 }
@@ -113,10 +113,10 @@ struct ContentView: View {
                             
                             Button("Clear Custom", action: {
                                 
-                                if let final = document.game.assetFolder.getAsset("Final", .Shader) {
+                                if let final = document.core.assetFolder.getAsset("Final", .Shader) {
                                     final.size = nil
-                                    if let asset = document.game.assetFolder.current {
-                                        document.game.createPreview(asset)
+                                    if let asset = document.core.assetFolder.current {
+                                        document.core.createPreview(asset)
                                     }
                                 }
                                 updateView.toggle()
@@ -124,17 +124,17 @@ struct ContentView: View {
                         }
                         Section(header: Text("Opacity")) {
                             Button("Opacity Off", action: {
-                                document.game.previewOpacity = 0
+                                document.core.previewOpacity = 0
                                 updateView.toggle()
                             })
                             .keyboardShortcut("4")
                             Button("Opacity Half", action: {
-                                document.game.previewOpacity = 0.5
+                                document.core.previewOpacity = 0.5
                                 updateView.toggle()
                             })
                             .keyboardShortcut("5")
                             Button("Opacity Full", action: {
-                                document.game.previewOpacity = 1.0
+                                document.core.previewOpacity = 1.0
                                 updateView.toggle()
                             })
                             .keyboardShortcut("6")
@@ -146,7 +146,7 @@ struct ContentView: View {
                         }
                     }
                     label: {
-                        Text("\(document.game.project!.size.x) x \(document.game.project!.size.y)")
+                        Text("\(document.core.project!.size.x) x \(document.core.project!.size.y)")
                         //Label("View", systemImage: "viewfinder")
                     }
                     
@@ -154,10 +154,10 @@ struct ContentView: View {
                         .padding(.horizontal, 20)
                         .opacity(0)
                     
-                    // Game Controls
+                    // Core Controls
                     Button(action: {
-                        document.game.stop()
-                        document.game.start()
+                        document.core.stop()
+                        document.core.start()
                         helpIsVisible = false
                         updateView.toggle()
                     })
@@ -167,15 +167,15 @@ struct ContentView: View {
                     .keyboardShortcut("r")
                     
                     Button(action: {
-                        document.game.stop()
-                        if let asset = document.game.assetFolder.current {
-                            document.game.createPreview(asset)
+                        document.core.stop()
+                        if let asset = document.core.assetFolder.current {
+                            document.core.createPreview(asset)
                         }
                         updateView.toggle()
                     }) {
                         Label("Stop", systemImage: "stop.fill")
                     }.keyboardShortcut("t")
-                    .disabled(document.game.state == .Idle)
+                    .disabled(document.core.state == .Idle)
                     
                     Divider()
                         .padding(.horizontal, 20)
@@ -193,22 +193,22 @@ struct ContentView: View {
                     })
                 }
             }
-            //.onReceive(self.document.game.timeChanged) { value in
+            //.onReceive(self.document.core.timeChanged) { value in
             //    timeString = String(format: "%.02f", value)
             //}
             
-            .onReceive(self.document.game.createPreview) { value in
-                if let asset = document.game.assetFolder.current {
-                    document.game.createPreview(asset)
+            .onReceive(self.document.core.createPreview) { value in
+                if let asset = document.core.assetFolder.current {
+                    document.core.createPreview(asset)
                 }
             }
             
             .onReceive(self.document.help) { value in
                 if self.helpIsVisible == false {
-                    self.document.game.scriptEditor!.activateHelpSession()
+                    self.document.core.scriptEditor!.activateHelpSession()
                 } else {
-                    if let asset = document.game.assetFolder.current {
-                        self.document.game.assetFolder.select(asset.id)
+                    if let asset = document.core.assetFolder.current {
+                        self.document.core.assetFolder.select(asset.id)
                     }
                 }
                 self.helpIsVisible.toggle()
@@ -218,21 +218,21 @@ struct ContentView: View {
                 exportingImage = true
             }
             
-            .onReceive(self.document.game.updateUI) { value in
+            .onReceive(self.document.core.updateUI) { value in
                 updateView.toggle()
             }
         
             if rightSideBarIsVisible == true {
                 if helpIsVisible == true {
                     /*
-                    HelpIndexView(document.game)
+                    HelpIndexView(document.core)
                         .frame(minWidth: 160, idealWidth: 160, maxWidth: 160)
                         .layoutPriority(0)
                         .animation(.easeInOut)
                     */
                 } else {
                     VStack {
-                        if let asset = document.game.assetFolder.current {
+                        if let asset = document.core.assetFolder.current {
                             if asset.type == .Texture {
                                 Button("Attach Image", action: {
                                     importingImage = true
@@ -263,10 +263,10 @@ struct ContentView: View {
                             TextField("Width", text: $customResWidth, onEditingChanged: { (changed) in
                                 if let width = Int(customResWidth), width > 0 {
                                     if let height = Int(customResHeight), height > 0 {
-                                        if let final = document.game.assetFolder.getAsset("Final", .Shader) {
+                                        if let final = document.core.assetFolder.getAsset("Final", .Shader) {
                                             final.size = SIMD2<Int>(width, height)
-                                            if let asset = document.game.assetFolder.current {
-                                                document.game.createPreview(asset)
+                                            if let asset = document.core.assetFolder.current {
+                                                document.core.createPreview(asset)
                                             }
                                         }
                                     }
@@ -275,10 +275,10 @@ struct ContentView: View {
                             TextField("Height", text: $customResHeight, onEditingChanged: { (changed) in
                                 if let width = Int(customResWidth), width > 0 {
                                     if let height = Int(customResHeight), height > 0 {
-                                        if let final = document.game.assetFolder.getAsset("Final", .Shader) {
+                                        if let final = document.core.assetFolder.getAsset("Final", .Shader) {
                                             final.size = SIMD2<Int>(width, height)
-                                            if let asset = document.game.assetFolder.current {
-                                                document.game.createPreview(asset)
+                                            if let asset = document.core.assetFolder.current {
+                                                document.core.createPreview(asset)
                                             }
                                         }
                                     }
@@ -297,13 +297,13 @@ struct ContentView: View {
                         do {
                             let selectedFiles = try result.get()
                             if selectedFiles.count > 0 {
-                                if let asset = document.game.assetFolder.current {
-                                    document.game.assetFolder.attachImage(asset, selectedFiles[0])
+                                if let asset = document.core.assetFolder.current {
+                                    document.core.assetFolder.attachImage(asset, selectedFiles[0])
                                     asset.name = selectedFiles[0].deletingPathExtension().lastPathComponent
-                                    document.game.assetFolder.current = nil
-                                    document.game.assetFolder.select(asset.id)
+                                    document.core.assetFolder.current = nil
+                                    document.core.assetFolder.select(asset.id)
                                     updateView.toggle()
-                                    document.game.createPreview(asset)
+                                    document.core.createPreview(asset)
                                 }
                             }
                         } catch {
@@ -320,13 +320,13 @@ struct ContentView: View {
                     ) { result in
                         do {
                             let url = try result.get()
-                            let game = document.game
-                            if let project = game.project {
-                                if let texture = project.render(assetFolder: game.assetFolder, device: game.device, time: 0, frame: 0, viewSize: SIMD2<Int>(Int(game.view.frame.width), Int(game.view.frame.height))) {
+                            let core = document.core
+                            if let project = core.project {
+                                if let texture = project.render(assetFolder: core.assetFolder, device: core.device, time: 0, frame: 0, viewSize: SIMD2<Int>(Int(core.view.frame.width), Int(core.view.frame.height))) {
                                     
                                     project.stopDrawing(syncTexture: texture, waitUntilCompleted: true)
                                     
-                                    if let cgiTexture = project.makeCGIImage(game.device, game.metalStates.getComputeState(state: .MakeCGIImage), texture) {
+                                    if let cgiTexture = project.makeCGIImage(core.device, core.metalStates.getComputeState(state: .MakeCGIImage), texture) {
                                         if let image = makeCGIImage(texture: cgiTexture, forImage: true) {
                                             if let imageDestination = CGImageDestinationCreateWithURL(url as CFURL, kUTTypePNG, 1, nil) {
                                                 CGImageDestinationAddImage(imageDestination, image, nil)
@@ -344,13 +344,13 @@ struct ContentView: View {
                     // Delete an asset
                     .alert(isPresented: $showDeleteAssetAlert) {
                         Alert(
-                            title: Text("Do you want to remove the asset '\(document.game.assetFolder.current!.name)' ?"),
+                            title: Text("Do you want to remove the asset '\(document.core.assetFolder.current!.name)' ?"),
                             message: Text("This action cannot be undone!"),
                             primaryButton: .destructive(Text("Yes"), action: {
-                                if let asset = document.game.assetFolder.current {
-                                    document.game.assetFolder.removeAsset(asset)
-                                    for a in document.game.assetFolder.assets {
-                                        document.game.assetFolder.select(a.id)
+                                if let asset = document.core.assetFolder.current {
+                                    document.core.assetFolder.removeAsset(asset)
+                                    for a in document.core.assetFolder.assets {
+                                        document.core.assetFolder.select(a.id)
                                         break
                                     }
                                     self.updateView.toggle()
