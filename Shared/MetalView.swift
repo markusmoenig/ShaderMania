@@ -10,6 +10,12 @@ import MetalKit
 
 public class DMTKView       : MTKView
 {
+    enum MetalViewType {
+        case Main, Nodes
+    }
+    
+    var viewType            : MetalViewType = .Main
+
     var core                : Core!
 
     var keysDown            : [Float] = []
@@ -218,9 +224,12 @@ struct MetalView: NSViewRepresentable {
     var core                : Core!
     var trackingArea        : NSTrackingArea?
 
-    init(_ core: Core)
+    var viewType            : DMTKView.MetalViewType
+
+    init(_ core: Core,_ viewType: DMTKView.MetalViewType)
     {
         self.core = core
+        self.viewType = viewType
     }
     
     func makeCoordinator() -> Coordinator {
@@ -242,7 +251,12 @@ struct MetalView: NSViewRepresentable {
         mtkView.enableSetNeedsDisplay = true
         mtkView.isPaused = true
                 
-        core.setupView(mtkView)
+        if viewType == .Main {
+            core.setupView(mtkView)
+        } else
+        if viewType == .Nodes {
+            core.setupNodesView(mtkView)
+        }
         
         return mtkView
     }
@@ -268,7 +282,12 @@ struct MetalView: NSViewRepresentable {
         }
         
         func draw(in view: MTKView) {
-            parent.core.draw()
+            if parent.viewType == .Main {
+                parent.core.draw()
+            } else
+            if parent.viewType == .Nodes {
+                parent.core.nodesWidget.draw()
+            }
         }
     }
 }
@@ -277,9 +296,12 @@ struct MetalView: UIViewRepresentable {
     typealias UIViewType = MTKView
     var core             : Core!
 
-    init(_ core: Core)
+    var viewType            : DMTKView.MetalViewType
+
+    init(_ core: Core,_ viewType: DMTKView.MetalViewType)
     {
         self.core = core
+        self.viewType = viewType
     }
     
     func makeCoordinator() -> Coordinator {
@@ -301,7 +323,12 @@ struct MetalView: UIViewRepresentable {
         mtkView.enableSetNeedsDisplay = true
         mtkView.isPaused = true
                 
-        core.setupView(mtkView)
+        if viewType == .Main {
+            core.setupView(mtkView)
+        } else
+        if viewType == .Nodes {
+            core.setupNodesView(mtkView)
+        }
         
         return mtkView
     }
@@ -327,7 +354,12 @@ struct MetalView: UIViewRepresentable {
         }
         
         func draw(in view: MTKView) {
-            parent.core.draw()
+            if parent.viewType == .Main {
+                parent.core.draw()
+            } else
+            if parent.viewType == .Nodes {
+                parent.core.nodesWidget.draw()
+            }
         }
     }
 }

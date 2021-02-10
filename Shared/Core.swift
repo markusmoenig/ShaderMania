@@ -20,6 +20,8 @@ public class Core       : ObservableObject
     var view            : DMTKView!
     var device          : MTLDevice!
 
+    var nodesView       : DMTKView!
+
     var texture         : Texture2D? = nil
     var metalStates     : MetalStates!
     
@@ -81,6 +83,8 @@ public class Core       : ObservableObject
     var frameworkId     : String? = nil
     
     var project         : Project? = nil
+    
+    var nodesWidget     : NodesWidget!
 
     public init(_ frameworkId: String? = nil)
     {
@@ -139,6 +143,13 @@ public class Core       : ObservableObject
         checkTexture()
         
         assetFolder.assetCompileAll()
+    }
+    
+    public func setupNodesView(_ view: DMTKView)
+    {
+        nodesView = view
+        view.core = self
+        nodesWidget = NodesWidget(self)
     }
     
     public func load(_ data: Data)

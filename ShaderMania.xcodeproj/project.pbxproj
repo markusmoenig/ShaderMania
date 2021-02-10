@@ -44,6 +44,10 @@
 		2B0EEABB2566035700C84C6C /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEABA2566035700C84C6C /* Project.swift */; };
 		2B0EEABC2566035700C84C6C /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEABA2566035700C84C6C /* Project.swift */; };
 		2B0EEAC3256619D000C84C6C /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B0EEAC2256619D000C84C6C /* CloudKit.framework */; };
+		2B36F66825D3BFCC001611BE /* NodesWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66725D3BFCC001611BE /* NodesWidget.swift */; };
+		2B36F66925D3BFCC001611BE /* NodesWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66725D3BFCC001611BE /* NodesWidget.swift */; };
+		2B36F66D25D3C8A0001611BE /* MetalDrawables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */; };
+		2B36F66E25D3C8A0001611BE /* MetalDrawables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */; };
 		2B3D4C7925A68ECA00D2F8EA /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D4C7825A68ECA00D2F8EA /* Views.swift */; };
 		2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D4C7825A68ECA00D2F8EA /* Views.swift */; };
 		2B77B7BB25773978002D99C0 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B77B7BA25773978002D99C0 /* File.swift */; };
@@ -76,6 +80,8 @@
 		2B0EEAA62565DFA800C84C6C /* Files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Files; sourceTree = "<group>"; };
 		2B0EEABA2566035700C84C6C /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 		2B0EEAC2256619D000C84C6C /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		2B36F66725D3BFCC001611BE /* NodesWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodesWidget.swift; sourceTree = "<group>"; };
+		2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDrawables.swift; sourceTree = "<group>"; };
 		2B3D4C7825A68ECA00D2F8EA /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		2B77B7BA25773978002D99C0 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -124,6 +130,8 @@
 				2B0EEA7F2565DF7800C84C6C /* Metal.metal */,
 				2B0EEA802565DF7800C84C6C /* MetalStates.swift */,
 				2B0EEA762565DF7800C84C6C /* MetalView.swift */,
+				2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */,
+				2B36F66725D3BFCC001611BE /* NodesWidget.swift */,
 				2B0EEA7E2565DF7800C84C6C /* ScriptEditor.swift */,
 				2B0EEA7A2565DF7800C84C6C /* ShaderCompiler.swift */,
 				2B0EEA7B2565DF7800C84C6C /* Utils.swift */,
@@ -290,10 +298,12 @@
 				2B3D4C7925A68ECA00D2F8EA /* Views.swift in Sources */,
 				2B0EEA872565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA02565DF9A00C84C6C /* Classes.swift in Sources */,
+				2B36F66D25D3C8A0001611BE /* MetalDrawables.swift in Sources */,
 				2B0EEA832565DF7800C84C6C /* ContentView.swift in Sources */,
 				2B77B7BB25773978002D99C0 /* File.swift in Sources */,
 				2B0EEA622565DF3A00C84C6C /* ShaderManiaApp.swift in Sources */,
 				2B0EEA8B2565DF7800C84C6C /* Core.swift in Sources */,
+				2B36F66825D3BFCC001611BE /* NodesWidget.swift in Sources */,
 				2B0EEA8F2565DF7800C84C6C /* ScriptEditor.swift in Sources */,
 				2B0EEA9E2565DF9A00C84C6C /* Texture2D.swift in Sources */,
 				2B0EEABB2566035700C84C6C /* Project.swift in Sources */,
@@ -315,10 +325,12 @@
 				2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */,
 				2B0EEA882565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA12565DF9A00C84C6C /* Classes.swift in Sources */,
+				2B36F66E25D3C8A0001611BE /* MetalDrawables.swift in Sources */,
 				2B0EEA842565DF7800C84C6C /* ContentView.swift in Sources */,
 				2B77B7BC25773978002D99C0 /* File.swift in Sources */,
 				2B0EEA632565DF3A00C84C6C /* ShaderManiaApp.swift in Sources */,
 				2B0EEA8C2565DF7800C84C6C /* Core.swift in Sources */,
+				2B36F66925D3BFCC001611BE /* NodesWidget.swift in Sources */,
 				2B0EEA902565DF7800C84C6C /* ScriptEditor.swift in Sources */,
 				2B0EEA9F2565DF9A00C84C6C /* Texture2D.swift in Sources */,
 				2B0EEABC2566035700C84C6C /* Project.swift in Sources */,
