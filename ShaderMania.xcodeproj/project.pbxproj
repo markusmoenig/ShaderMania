@@ -48,6 +48,10 @@
 		2B36F66925D3BFCC001611BE /* NodesWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66725D3BFCC001611BE /* NodesWidget.swift */; };
 		2B36F66D25D3C8A0001611BE /* MetalDrawables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */; };
 		2B36F66E25D3C8A0001611BE /* MetalDrawables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */; };
+		2B36F67625D4DE84001611BE /* OpenSans.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 2B36F67425D4DE84001611BE /* OpenSans.tiff */; };
+		2B36F67725D4DE84001611BE /* OpenSans.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 2B36F67425D4DE84001611BE /* OpenSans.tiff */; };
+		2B36F67825D4DE84001611BE /* OpenSans.json in Resources */ = {isa = PBXBuildFile; fileRef = 2B36F67525D4DE84001611BE /* OpenSans.json */; };
+		2B36F67925D4DE84001611BE /* OpenSans.json in Resources */ = {isa = PBXBuildFile; fileRef = 2B36F67525D4DE84001611BE /* OpenSans.json */; };
 		2B3D4C7925A68ECA00D2F8EA /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D4C7825A68ECA00D2F8EA /* Views.swift */; };
 		2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D4C7825A68ECA00D2F8EA /* Views.swift */; };
 		2B77B7BB25773978002D99C0 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B77B7BA25773978002D99C0 /* File.swift */; };
@@ -82,6 +86,8 @@
 		2B0EEAC2256619D000C84C6C /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		2B36F66725D3BFCC001611BE /* NodesWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodesWidget.swift; sourceTree = "<group>"; };
 		2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDrawables.swift; sourceTree = "<group>"; };
+		2B36F67425D4DE84001611BE /* OpenSans.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = OpenSans.tiff; sourceTree = "<group>"; };
+		2B36F67525D4DE84001611BE /* OpenSans.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = OpenSans.json; sourceTree = "<group>"; };
 		2B3D4C7825A68ECA00D2F8EA /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		2B77B7BA25773978002D99C0 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -138,6 +144,7 @@
 				2B0EEABA2566035700C84C6C /* Project.swift */,
 				2B77B7BA25773978002D99C0 /* File.swift */,
 				2B0EEA9A2565DF9A00C84C6C /* Classes */,
+				2B36F67325D4DE53001611BE /* Fonts */,
 				2B0EEAA62565DFA800C84C6C /* Files */,
 				2B0EEA512565DF3A00C84C6C /* Assets.xcassets */,
 			);
@@ -186,6 +193,15 @@
 				2B0EEAC2256619D000C84C6C /* CloudKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2B36F67325D4DE53001611BE /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				2B36F67525D4DE84001611BE /* OpenSans.json */,
+				2B36F67425D4DE84001611BE /* OpenSans.tiff */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -266,7 +282,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B36F67825D4DE84001611BE /* OpenSans.json in Resources */,
 				2B0EEAA72565DFA800C84C6C /* Files in Resources */,
+				2B36F67625D4DE84001611BE /* OpenSans.tiff in Resources */,
 				2B0EEA682565DF3A00C84C6C /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -275,7 +293,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B36F67925D4DE84001611BE /* OpenSans.json in Resources */,
 				2B0EEAA82565DFA800C84C6C /* Files in Resources */,
+				2B36F67725D4DE84001611BE /* OpenSans.tiff in Resources */,
 				2B0EEA692565DF3A00C84C6C /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

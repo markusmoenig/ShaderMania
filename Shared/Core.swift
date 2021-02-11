@@ -319,7 +319,7 @@ public class Core       : ObservableObject
     {
         if state == .Idle {
             clearLocalAudio()
-            if asset.type == .Buffer || asset.type == .Shader {
+            if asset.type == .Shader {
                 updateOnce()
             } else
             if asset.type == .Shader {

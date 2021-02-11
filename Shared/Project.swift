@@ -82,6 +82,7 @@ class Project
             }
             checkTextures(device)
             
+            /*
             // Do buffers
             for asset in assetFolder.assets {
                 if asset.type == .Buffer {
@@ -97,6 +98,7 @@ class Project
                     }
                 }
             }
+            */
             
             // Final Shader
             drawShader(final, texture!, device)

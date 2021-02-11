@@ -21,18 +21,6 @@ class AssetFolder       : Codable
     
     init()
     {
-        /*
-        CKContainer.default().requestApplicationPermission(.userDiscoverability) { (status, error) in
-                    CKContainer.default().fetchUserRecordID { (record, error) in
-                        CKContainer.default().discoverUserIdentity(withUserRecordID: record!, completionHandler: { (userID, error) in
-                            print(userID?.hasiCloudAccount)
-                            print(userID?.lookupInfo?.phoneNumber)
-                            print(userID?.lookupInfo?.emailAddress)
-                            print((userID?.nameComponents?.givenName)! + " " + (userID?.nameComponents?.familyName)!)
-                        })
-                    }
-                }
-        */
     }
     
     func setup(_ core: Core)
@@ -327,6 +315,9 @@ class Asset         : Codable, Equatable
     var name        = ""
     var value       = ""
     
+    var nodeRect    = MMRect()
+    var nodeData    = float4(0, 0, 0, 0)
+    
     var data        : [Data] = []
     var dataIndex   : Int = 0
     var dataScale   : Double = 1
@@ -356,6 +347,7 @@ class Asset         : Codable, Equatable
         case data
         case slots
         case output
+        case nodeData
     }
     
     init(type: AssetType, name: String, value: String = "", data: [Data] = [])
@@ -379,7 +371,14 @@ class Asset         : Codable, Equatable
         if let output = try container.decodeIfPresent(UUID?.self, forKey: .output) {
             self.output = output
         }
+        // Convert old projects
+        if type == .Buffer {
+            type = .Shader
+        }
         data = try container.decode([Data].self, forKey: .data)
+        if let nodeData = try container.decodeIfPresent(float4.self, forKey: .nodeData) {
+            self.nodeData = nodeData
+        }
     }
     
     func encode(to encoder: Encoder) throws
@@ -392,6 +391,7 @@ class Asset         : Codable, Equatable
         try container.encode(data, forKey: .data)
         try container.encode(slots, forKey: .slots)
         try container.encode(output, forKey: .output)
+        try container.encode(nodeData, forKey: .nodeData)
     }
     
     static func ==(lhs:Asset, rhs:Asset) -> Bool { // Implement Equatable

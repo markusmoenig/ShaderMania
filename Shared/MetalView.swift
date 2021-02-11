@@ -68,30 +68,27 @@ public class DMTKView       : MTKView
     }
         
     override public func mouseDown(with event: NSEvent) {
-        if core.state == .Running {
-            if event.clickCount == 2 {
-                hasDoubleTap = true
-            } else {
-                mouseIsDown = true
-                setMousePos(event)
-            }
-        }
+        setMousePos(event)
+        core.nodesWidget.touchDown(mousePos)
     }
     
     override public func mouseDragged(with event: NSEvent) {
-        if core.state == .Running && mouseIsDown {
-            setMousePos(event)
-        }
+        setMousePos(event)
+        core.nodesWidget.touchMoved(mousePos)
     }
     
     override public func mouseUp(with event: NSEvent) {
-        if core.state == .Running {
-            mouseIsDown = false
-            hasTap = false
-            hasDoubleTap = false
-            setMousePos(event)
-        }
+        mouseIsDown = false
+        hasTap = false
+        hasDoubleTap = false
+        setMousePos(event)
+        core.nodesWidget.touchUp(mousePos)
     }
+    
+    override public func scrollWheel(with event: NSEvent) {
+        core.nodesWidget.scrollWheel(float3(Float(event.deltaX), Float(event.deltaY), Float(event.deltaZ)))
+    }
+    
     #elseif os(iOS)
     
     func platformInit()

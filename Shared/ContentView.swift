@@ -17,7 +17,7 @@ struct ContentView: View {
         case Source, Nodes, Both
     }
     
-    @State var editingState                 : EditingState = .Source
+    @State var editingState                 : EditingState = .Both
 
     @Binding var document                   : ShaderManiaDocument
 
@@ -65,6 +65,7 @@ struct ContentView: View {
 
                                     WebView(document.core, deviceColorScheme).tabItem {
                                     }
+                                        .animation(.default)
                                         .frame(height: geometry.size.height)
                                         .tag(1)
                                         .onChange(of: deviceColorScheme) { newValue in
@@ -74,7 +75,8 @@ struct ContentView: View {
                                 .zIndex(0)
                                 .frame(maxWidth: .infinity)
                                 .layoutPriority(2)
-                                
+                                .animation(.default)
+
                                 .onReceive(self.document.core.contentChanged) { state in
                                     document.updated.toggle()
                                 }

@@ -114,6 +114,7 @@ struct LeftPanelView: View {
                 .padding(.leading, 10)
                 .padding(.bottom, 1)
                 
+                /*
                 Button(action: {
                     document.core.assetFolder.addBuffer("New Shader")
                     assetName = document.core.assetFolder.current!.name
@@ -126,7 +127,7 @@ struct LeftPanelView: View {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .padding(.bottom, 1)
-                Spacer()
+                Spacer()*/
             }
             // Edit Asset name
             .popover(isPresented: self.$showAssetNamePopover,
@@ -192,7 +193,7 @@ struct LeftPanelView: View {
                 }
                 DisclosureGroup("Shaders", isExpanded: $showBufferItems) {
                     ForEach(document.core.assetFolder.assets, id: \.id) { asset in
-                        if asset.type == .Buffer {
+                        if asset.type == .Shader {
                             Button(action: {
                                 document.core.assetFolder.select(asset.id)
                                 document.core.createPreview(asset)

@@ -95,7 +95,7 @@ class ScriptEditor
             sessions += 1
         }
 
-        if asset.type == .Shader || asset.type == .Common || asset.type == .Buffer {
+        if asset.type == .Shader || asset.type == .Common {
             webView.evaluateJavaScript(
                 """
                 var \(asset.scriptName) = ace.createEditSession(`\(asset.value)`)

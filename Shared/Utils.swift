@@ -118,6 +118,18 @@ class MMRect
     {
         set(0, 0, 0, 0)
     }
+    
+    /// Returns the position of the rect as float2
+    func position() -> float2
+    {
+        return float2(x, y)
+    }
+    
+    /// Returns the size of the rect as float2
+    func size() -> float2
+    {
+        return float2(width, height)
+    }
 }
 
 func makeCGIImage(texture: MTLTexture, forImage: Bool) -> CGImage?
