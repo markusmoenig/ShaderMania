@@ -307,7 +307,11 @@ class Asset         : Codable, Equatable
     var name        = ""
     var value       = ""
     
+    // For Drawing
     var nodeRect    = MMRect()
+    var nodeIn      = [MMRect(), MMRect(),MMRect(),MMRect()]
+    var nodeOut     = MMRect()
+
     var nodeData    = float4(0, 0, 0, 0)
     
     var data        : [Data] = []

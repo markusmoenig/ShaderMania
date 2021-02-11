@@ -78,7 +78,7 @@ class MetalDrawables
         }
     }
     
-    @discardableResult func encodeStart(_ clearColor: float4 = float4(0.1, 0.1, 0.1, 1.000)) -> MTLRenderCommandEncoder?
+    @discardableResult func encodeStart(_ clearColor: float4 = float4(0.125, 0.129, 0.137, 1.000)) -> MTLRenderCommandEncoder?
     {
         if font == nil { font = Font(name: "OpenSans", core: metalView.core) }
         

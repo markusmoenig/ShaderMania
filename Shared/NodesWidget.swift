@@ -118,10 +118,26 @@ public class NodesWidget    : ObservableObject
         rect.y += graphOffset.y
 
         //drawables.drawBox.draw(x: rect.x + item.rect.x, y: rect.y + item.rect.y, width: item.rect.width, height: item.rect.height, round: 12 * graphZoom, borderSize: 1, fillColor: skin.normalInteriorColor, borderColor: selected ? skin.selectedBorderColor : skin.normalInteriorColor)
-        drawables.drawBox(position: rect.position(), size: rect.size(), rounding: 12 * graphZoom, borderSize: 1, fillColor: skin.normalInteriorColor, borderColor: selected ? skin.selectedBorderColor : skin.normalInteriorColor)
+        drawables.drawBox(position: rect.position(), size: rect.size(), rounding: 8 * graphZoom, borderSize: 1, fillColor: skin.normalInteriorColor, borderColor: selected ? skin.selectedBorderColor : skin.normalInteriorColor)
         drawables.drawText(position: rect.position() + float2(8, 4) * graphZoom, text: node.name, size: 15 * graphZoom, color: skin.normalTextColor)
         
-        drawables.drawLine(startPos: rect.position() + float2(4,24) * graphZoom, endPos: rect.position() + float2(rect.width - 8 * graphZoom, 24 * graphZoom), radius: 0.6, fillColor: skin.normalBorderColor)
+        drawables.drawLine(startPos: rect.position() + float2(6,24) * graphZoom, endPos: rect.position() + float2(rect.width - 8 * graphZoom, 24 * graphZoom), radius: 0.6, fillColor: skin.normalBorderColor)
+        
+        var x = rect.x - 7 * graphZoom
+        var y = rect.y + 32 * graphZoom
+        for i in 0..<4 {
+            
+            drawables.drawDisk(position: float2(x, y), radius: 7 * graphZoom, borderSize: 1, fillColor: skin.normalInteriorColor, borderColor: selected ? skin.selectedBorderColor : skin.normalBorderColor)
+            node.nodeIn[i].set(x, y, 14 * graphZoom, 14 * graphZoom)
+
+            y += 20 * graphZoom
+        }
+        
+        x = rect.x + rect.width - 7 * graphZoom
+        y = rect.y + 32 * graphZoom
+        
+        node.nodeOut.set(x, y, 14 * graphZoom, 14 * graphZoom)
+        drawables.drawBox(position: float2(x, y), size: float2(14 * graphZoom, 14 * graphZoom), borderSize: 1, fillColor: skin.normalInteriorColor, borderColor: selected ? skin.selectedBorderColor : skin.normalBorderColor)
     }
     
     func touchDown(_ pos: float2)
@@ -147,8 +163,8 @@ public class NodesWidget    : ObservableObject
     {
         if action == .DragNode {
             if let node = currentNode {
-                node.nodeData.x += pos.x - dragStart.x
-                node.nodeData.y += pos.y - dragStart.y
+                node.nodeData.x += (pos.x - dragStart.x) / graphZoom
+                node.nodeData.y += (pos.y - dragStart.y) / graphZoom
                 dragStart = pos
                 drawables.update()
             }
