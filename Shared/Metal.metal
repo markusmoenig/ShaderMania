@@ -144,11 +144,26 @@ fragment float4 m4mBoxDrawable(RasterizerData in [[stage_in]],
         col.xyz = sample.xyz;
         col.w = col.w * sample.w;
     }
+    
+    return col;
+}
 
-    //float4 col = float4( data->fillColor.x, data->fillColor.y, data->fillColor.z, m4mFillMask( dist ) * data->fillColor.w );
-    //float4 col = float4( data->fillColor.x, data->fillColor.y, data->fillColor.z, smoothstep(0.0, -0.1, dist) * data->fillColor.w );
-    //col = mix( col, data->borderColor, m4mBorderMask( dist, data->borderSize ) );
-    //col = mix( col, data->borderColor, 1.0-smoothstep(0.0, data->borderSize, abs(dist)) );
+// Box
+fragment float4 m4mLineDrawable(RasterizerData in [[stage_in]],
+                               constant LineUniform *data [[ buffer(0) ]])
+{
+    float2 uv = in.textureCoordinate * ( data->size + data->borderSize / 2.0);
+    uv -= float2(data->size / 2.0 + data->borderSize / 2.0);
+    
+    float2 o = uv - data->sp;
+    float2 l = data->ep - data->sp;
+    
+    float h = clamp( dot(o,l)/dot(l,l), 0.0, 1.0 );
+    float dist = -(data->width-distance(o,l*h));
+    
+    float4 col = float4( data->fillColor.x, data->fillColor.y, data->fillColor.z, m4mFillMask( dist ) * data->fillColor.w );
+    col = mix( col, data->borderColor, m4mBorderMask( dist, data->borderSize ) );
+    
     return col;
 }
 

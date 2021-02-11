@@ -78,7 +78,7 @@ class MetalDrawables
         }
     }
     
-    @discardableResult func encodeStart() -> MTLRenderCommandEncoder?
+    @discardableResult func encodeStart(_ clearColor: float4 = float4(0.1, 0.1, 0.1, 1.000)) -> MTLRenderCommandEncoder?
     {
         if font == nil { font = Font(name: "OpenSans", core: metalView.core) }
         
@@ -89,7 +89,7 @@ class MetalDrawables
         let renderPassDescriptor = metalView.currentRenderPassDescriptor
         
         renderPassDescriptor!.colorAttachments[0].loadAction = .clear
-        renderPassDescriptor!.colorAttachments[0].clearColor = MTLClearColor( red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
+        renderPassDescriptor!.colorAttachments[0].clearColor = MTLClearColor( red: Double(clearColor.x), green: Double(clearColor.y), blue: Double(clearColor.z), alpha: 1.0)
         
         if renderPassDescriptor != nil {
             renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor! )
@@ -155,7 +155,7 @@ class MetalDrawables
         data.hasTexture = 0
         data.round = rounding
 
-        let rect = MMRect(position.x - data.borderSize / 2, position.y - data.borderSize / 2, data.size.x + data.borderSize * 2, data.size.y + data.borderSize * 2, scale: 1)
+        let rect = MMRect(position.x - data.borderSize / 2, position.y - data.borderSize / 2, size.x + data.borderSize * 2, size.y + data.borderSize * 2, scale: 1)
         let vertexData = createVertexData(rect)
         
         renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
@@ -163,6 +163,45 @@ class MetalDrawables
         
         renderEncoder.setFragmentBytes(&data, length: MemoryLayout<BoxUniform>.stride, index: 0)
         renderEncoder.setRenderPipelineState(boxState!)
+        renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
+    }
+    
+    /// Draws a box
+    func drawLine(startPos: float2, endPos: float2, radius: Float, borderSize: Float = 0, fillColor: float4 = float4(1,1,1,1), borderColor: float4 = float4(0,0,0,0))
+    {
+        let sx = startPos.x
+        let sy = startPos.y
+        let ex = endPos.x
+        let ey = endPos.y
+        
+        let minX = min(sx, ex)
+        let maxX = max(sx, ex)
+        let minY = min(sy, ey)
+        let maxY = max(sy, ey)
+        
+        let areaWidth : Float = maxX - minX + borderSize + radius * 2
+        let areaHeight : Float = maxY - minY + borderSize + radius * 2
+                
+        let middleX : Float = (sx + ex) / 2
+        let middleY : Float = (sy + ey) / 2
+        
+        var data = LineUniform()
+        data.size = float2(areaWidth, areaHeight)
+        data.width = radius
+        data.borderSize = borderSize
+        data.fillColor = fillColor
+        data.borderColor = borderColor
+        data.sp = float2(sx - middleX, middleY - sy)
+        data.ep = float2(ex - middleX, middleY - ey)
+
+        let rect = MMRect( minX - borderSize / 2, minY - borderSize / 2, areaWidth, areaHeight, scale: 1)
+        let vertexData = createVertexData(rect)
+        
+        renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
+        renderEncoder.setVertexBytes(&viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
+        
+        renderEncoder.setFragmentBytes(&data, length: MemoryLayout<LineUniform>.stride, index: 0)
+        renderEncoder.setRenderPipelineState(metalView.core.metalStates.getState(state: .DrawLine))
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
     }
     

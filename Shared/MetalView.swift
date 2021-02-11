@@ -29,6 +29,9 @@ public class DMTKView       : MTKView
     var buttonDown          : String? = nil
     var swipeDirection      : String? = nil
 
+    var commandIsDown       : Bool = false
+    var shiftIsDown         : Bool = false
+    
     func reset()
     {
         keysDown = []
@@ -87,6 +90,21 @@ public class DMTKView       : MTKView
     
     override public func scrollWheel(with event: NSEvent) {
         core.nodesWidget.scrollWheel(float3(Float(event.deltaX), Float(event.deltaY), Float(event.deltaZ)))
+    }
+    
+    override public func flagsChanged(with event: NSEvent) {
+        //https://stackoverflow.com/questions/9268045/how-can-i-detect-that-the-shift-key-has-been-pressed
+        if event.modifierFlags.contains(.shift) {
+            shiftIsDown = true
+        } else {
+            shiftIsDown = false
+        }
+        
+        if event.modifierFlags.contains(.command) {
+            commandIsDown = true
+        } else {
+            commandIsDown = false
+        }
     }
     
     #elseif os(iOS)

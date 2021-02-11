@@ -27,20 +27,12 @@ class AssetFolder       : Codable
     {
         self.core = core
         
-        guard let commonPath = Bundle.main.path(forResource: "Common", ofType: "", inDirectory: "Files/default") else {
-            return
-        }
-        
-        if let value = try? String(contentsOfFile: commonPath, encoding: String.Encoding.utf8) {
-            assets.append(Asset(type: .Common, name: "Common", value: value))
-        }
-        
         guard let path = Bundle.main.path(forResource: "Shader", ofType: "", inDirectory: "Files/default") else {
             return
         }
         
         if let value = try? String(contentsOfFile: path, encoding: String.Encoding.utf8) {
-            assets.append(Asset(type: .Shader, name: "Final", value: value))
+            assets.append(Asset(type: .Shader, name: "Shader", value: value))
             current = assets[0]
         }
     }
@@ -372,7 +364,7 @@ class Asset         : Codable, Equatable
             self.output = output
         }
         // Convert old projects
-        if type == .Buffer {
+        if type == .Buffer || type == .Common {
             type = .Shader
         }
         data = try container.decode([Data].self, forKey: .data)
