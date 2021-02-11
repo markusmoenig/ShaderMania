@@ -71,6 +71,7 @@ public class Core       : ObservableObject
     let helpTextChanged = PassthroughSubject<Void, Never>()
 
     let contentChanged  = PassthroughSubject<Void, Never>()
+    let selectionChanged = PassthroughSubject<Asset?, Never>()
 
     var assetError      = CompileError()
     let coreError       = PassthroughSubject<Void, Never>()

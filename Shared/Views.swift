@@ -10,76 +10,23 @@ import SwiftUI
 /// ParameterView
 struct ParameterView: View {
     @State var document                     : ShaderManiaDocument
+    @State var currentNode                  : Asset? = nil
+    
+    @Binding var updateView                 : Bool
 
     var body: some View {
         VStack {
-            
-        }
-    }
-}
-
-/// Middle
-struct MiddleToolbarView: View {
-    @State var document                     : ShaderManiaDocument
-    
-    @Binding var editingState               : ContentView.EditingState
-
-    var body: some View {
-        HStack {
-            Button(action: {
-                editingState = .Source
-            })
-            {
-                Text("Source")
+            if let node = currentNode {
+                Text("Parameters for \(node.name)")
             }
-            .frame(minWidth: 0, maxWidth: 80, maxHeight: 20)
-            .font(.system(size: 13))
-            .background(editingState == .Source ? Color.accentColor.opacity(1) : Color.accentColor.opacity(0.5))
-            .cornerRadius(10)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.gray, lineWidth: 0)
-            )
-            .padding(.leading, 10)
-            .buttonStyle(PlainButtonStyle())
             
-            Button(action: {
-                editingState = .Nodes
-            })
-            {
-                Text("Nodes")
-            }
-            .frame(minWidth: 0, maxWidth: 80, maxHeight: 20)
-            .font(.system(size: 13))
-            .background(editingState == .Nodes ? Color.accentColor.opacity(1) : Color.accentColor.opacity(0.5))
-            .cornerRadius(10)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.gray, lineWidth: 0)
-            )
-            .padding(.leading, 20)
-            .buttonStyle(PlainButtonStyle())
-            
-            Button(action: {
-                editingState = .Both
-            })
-            {
-                Text("Both")
-            }
-            .frame(minWidth: 0, maxWidth: 80, maxHeight: 20)
-            .font(.system(size: 13))
-            .background(editingState == .Both ? Color.accentColor.opacity(1) : Color.accentColor.opacity(0.5))
-            .cornerRadius(10)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.gray, lineWidth: 0)
-            )
-            .padding(.leading, 20)
-            .buttonStyle(PlainButtonStyle())
-            
+            Divider()
             Spacer()
         }
-        .padding(.bottom, editingState == .Source ? 4 : 0)
+        
+        .onReceive(self.document.core.selectionChanged) { asset in
+            currentNode = asset
+        }
     }
 }
 

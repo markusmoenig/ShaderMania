@@ -18,6 +18,7 @@ struct ContentView: View {
     }
     
     @State var editingState                 : EditingState = .Both
+    @State var editingStateText             : String = " Source & Nodes"
 
     @Binding var document                   : ShaderManiaDocument
 
@@ -46,7 +47,7 @@ struct ContentView: View {
         
         NavigationView() {
 
-            ParameterView(document: document)
+            ParameterView(document: document, updateView: $updateView)
 
             /*
             LeftPanelView(document: document, updateView: $updateView, showAssetNamePopover: $showAssetNamePopover, assetName: $assetName, showDeleteAssetAlert: $showDeleteAssetAlert)
@@ -82,9 +83,7 @@ struct ContentView: View {
                                 }
                             }
                         }
-                        
-                        MiddleToolbarView(document: document, editingState: $editingState)
-                        
+                                                
                         if editingState == .Nodes || editingState == .Both {
                             MetalView(document.core, .Nodes)
                                 .zIndex(0)
@@ -109,75 +108,22 @@ struct ContentView: View {
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {
                 
-                Menu {
-                    Section(header: Text("Preview")) {
-                        Button("Small", action: {
-                            document.core.previewFactor = 4
-                            updateView.toggle()
-                        })
-                        .keyboardShortcut("1")
-                        Button("Medium", action: {
-                            document.core.previewFactor = 2
-                            updateView.toggle()
-                        })
-                        .keyboardShortcut("2")
-                        Button("Large", action: {
-                            document.core.previewFactor = 1
-                            updateView.toggle()
-                        })
-                        .keyboardShortcut("3")
-                        Button("Set Custom", action: {
-                            
-                            if let project = document.core.project {
-                                customResWidth = String(project.size.x)
-                                customResHeight = String(project.size.y)
-                            }
-                            
-                            showCustomResPopover = true
-                            updateView.toggle()
-                        })
-                        
-                        Button("Clear Custom", action: {
-                            
-                            if let final = document.core.assetFolder.getAsset("Final", .Shader) {
-                                final.size = nil
-                                if let asset = document.core.assetFolder.current {
-                                    document.core.createPreview(asset)
-                                }
-                            }
-                            updateView.toggle()
-                        })
-                    }
-                    Section(header: Text("Opacity")) {
-                        Button("Opacity Off", action: {
-                            document.core.previewOpacity = 0
-                            updateView.toggle()
-                        })
-                        .keyboardShortcut("4")
-                        Button("Opacity Half", action: {
-                            document.core.previewOpacity = 0.5
-                            updateView.toggle()
-                        })
-                        .keyboardShortcut("5")
-                        Button("Opacity Full", action: {
-                            document.core.previewOpacity = 1.0
-                            updateView.toggle()
-                        })
-                        .keyboardShortcut("6")
-                    }
-                    Section(header: Text("Export")) {
-                        Button("Export Image...", action: {
-                            exportingImage = true
-                        })
-                    }
-                }
-                label: {
-                    Text("\(document.core.project!.size.x) x \(document.core.project!.size.y)")
-                    //Label("View", systemImage: "viewfinder")
-                }
+                toolAddMenu
+
+                Divider()
+                    .padding(.horizontal, 2)
+                    .opacity(0)
+                
+                toolEditMenu
                 
                 Divider()
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 2)
+                    .opacity(0)
+                
+                toolPreviewMenu
+                
+                Divider()
+                    .padding(.horizontal, 2)
                     .opacity(0)
                 
                 // Core Controls
@@ -204,7 +150,7 @@ struct ContentView: View {
                 .disabled(document.core.state == .Idle)
                 
                 Divider()
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 10)
                     .opacity(0)
 
                 Button(action: {
@@ -213,10 +159,6 @@ struct ContentView: View {
                     Label("Help", systemImage: "questionmark")
                 }
                 .keyboardShortcut("h")
-                
-                Button(action: { rightSideBarIsVisible.toggle() }, label: {
-                    Image(systemName: "sidebar.right")
-                })
             }
         }
         //.onReceive(self.document.core.timeChanged) { value in
@@ -390,6 +332,203 @@ struct ContentView: View {
         }
         */
         
+    }
+    
+    // tool bar menus
+    
+    var toolAddMenu : some View {
+        Menu {
+            Button("Add Texture", action: {
+                editingState = .Source
+                editingStateText = "Source Only"
+            })
+            .keyboardShortcut("1")
+            Button("Add Image", action: {
+                editingState = .Nodes
+                editingStateText = "Nodes Only"
+            })
+            .keyboardShortcut("2")
+            Button("Add Shader", action: {
+                document.core.assetFolder.addBuffer("New Shader")
+                //assetName = "New Shader"
+                //showAssetNamePopover = true
+                document.core.nodesWidget.drawables.update()
+            })
+            .keyboardShortcut("3")
+            Divider()
+            Button("Rename", action: {
+                if let node = document.core.nodesWidget.currentNode {
+                    assetName = node.name
+                    showAssetNamePopover = true
+                }
+            })
+            Button("Delete", action: {
+                if document.core.nodesWidget.currentNode != nil {
+                    showDeleteAssetAlert = true
+                    document.core.nodesWidget.drawables.update()
+                }
+            })
+        }
+        label: {
+            Text("Nodes ...")
+        }
+        // Edit Node name
+        .popover(isPresented: self.$showAssetNamePopover,
+                 arrowEdge: .top
+        ) {
+            VStack(alignment: .leading) {
+                Text("Name:")
+                TextField("Name", text: $assetName, onEditingChanged: { (changed) in
+                    if let node = document.core.nodesWidget.currentNode {
+                        node.name = assetName
+                        updateView.toggle()
+                        document.core.nodesWidget.drawables.update()
+                    }
+                })
+                .frame(minWidth: 200)
+            }.padding()
+        }
+        // Delete an asset
+        .alert(isPresented: $showDeleteAssetAlert) {
+            Alert(
+                title: Text("Do you want to remove the node '\(document.core.nodesWidget.currentNode!.name)' ?"),
+                message: Text("This action cannot be undone!"),
+                primaryButton: .destructive(Text("Yes"), action: {
+                    if let asset = document.core.nodesWidget.currentNode {
+                        document.core.assetFolder.removeAsset(asset)
+                        for a in document.core.assetFolder.assets {
+                            document.core.assetFolder.select(a.id)
+                            break
+                        }
+                        self.updateView.toggle()
+                    }
+                }),
+                secondaryButton: .cancel(Text("No"), action: {})
+            )
+        }
+    }
+    
+    var toolEditMenu : some View {
+        Menu {
+            Button("Source", action: {
+                editingState = .Source
+                editingStateText = "Source Only"
+            })
+            .keyboardShortcut("1")
+            Button("Nodes", action: {
+                editingState = .Nodes
+                editingStateText = "Nodes Only"
+            })
+            .keyboardShortcut("2")
+            Button("Source & Nodes", action: {
+                editingState = .Both
+                editingStateText = "Source & Nodes"
+            })
+            .keyboardShortcut("3")
+        }
+        label: {
+            Text(editingStateText)
+        }
+    }
+    
+    var toolPreviewMenu : some View {
+        Menu {
+            Section(header: Text("Preview")) {
+                Button("Small", action: {
+                    document.core.previewFactor = 4
+                    updateView.toggle()
+                })
+                .keyboardShortcut("4")
+                Button("Medium", action: {
+                    document.core.previewFactor = 2
+                    updateView.toggle()
+                })
+                .keyboardShortcut("5")
+                Button("Large", action: {
+                    document.core.previewFactor = 1
+                    updateView.toggle()
+                })
+                .keyboardShortcut("6")
+                Button("Set Custom", action: {
+                    
+                    if let project = document.core.project {
+                        customResWidth = String(project.size.x)
+                        customResHeight = String(project.size.y)
+                    }
+                    
+                    showCustomResPopover = true
+                    updateView.toggle()
+                })
+                
+                Button("Clear Custom", action: {
+                    
+                    if let final = document.core.assetFolder.getAsset("Final", .Shader) {
+                        final.size = nil
+                        if let asset = document.core.assetFolder.current {
+                            document.core.createPreview(asset)
+                        }
+                    }
+                    updateView.toggle()
+                })
+            }
+            Section(header: Text("Opacity")) {
+                Button("Opacity Off", action: {
+                    document.core.previewOpacity = 0
+                    updateView.toggle()
+                })
+                .keyboardShortcut("7")
+                Button("Opacity Half", action: {
+                    document.core.previewOpacity = 0.5
+                    updateView.toggle()
+                })
+                .keyboardShortcut("8")
+                Button("Opacity Full", action: {
+                    document.core.previewOpacity = 1.0
+                    updateView.toggle()
+                })
+                .keyboardShortcut("9")
+            }
+            Section(header: Text("Export")) {
+                Button("Export Image...", action: {
+                    exportingImage = true
+                })
+            }
+        }
+        label: {
+            Label("View", systemImage: "viewfinder")
+            Text("\(document.core.project!.size.x) x \(document.core.project!.size.y)")
+        }
+        
+        // Export Image
+        .fileExporter(
+            isPresented: $exportingImage,
+            document: document,
+            contentType: .png,
+            defaultFilename: "Image"
+        ) { result in
+            do {
+                let url = try result.get()
+                let core = document.core
+                if let project = core.project {
+                    if let texture = project.render(assetFolder: core.assetFolder, device: core.device, time: 0, frame: 0, viewSize: SIMD2<Int>(Int(core.view.frame.width), Int(core.view.frame.height))) {
+                        
+                        project.stopDrawing(syncTexture: texture, waitUntilCompleted: true)
+                        
+                        if let cgiTexture = project.makeCGIImage(core.device, core.metalStates.getComputeState(state: .MakeCGIImage), texture) {
+                            if let image = makeCGIImage(texture: cgiTexture, forImage: true) {
+                                if let imageDestination = CGImageDestinationCreateWithURL(url as CFURL, kUTTypePNG, 1, nil) {
+                                    CGImageDestinationAddImage(imageDestination, image, nil)
+                                    CGImageDestinationFinalize(imageDestination)
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch {
+                // Handle failure.
+            }
+        }
+
     }
 }
 

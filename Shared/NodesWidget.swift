@@ -140,6 +140,14 @@ public class NodesWidget    : ObservableObject
         drawables.drawBox(position: float2(x, y), size: float2(14 * graphZoom, 14 * graphZoom), borderSize: 1, fillColor: skin.normalInteriorColor, borderColor: selected ? skin.selectedBorderColor : skin.normalBorderColor)
     }
     
+    /// The source for a node has been changed
+    func nodeChanged()
+    {
+        if let node = currentNode {
+            print("updared", node.name)
+        }
+    }
+    
     func touchDown(_ pos: float2)
     {
         if let assets = core.assetFolder?.assets {
@@ -152,11 +160,13 @@ public class NodesWidget    : ObservableObject
                     if currentNode !== asset {
                         core.scriptEditor?.setAssetSession(asset)
                         currentNode = asset
+                        core.selectionChanged.send(asset)
                     }
                     break
                 }
             }
         }
+        drawables.update()
     }
     
     func touchMoved(_ pos: float2)

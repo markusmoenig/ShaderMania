@@ -295,14 +295,7 @@ class ScriptEditor
     
     func updated()
     {
-        if let asset = core.assetFolder.current {
-            getAssetValue(asset, { (value) in
-                self.core.assetFolder.assetUpdated(id: asset.id, value: value)
-                //self.getChangeDelta({ (from, to) in
-                //    self.core.assetFolder.assetUpdated(id: asset.id, value: value, deltaStart: from, deltaEnd: to)
-                //})
-            })
-        }
+        core.nodesWidget.nodeChanged()
     }
 }
 

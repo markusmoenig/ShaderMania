@@ -200,6 +200,7 @@ class AssetFolder       : Codable
     
     func assetUpdated(id: UUID, value: String)//, deltaStart: Int32, deltaEnd: Int32)
     {
+        /*
         for asset in assets {
             if asset.id == id {
                 asset.value = value
@@ -214,6 +215,7 @@ class AssetFolder       : Codable
                 }
             }
         }
+        */
     }
     
     /// Compiles the Buffer or Shader asset
@@ -333,6 +335,9 @@ class Asset         : Codable, Equatable
     
     var slots       : [Int: UUID] = [:]
     var output      : UUID? = nil
+    
+    // Preview Texture
+    var texture     : MTLTexture? = nil
 
     private enum CodingKeys: String, CodingKey {
         case type

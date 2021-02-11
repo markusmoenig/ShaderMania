@@ -5,8 +5,6 @@
 //  Created by Markus Moenig on 19/11/20.
 //
 
-import Foundation
-
 import MetalKit
 
 class Project
