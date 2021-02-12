@@ -60,16 +60,6 @@ class ShaderCompiler
         ns.enumerateLines { (str, _) in
             lineNumbers += 1
         }
-        /*
-        let p1 = " in [[stage_in]])"
-        code = code.replacingOccurrences(of: " in)", with: p1)
-            
-        let p2 = "constant BehaviorData"
-        code = code.replacingOccurrences(of: "BehaviorData", with: p2)
-
-        let p3 = "*behavior [[ buffer(0) ]]"
-        code = code.replacingOccurrences(of: "*behavior", with: p3)
-        */
                 
         var parseErrors: [CompileError] = []
         let shader = Shader()
@@ -84,82 +74,16 @@ class ShaderCompiler
             parseErrors.append(error)
         }
         
-        let parsedCode = code + asset.value;//code.replacingOccurrences(of: "___REP__HERE___", with: asset.value, options: .literal, range: nil)
+        let parsedCode = code + asset.value
         ns = code as NSString
         var lineNr : Int32 = 0
                 
         ns.enumerateLines { (str, _) in
-            /*
-            if str.contains("behavior.") {
-                let array = str.split(separator: " ")
-                if array.count == 6 && array[2] == "=>" {
-                    var out = array[0] + " " + array[1] + " = "
-                    
-                    if let behavior = behavior {
-                        shader.hasBindings = true
-                        let nameArray = String(array[3]).split(separator: ".")
-                        if nameArray.count == 2 {
-                            let varName = String(nameArray[1])
-                            if let value = behavior.getVariableValue(varName) {
-                                // Bind the value of the referenced varName
-                                let varType = String(array[0])
-                                
-                                if varType == "int" && value as? Int1 != nil {
-                                    let index : Int = shader.intVar.count
-                                    shader.intVar[varName] = (index, value)
-                                    out += "behavior.intData[\(index)];"
-                                } else
-                                if varType == "float" && value as? Float1 != nil {
-                                    let index : Int = shader.floatVar.count
-                                    shader.floatVar[varName] = (index, value)
-                                    out += "behavior.floatData[\(index)];"
-                                } else
-                                if varType == "float2" && value as? Float2 != nil {
-                                    let index : Int = shader.float2Var.count
-                                    shader.float2Var[varName] = (index, value)
-                                    out += "behavior.float2Data[\(index)];"
-                                } else
-                                if varType == "float3" && value as? Float3 != nil {
-                                    let index : Int = shader.float3Var.count
-                                    shader.float3Var[varName] = (index, value)
-                                    out += "behavior.float3Data[\(index)];"
-                                } else
-                                if varType == "float4" && value as? Float4 != nil {
-                                    let index : Int = shader.float4Var.count
-                                    shader.float4Var[varName] = (index, value)
-                                    out += "behavior.float4Data[\(index)];"
-                                }
-                                else {
-                                    createError("Variable type '\(varType)' does not much type of variable in behavior", line: lineNr)
-                                }
-                            } else {
-                                createError("Could not find variable '\(varName)' in behavior", line: lineNr)
-                            }
-                        } else {
-                            createError(line: lineNr)
-                        }
-                    } else {
-                        // No behavior, just use default value
-                        out += array[5]
-                    }
-                    
-                    parsedCode += out + "\n"
-                } else {
-                    createError(line: lineNr)
-                    parsedCode += str + "\n"
-                }
-            } else {
-                parsedCode += str + "\n"
-            }
-            */
-            
             lineNr += 1
         }
         
         if parseErrors.count > 0 {            
-            //DispatchQueue.main.async(execute: {
-                cb(nil, parseErrors)
-            //} )
+            cb(nil, parseErrors)
             return
         }
                 
@@ -185,7 +109,9 @@ class ShaderCompiler
                             er.column = Int32(arr[1])
                             er.type = arr[2].trimmingCharacters(in: .whitespaces)
                             er.error = errorText
-                            errors.append(er)
+                            if er.line != nil && er.column != nil && er.line! >= 0 && er.column! >= 0 {
+                                errors.append(er)
+                            }
                         }
                     }
                 }

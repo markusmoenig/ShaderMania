@@ -156,16 +156,17 @@ class Project
         metalData.frame = frame
         renderEncoder.setFragmentBytes(&metalData, length: MemoryLayout<MetalData>.stride, index: 0)
         
-        for (index, nodeId) in asset.slots {
+        for index in 1..<5 {
             var hasBeenSet = false
-                            
-            if let slotAsset = assetFolder!.getAssetById(nodeId) {
-                
-                let slotTexture = preview == false ? slotAsset.texture : slotAsset.previewTexture
-                if let slotTexture = slotTexture {
-                    print("texture has been set for", asset.name, index)
-                    renderEncoder.setFragmentTexture(slotTexture, index: index)
-                    hasBeenSet = true
+            
+            if let nodeId = asset.slots[index - 1] {
+                if let node = assetFolder?.getAssetById(nodeId) {
+                    let texture = preview == false ? node.texture : node.previewTexture
+                    
+                    if let texture = texture {
+                        renderEncoder.setFragmentTexture(texture, index: index)
+                        hasBeenSet = true
+                    }
                 }
             }
             

@@ -157,7 +157,9 @@ public class NodesWidget    : ObservableObject
         
         drawables.drawLine(startPos: rect.position() + float2(6,24) * graphZoom, endPos: rect.position() + float2(rect.width - 8 * graphZoom, 24 * graphZoom), radius: 0.6, fillColor: skin.normalBorderColor)
         
-        drawables.drawBox(position: rect.position() + float2(18,34) * graphZoom, size: float2(80,80) * graphZoom, rounding: 8 * graphZoom, fillColor: skin.normalInteriorColor, texture: node.previewTexture)
+        if node.previewTexture != nil {
+            drawables.drawBox(position: rect.position() + float2(18,34) * graphZoom, size: float2(80,80) * graphZoom, rounding: 8 * graphZoom, fillColor: skin.normalInteriorColor, texture: node.previewTexture)
+        }
         
         /// Get the colors for a terminal
         func terminalColor(_ terminalId: Int) -> (float4, float4)
@@ -285,6 +287,7 @@ public class NodesWidget    : ObservableObject
         currentNode = asset
         core.assetFolder!.current = asset
         core.selectionChanged.send(asset)
+        core.createPreview(asset)
     }
     
     func touchDown(_ pos: float2)

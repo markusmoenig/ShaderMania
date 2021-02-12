@@ -35,6 +35,12 @@ class MetalDrawables
     init(_ metalView: DMTKView)
     {
         self.metalView = metalView
+        #if os(iOS)
+        metalView.layer.isOpaque = false
+        #else
+        metalView.layer?.isOpaque = false
+        #endif
+
         device = metalView.device!
         viewportSize = vector_uint2( UInt32(metalView.bounds.width), UInt32(metalView.bounds.height) )
         commandQueue = device.makeCommandQueue()
@@ -78,7 +84,7 @@ class MetalDrawables
         }
     }
     
-    @discardableResult func encodeStart(_ clearColor: float4 = float4(0.125, 0.129, 0.137, 1.000)) -> MTLRenderCommandEncoder?
+    @discardableResult func encodeStart(_ clearColor: float4 = float4(0.125, 0.129, 0.137, 1)) -> MTLRenderCommandEncoder?
     {
         if font == nil { font = Font(name: "OpenSans", core: metalView.core) }
         
@@ -89,7 +95,7 @@ class MetalDrawables
         let renderPassDescriptor = metalView.currentRenderPassDescriptor
         
         renderPassDescriptor!.colorAttachments[0].loadAction = .clear
-        renderPassDescriptor!.colorAttachments[0].clearColor = MTLClearColor( red: Double(clearColor.x), green: Double(clearColor.y), blue: Double(clearColor.z), alpha: 1.0)
+        renderPassDescriptor!.colorAttachments[0].clearColor = MTLClearColor( red: Double(clearColor.x), green: Double(clearColor.y), blue: Double(clearColor.z), alpha: Double(clearColor.w))
         
         if renderPassDescriptor != nil {
             renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor! )

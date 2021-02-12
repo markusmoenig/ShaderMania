@@ -48,6 +48,7 @@ public class DMTKView       : MTKView
     
     func platformInit()
     {
+        layer?.isOpaque = false
     }
     
     func setMousePos(_ event: NSEvent)
@@ -265,7 +266,7 @@ struct MetalView: NSViewRepresentable {
         mtkView.drawableSize = mtkView.frame.size
         mtkView.enableSetNeedsDisplay = true
         mtkView.isPaused = true
-                
+        
         if viewType == .Main {
             core.setupView(mtkView)
         } else
