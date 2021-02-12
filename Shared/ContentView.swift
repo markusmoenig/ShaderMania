@@ -507,15 +507,17 @@ struct ContentView: View {
                 let url = try result.get()
                 let core = document.core
                 if let project = core.project {
-                    if let texture = project.render(assetFolder: core.assetFolder, device: core.device, time: 0, frame: 0, viewSize: SIMD2<Int>(Int(core.view.frame.width), Int(core.view.frame.height))) {
-                        
-                        project.stopDrawing(syncTexture: texture, waitUntilCompleted: true)
-                        
-                        if let cgiTexture = project.makeCGIImage(core.device, core.metalStates.getComputeState(state: .MakeCGIImage), texture) {
-                            if let image = makeCGIImage(texture: cgiTexture, forImage: true) {
-                                if let imageDestination = CGImageDestinationCreateWithURL(url as CFURL, kUTTypePNG, 1, nil) {
-                                    CGImageDestinationAddImage(imageDestination, image, nil)
-                                    CGImageDestinationFinalize(imageDestination)
+                    if let asset = core.nodesWidget.currentNode {
+                        if let texture = project.render(assetFolder: core.assetFolder, device: core.device, time: 0, frame: 0, viewSize: SIMD2<Int>(Int(core.view.frame.width), Int(core.view.frame.height)), forAsset: asset) {
+                            
+                            project.stopDrawing(syncTexture: texture, waitUntilCompleted: true)
+                            
+                            if let cgiTexture = project.makeCGIImage(core.device, core.metalStates.getComputeState(state: .MakeCGIImage), texture) {
+                                if let image = makeCGIImage(texture: cgiTexture, forImage: true) {
+                                    if let imageDestination = CGImageDestinationCreateWithURL(url as CFURL, kUTTypePNG, 1, nil) {
+                                        CGImageDestinationAddImage(imageDestination, image, nil)
+                                        CGImageDestinationFinalize(imageDestination)
+                                    }
                                 }
                             }
                         }

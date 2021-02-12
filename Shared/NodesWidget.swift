@@ -157,6 +157,8 @@ public class NodesWidget    : ObservableObject
         
         drawables.drawLine(startPos: rect.position() + float2(6,24) * graphZoom, endPos: rect.position() + float2(rect.width - 8 * graphZoom, 24 * graphZoom), radius: 0.6, fillColor: skin.normalBorderColor)
         
+        drawables.drawBox(position: rect.position() + float2(18,34) * graphZoom, size: float2(80,80) * graphZoom, rounding: 8 * graphZoom, fillColor: skin.normalInteriorColor, texture: node.previewTexture)
+        
         /// Get the colors for a terminal
         func terminalColor(_ terminalId: Int) -> (float4, float4)
         {
@@ -221,10 +223,17 @@ public class NodesWidget    : ObservableObject
     }
     
     /// The source for a node has been changed
-    func nodeChanged()
+    func nodeChanged(_ value: String)
     {
         if let node = currentNode {
+            node.value = value
             node.shader = nil
+            core.project!.compileAssets(assetFolder: core.assetFolder!, forAsset: node, compiler: core.shaderCompiler, finished: { () in
+                
+                self.core.createPreview(node, updatePreviewTextures: true)
+                self.core.scriptEditor?.setErrors(node.errors)
+                self.update()
+            })
         }
     }
     

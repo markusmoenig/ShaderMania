@@ -9,7 +9,6 @@ import MetalKit
 
 class Project
 {
-    var texture         : MTLTexture? = nil
     var black           : MTLTexture? = nil
     var temp            : MTLTexture? = nil
 
@@ -38,8 +37,6 @@ class Project
     
     func clear() {
         if black != nil { black!.setPurgeableState(.empty); black = nil }
-        if texture != nil { texture!.setPurgeableState(.empty); texture = nil }
-        if temp != nil { temp!.setPurgeableState(.empty); temp = nil }
 
         for (id, _) in textureCache {
             if textureCache[id] != nil {
@@ -49,110 +46,104 @@ class Project
         textureCache = [:]
     }
     
-    func render(assetFolder: AssetFolder, device: MTLDevice, time: Float, frame: UInt32, viewSize: SIMD2<Int>, breakAsset: Asset? = nil) -> MTLTexture?
+    func collectShadersFor(assetFolder: AssetFolder, asset: Asset,_ collected: inout [Asset])
+    {
+        for (_, connectedToId) in asset.slots {
+            
+            if let conAsset = assetFolder.getAssetById(connectedToId) {
+                collectShadersFor(assetFolder: assetFolder, asset: conAsset, &collected)
+                if collected.contains(conAsset) == false {
+                    collected.append(conAsset)
+                }
+            }
+        }
+        collected.append(asset)
+    }
+    
+    func compileAssets(assetFolder: AssetFolder, forAsset: Asset, compiler: ShaderCompiler, finished: @escaping () -> ())
+    {
+        var collected : [Asset] = []
+        collectShadersFor(assetFolder: assetFolder, asset: forAsset, &collected)
+        
+        var toCompile = 0
+        
+        for asset in collected {
+            if asset.shader == nil && asset.type == .Shader {
+                toCompile += 1
+            }
+        }
+        
+        for asset in collected {
+            if asset.shader == nil && asset.type == .Shader {
+                compiler.compile(asset: asset, cb: { (shader, errors) in
+                    
+                    asset.shader = shader
+                    asset.errors = errors
+                    toCompile -= 1
+
+                    if toCompile == 0 {
+                        DispatchQueue.main.async {
+                            finished()
+                        }
+                    }
+                })
+            }
+        }
+    }
+    
+    @discardableResult func render(assetFolder: AssetFolder, device: MTLDevice, time: Float, frame: UInt32, viewSize: SIMD2<Int>, forAsset: Asset, preview: Bool = false) -> MTLTexture?
     {
         self.assetFolder = assetFolder
         self.time = time
-
-        startDrawing(device)
 
         if black == nil {
             black = allocateTexture(device, width: 10, height: 10)
             clear(black!)
         }
-
-        if let final = assetFolder.getAsset("Final", .Shader) {
-            size = viewSize
-            
-            if let customSize = final.size {
-                size = customSize
-            }
-
-            // Make sure texture is of size size
-            if texture == nil || texture!.width != size.x || texture!.height != size.y {
-                if texture != nil {
-                    texture!.setPurgeableState(.empty)
-                    texture = nil
-                }
-                texture = allocateTexture(device, width: size.x, height: size.y)
-                clear(texture!)
-                resChanged = true
-            }
-            checkTextures(device)
-            
-            /*
-            // Do buffers
-            for asset in assetFolder.assets {
-                if asset.type == .Buffer {
-                    if asset === breakAsset {
-                        drawShader(asset, texture!, device)
-                        return texture
-                    } else {
-                        if let outputId = asset.output {
-                            if let texture = textureCache[outputId] {
-                                drawShader(asset, texture, device)
-                            }
-                        }
-                    }
-                }
-            }
-            */
-            
-            // Final Shader
-            drawShader(final, texture!, device)
-        }
         
-        return texture
-    }
-    
-    /// Checks if all textures are loaded and makes sure they have the right size
-    func checkTextures(_ device: MTLDevice)
-    {
-        for asset in assetFolder!.assets {
-            if asset.type == .Texture {
-                if asset.data.count == 0 {
-                    // Empty Texture
-                    
-                    if textureCache[asset.id] == nil || textureCache[asset.id]!.width != size.x || textureCache[asset.id]!.height != size.y {
-                        if textureCache[asset.id] != nil {
-                            textureCache[asset.id]!.setPurgeableState(.empty)
-                            textureCache[asset.id] = nil
-                        }
-                        textureCache[asset.id] = allocateTexture(device, width: size.x, height: size.y)
-                        clear(textureCache[asset.id]!)
-                    }
-                } else {
-                    // Image Texture
-                    
-                    if textureLoader == nil {
-                        textureLoader = MTKTextureLoader(device: device)
-                    }
-                    
-                    if textureCache[asset.id] == nil {
-                        let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
-                        if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
-                            textureCache[asset.id] = texture
-                        }
-                    }
-                }
+        var collected : [Asset] = []
+        collectShadersFor(assetFolder: assetFolder, asset: forAsset, &collected)
+
+        size = viewSize
+        
+        //if let customSize = final.size {
+        //    size = customSize
+        //}
+
+        checkTextures(collected: collected, preview: preview, device: device)
+            
+        for asset in collected {
+
+            print("rendering", asset.name)
+            if asset.type == .Shader {
+                drawShader(asset, preview, device)
             }
+        }
+
+        if collected.count == 0 {
+            return nil
+        } else {
+            return collected.last!.texture
         }
     }
     
-    func drawShader(_ asset: Asset,_ texture: MTLTexture, _ device: MTLDevice)
+    func drawShader(_ asset: Asset,_ preview: Bool, _ device: MTLDevice)
     {
         if asset.shader == nil {
             print("no shader for \(asset.name)")
             return
         }
-        let rect = MMRect( 0, 0, Float(size.x), Float(size.y), scale: 1 )
+        let rect = MMRect( 0, 0, Float(size.x), Float(size.y))
+        
+        let texture = preview == false ? asset.texture! : asset.previewTexture!
         
         let vertexData = createVertexData(texture: texture, rect: rect)
         
         let renderPassDescriptor = MTLRenderPassDescriptor()
         renderPassDescriptor.colorAttachments[0].texture = texture
-        renderPassDescriptor.colorAttachments[0].loadAction = .load
-        
+        renderPassDescriptor.colorAttachments[0].loadAction = .clear
+        renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0,0,0,0)
+
         let renderEncoder = commandBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
 
         var viewportSize = vector_uint2( UInt32(texture.width), UInt32(texture.height))
@@ -165,12 +156,15 @@ class Project
         metalData.frame = frame
         renderEncoder.setFragmentBytes(&metalData, length: MemoryLayout<MetalData>.stride, index: 0)
         
-        for index in 1..<5 {
+        for (index, nodeId) in asset.slots {
             var hasBeenSet = false
-            
-            if let textureId = asset.slots[0] {
-                if let texture = textureCache[textureId] {
-                    renderEncoder.setFragmentTexture(texture, index: index)
+                            
+            if let slotAsset = assetFolder!.getAssetById(nodeId) {
+                
+                let slotTexture = preview == false ? slotAsset.texture : slotAsset.previewTexture
+                if let slotTexture = slotTexture {
+                    print("texture has been set for", asset.name, index)
+                    renderEncoder.setFragmentTexture(slotTexture, index: index)
                     hasBeenSet = true
                 }
             }
@@ -183,6 +177,45 @@ class Project
         renderEncoder.setRenderPipelineState(asset.shader!.pipelineState)
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         renderEncoder.endEncoding()
+    }
+    
+    /// Checks if all textures are loaded and makes sure they have the right size
+    func checkTextures(collected: [Asset], preview: Bool = true, device: MTLDevice)
+    {
+        for asset in collected {
+            
+            if asset.type == .Shader {
+                if preview == false {
+                    if asset.texture == nil || asset.texture!.width != size.x || asset.texture!.height != size.y {
+                        if asset.texture != nil {
+                            asset.texture!.setPurgeableState(.empty)
+                            asset.texture = nil
+                        }
+                        asset.texture = allocateTexture(device, width: size.x, height: size.y)
+                        clear(asset.texture!)
+                    }
+                } else {
+                    if asset.previewTexture == nil {
+                        asset.previewTexture = allocateTexture(device, width: size.x, height: size.y)
+                        clear(asset.previewTexture!, float4(0,0,0,0))
+                    }
+                }
+            } else
+            if asset.type == .Image {
+                // Image Texture
+                
+                if textureLoader == nil {
+                    textureLoader = MTKTextureLoader(device: device)
+                }
+                
+                if textureCache[asset.id] == nil {
+                    let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
+                    if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
+                        textureCache[asset.id] = texture
+                    }
+                }
+            }
+        }
     }
     
     func startDrawing(_ device: MTLDevice)

@@ -14,7 +14,7 @@ class AssetFolder       : Codable
     
     var core            : Core!
     var current         : Asset? = nil
-        
+            
     private enum CodingKeys: String, CodingKey {
         case assets
         case groups
@@ -208,6 +208,7 @@ class AssetFolder       : Codable
     /// Compiles the Buffer or Shader asset
     func assetCompile(_ asset: Asset)
     {
+        /*
         if asset.type == .Shader || asset.type == .Buffer || asset.type == .Common {
             core.shaderCompiler.compile(asset: asset, cb: { (shader, errors) in
                 if shader == nil {
@@ -235,7 +236,7 @@ class AssetFolder       : Codable
                     }
                 }
             })
-        }
+        }*/
     }
     
     /// Compiles all assets, used after loading the project
@@ -314,18 +315,17 @@ class Asset         : Codable, Equatable
 
     // If this is a shader
     var shader      : Shader? = nil
-
-    // If the asset has an error
-    var hasError    : Bool = false
+    var errors      : [CompileError] = []
     
     // Texture In/Out
     
     var slots       : [Int: UUID] = [:]
     var output      : UUID? = nil
     
-    // Preview Texture
+    // Textures
     var texture     : MTLTexture? = nil
-
+    var previewTexture  : MTLTexture? = nil
+    
     private enum CodingKeys: String, CodingKey {
         case type
         case id

@@ -86,6 +86,8 @@ public class Core       : ObservableObject
     var project         : Project? = nil
     
     var nodesWidget     : NodesWidget!
+    
+    var needsPreviews   : Bool = false
 
     public init(_ frameworkId: String? = nil)
     {
@@ -267,24 +269,37 @@ public class Core       : ObservableObject
             //_Time.x += 1.0 / targetFPS
             //timeChanged.send(_Time.x)
         }
+            
+        project?.startDrawing(device)
+        if let asset = nodesWidget.currentNode {
+            
+            if needsPreviews {
                 
-        if let texture = project?.render(assetFolder: assetFolder, device: device, time: _Time.x, frame: _Frame, viewSize: SIMD2<Int>(Int(view.frame.width), Int(view.frame.height)), breakAsset: state == .Idle ? assetFolder.current : nil) {
+                project?.render(assetFolder: assetFolder, device: device, time: 0, frame: 0, viewSize: SIMD2<Int>(80, 80), forAsset: asset, preview: true)
+                
+                needsPreviews = false
+            }
             
-            let renderPassDescriptor = view.currentRenderPassDescriptor
-            renderPassDescriptor?.colorAttachments[0].loadAction = .load
-            let renderEncoder = project!.commandBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
-            
-            drawTexture(texture, renderEncoder: renderEncoder!)
-            renderEncoder?.endEncoding()
-            
-            project!.commandBuffer!.present(drawable)
-            
-            if project!.resChanged {
-                if didSend == false {
-                    didSend = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.updateUI.send()
-                        self.didSend = false
+            if let texture = project?.render(assetFolder: assetFolder, device: device, time: _Time.x, frame: _Frame, viewSize: SIMD2<Int>(Int(view.frame.width), Int(view.frame.height)), forAsset: asset) {
+                
+                let renderPassDescriptor = view.currentRenderPassDescriptor
+                renderPassDescriptor?.colorAttachments[0].loadAction = .clear
+                renderPassDescriptor?.colorAttachments[0].clearColor = MTLClearColorMake(0,0,0,0)
+
+                let renderEncoder = project!.commandBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
+                
+                drawTexture(texture, renderEncoder: renderEncoder!)
+                renderEncoder?.endEncoding()
+                
+                project!.commandBuffer!.present(drawable)
+                
+                if project!.resChanged {
+                    if didSend == false {
+                        didSend = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            self.updateUI.send()
+                            self.didSend = false
+                        }
                     }
                 }
             }
@@ -316,11 +331,12 @@ public class Core       : ObservableObject
     }
     
     /// Create a preview for the current asset
-    func createPreview(_ asset: Asset, _ update: Bool = true)
+    func createPreview(_ asset: Asset,_ update: Bool = true, updatePreviewTextures: Bool = false)
     {
         if state == .Idle {
             clearLocalAudio()
             if asset.type == .Shader {
+                needsPreviews = updatePreviewTextures
                 updateOnce()
             } else
             if asset.type == .Shader {
