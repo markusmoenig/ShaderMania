@@ -11,6 +11,7 @@ import CloudKit
 class AssetFolder       : Codable
 {
     var assets          : [Asset] = []
+    
     var core            : Core!
     var current         : Asset? = nil
         
@@ -47,20 +48,6 @@ class AssetFolder       : Codable
     {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(assets, forKey: .assets)
-    }
-    
-    func addBuffer(_ name: String)
-    {
-        guard let path = Bundle.main.path(forResource: "Shader", ofType: "", inDirectory: "Files/default") else {
-            return
-        }
-        
-        if let shaderTemplate = try? String(contentsOfFile: path, encoding: String.Encoding.utf8) {
-            let asset = Asset(type: .Buffer, name: name, value: shaderTemplate)
-            assets.append(asset)
-            select(asset.id)
-            core.scriptEditor?.createSession(asset)
-        }
     }
     
     func addShader(_ name: String)

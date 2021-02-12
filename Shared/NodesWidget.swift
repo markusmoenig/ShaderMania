@@ -57,7 +57,7 @@ class NodeSkin {
 public class NodesWidget    : ObservableObject
 {
     enum Action {
-        case None, DragNode
+        case None, DragNode, Connecting
     }
     
     var action              : Action = .None
@@ -68,11 +68,19 @@ public class NodesWidget    : ObservableObject
     let drawables           : MetalDrawables
     
     var currentNode         : Asset? = nil
+    var currentTerminalId   : Int? = nil
     
+    // For connecting terminals
+    var connectingNode      : Asset? = nil
+    var connectingTerminalId: Int? = nil
+
     var graphZoom           : Float = 0.63
     var graphOffset         = float2(0, 0)
 
     var dragStart           = float2(0, 0)
+    var mouseMovedPos       : float2? = nil
+    
+    var highTerminals       : [(UUID, Int)] = []
 
     init(_ core: Core)
     {
@@ -82,7 +90,8 @@ public class NodesWidget    : ObservableObject
     }
     
     public func draw()
-    {        
+    {
+        highTerminals = []
         drawables.encodeStart()
         
         let skin = NodeSkin(drawables.font, fontScale: 0.4, graphZoom: graphZoom)
@@ -94,6 +103,31 @@ public class NodesWidget    : ObservableObject
                 
                 //print(asset.type, asset.name)
                 drawNode(asset, asset === currentNode, skin)
+            }
+        }
+        
+        if action == .Connecting {
+            if let id = currentTerminalId {
+                let rect = getTerminal(currentNode!, id: id)
+                
+                if let mousePos = mouseMovedPos {
+                    drawables.drawLine(startPos: rect.middle(), endPos: mousePos, radius: 0.6, fillColor: skin.selectedTerminalColor)
+                }
+            }
+        }
+        
+        // Draw Connections
+        if let assets = core.assetFolder?.assets {
+            for asset in assets {
+                
+                for (index, nodeUUID) in asset.slots {
+                    if let connTo = core.assetFolder!.getAssetById(nodeUUID) {
+                        let dRect = getTerminal(connTo, id: -1)
+                        let sRect = getTerminal(asset, id: index)
+                        
+                        drawables.drawLine(startPos: sRect.middle(), endPos: dRect.middle(), radius: 0.6, fillColor: skin.selectedTerminalColor)
+                    }
+                }
             }
         }
         
@@ -112,10 +146,10 @@ public class NodesWidget    : ObservableObject
         rect.x -= rect.width / 2
         rect.y -= rect.height / 2
 
-        node.nodeRect.copy(rect)
-
         rect.x += graphOffset.x
         rect.y += graphOffset.y
+        
+        node.nodeRect.copy(rect)
 
         //drawables.drawBox.draw(x: rect.x + item.rect.x, y: rect.y + item.rect.y, width: item.rect.width, height: item.rect.height, round: 12 * graphZoom, borderSize: 1, fillColor: skin.normalInteriorColor, borderColor: selected ? skin.selectedBorderColor : skin.normalInteriorColor)
         drawables.drawBox(position: rect.position(), size: rect.size(), rounding: 8 * graphZoom, borderSize: 1, fillColor: skin.normalInteriorColor, borderColor: selected ? skin.selectedBorderColor : skin.normalInteriorColor)
@@ -123,11 +157,55 @@ public class NodesWidget    : ObservableObject
         
         drawables.drawLine(startPos: rect.position() + float2(6,24) * graphZoom, endPos: rect.position() + float2(rect.width - 8 * graphZoom, 24 * graphZoom), radius: 0.6, fillColor: skin.normalBorderColor)
         
+        /// Get the colors for a terminal
+        func terminalColor(_ terminalId: Int) -> (float4, float4)
+        {
+            var fillColor = skin.normalInteriorColor
+            var borderColor = skin.normalBorderColor
+            
+            if node === currentNode && currentTerminalId == terminalId {
+                // Currently pressed
+                fillColor = skin.selectedTerminalColor
+            } else
+            if connectingNode === node && terminalId == connectingTerminalId {
+                // Connecting to this terminal
+                fillColor = skin.selectedTerminalColor
+            } else
+            if terminalId != -1 && node.slots[terminalId] != nil {
+                // This slot is connected
+                fillColor = skin.selectedTerminalColor
+            } else
+            if terminalId == -1 {
+                // Test last possibility, this is an outgoing slot, see if it connects to somewhere
+                
+                if let assets = core.assetFolder?.assets {
+                    for asset in assets {
+
+                        if asset !== node {
+                            for (_, nodeUUID) in asset.slots {
+                                if nodeUUID == node.id {
+                                    fillColor = skin.selectedTerminalColor
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if selected {
+                borderColor = skin.selectedBorderColor
+            }
+            
+            return (fillColor, borderColor)
+        }
+        
         var x = rect.x - 7 * graphZoom
         var y = rect.y + 32 * graphZoom
         for i in 0..<4 {
             
-            drawables.drawDisk(position: float2(x, y), radius: 7 * graphZoom, borderSize: 1, fillColor: skin.normalInteriorColor, borderColor: selected ? skin.selectedBorderColor : skin.normalBorderColor)
+            let tColors = terminalColor(i)
+            drawables.drawDisk(position: float2(x, y), radius: 7 * graphZoom, borderSize: 1, fillColor: tColors.0, borderColor: tColors.1)
             node.nodeIn[i].set(x, y, 14 * graphZoom, 14 * graphZoom)
 
             y += 20 * graphZoom
@@ -137,32 +215,102 @@ public class NodesWidget    : ObservableObject
         y = rect.y + 32 * graphZoom
         
         node.nodeOut.set(x, y, 14 * graphZoom, 14 * graphZoom)
-        drawables.drawBox(position: float2(x, y), size: float2(14 * graphZoom, 14 * graphZoom), borderSize: 1, fillColor: skin.normalInteriorColor, borderColor: selected ? skin.selectedBorderColor : skin.normalBorderColor)
+        let tColors = terminalColor(-1)
+
+        drawables.drawBox(position: float2(x, y), size: float2(14 * graphZoom, 14 * graphZoom), borderSize: 1, fillColor: tColors.0, borderColor: tColors.1)
     }
     
     /// The source for a node has been changed
     func nodeChanged()
     {
         if let node = currentNode {
-            print("updared", node.name)
+            node.shader = nil
         }
+    }
+    
+    /// Called before nodes get deleted, make sure to break its connections
+    func nodeIsAboutToBeDeleted(_ node: Asset)
+    {
+        if let assets = core.assetFolder?.assets {
+            for asset in assets {
+                if asset !== node {
+                    for (index, nodeUUID) in asset.slots {
+                        if nodeUUID == node.id {
+                            asset.slots[index] = nil
+                            print("connection deleted")
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Check if there is a terminal the given position
+    func checkForNodeTerminal(_ node: Asset, at: float2) -> Int?
+    {
+        for (index, slot) in node.nodeIn.enumerated() {
+            if slot.contains(at.x, at.y) {
+                return index
+            }
+        }
+        
+        if node.nodeOut.contains(at.x, at.y) {
+            return -1
+        }
+        
+        return nil
+    }
+    
+    // Gets the terminal rect for the given node and id
+    func getTerminal(_ node: Asset, id: Int) -> MMRect
+    {
+        if id == -1 {
+            return node.nodeOut
+        } else {
+            return node.nodeIn[id]
+        }
+    }
+    
+    func selectNode(_ asset: Asset) {
+        core.scriptEditor?.setAssetSession(asset)
+        currentNode = asset
+        core.assetFolder!.current = asset
+        core.selectionChanged.send(asset)
     }
     
     func touchDown(_ pos: float2)
     {
         if let assets = core.assetFolder?.assets {
             for asset in assets {
-                if asset.nodeRect.contains(pos.x - graphOffset.x, pos.y - graphOffset.y) {
-                    print("hit", asset.name)
-                    action = .DragNode
-                    dragStart = pos
-                    
+                
+                if let t = checkForNodeTerminal(asset, at: pos) {
                     if currentNode !== asset {
-                        core.scriptEditor?.setAssetSession(asset)
-                        currentNode = asset
-                        core.selectionChanged.send(asset)
+                        selectNode(asset)
                     }
-                    break
+                    
+                    let canConnect = true
+                    if t != -1 && asset.slots[t] != nil {
+                        //canConnect = false
+                        asset.slots[t] = nil
+                        // Disconnect instead of not allowing to connect when slot is already taken
+                    }
+                    
+                    if canConnect {
+                        currentTerminalId = t
+                        action = .Connecting
+                    }
+                } else
+                {
+                    var freshlySelectedNode : Asset? = nil
+                    if asset.nodeRect.contains(pos.x, pos.y) {
+                        action = .DragNode
+                        dragStart = pos
+                        
+                        freshlySelectedNode = asset
+                    }
+                    if freshlySelectedNode != nil && currentNode !== freshlySelectedNode {
+                        selectNode(freshlySelectedNode!)
+                    }
                 }
             }
         }
@@ -171,19 +319,52 @@ public class NodesWidget    : ObservableObject
     
     func touchMoved(_ pos: float2)
     {
+        mouseMovedPos = pos
         if action == .DragNode {
             if let node = currentNode {
                 node.nodeData.x += (pos.x - dragStart.x) / graphZoom
                 node.nodeData.y += (pos.y - dragStart.y) / graphZoom
                 dragStart = pos
-                drawables.update()
+                update()
             }
+        }
+        if action == .Connecting {
+            connectingNode = nil
+            connectingTerminalId = nil
+            
+            if let assets = core.assetFolder?.assets {
+                for asset in assets {
+                    if let t = checkForNodeTerminal(asset, at: pos) {
+                        if currentNode !== asset {
+                            if (t == -1 && currentTerminalId != -1) || (currentTerminalId == -1 && t != -1) {
+                                connectingNode = asset
+                                connectingTerminalId = t
+                            }
+                        }
+                        break
+                    }
+                }
+            }
+            update()
         }
     }
 
     func touchUp(_ pos: float2)
     {
+        if action == .Connecting && connectingNode != nil {
+            // Create Connection
+            
+            if currentTerminalId != -1 {
+                currentNode!.slots[currentTerminalId!] = connectingNode!.id
+            } else {
+                connectingNode!.slots[connectingTerminalId!] = currentNode!.id
+            }
+        }
+
         action = .None
+        currentTerminalId = nil
+        mouseMovedPos = nil
+        update()
     }
     
     func scrollWheel(_ delta: float3)
@@ -197,6 +378,10 @@ public class NodesWidget    : ObservableObject
             graphZoom = min(1, graphZoom)
         }
         
+        update()
+    }
+    
+    func update() {
         drawables.update()
     }
 }

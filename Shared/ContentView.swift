@@ -58,7 +58,7 @@ struct ContentView: View {
             GeometryReader { geometry in
                 ZStack(alignment: .topTrailing) {
 
-                    VStack {
+                    VStack(spacing: 2) {
                         
                         if editingState == .Source || editingState == .Both {
                             GeometryReader { geometry in
@@ -338,23 +338,18 @@ struct ContentView: View {
     
     var toolAddMenu : some View {
         Menu {
-            Button("Add Texture", action: {
-                editingState = .Source
-                editingStateText = "Source Only"
-            })
-            .keyboardShortcut("1")
             Button("Add Image", action: {
                 editingState = .Nodes
                 editingStateText = "Nodes Only"
             })
-            .keyboardShortcut("2")
+            .keyboardShortcut("1")
             Button("Add Shader", action: {
-                document.core.assetFolder.addBuffer("New Shader")
+                document.core.assetFolder.addShader("New Shader")
                 //assetName = "New Shader"
                 //showAssetNamePopover = true
                 document.core.nodesWidget.drawables.update()
             })
-            .keyboardShortcut("3")
+            .keyboardShortcut("2")
             Divider()
             Button("Rename", action: {
                 if let node = document.core.nodesWidget.currentNode {
@@ -370,7 +365,7 @@ struct ContentView: View {
             })
         }
         label: {
-            Text("Nodes ...")
+            Text("Nodes")
         }
         // Edit Node name
         .popover(isPresented: self.$showAssetNamePopover,
@@ -382,7 +377,7 @@ struct ContentView: View {
                     if let node = document.core.nodesWidget.currentNode {
                         node.name = assetName
                         updateView.toggle()
-                        document.core.nodesWidget.drawables.update()
+                        document.core.nodesWidget.update()
                     }
                 })
                 .frame(minWidth: 200)
@@ -395,12 +390,14 @@ struct ContentView: View {
                 message: Text("This action cannot be undone!"),
                 primaryButton: .destructive(Text("Yes"), action: {
                     if let asset = document.core.nodesWidget.currentNode {
+                        document.core.nodesWidget.nodeIsAboutToBeDeleted(asset)
                         document.core.assetFolder.removeAsset(asset)
                         for a in document.core.assetFolder.assets {
                             document.core.assetFolder.select(a.id)
                             break
                         }
                         self.updateView.toggle()
+                        document.core.nodesWidget.update()
                     }
                 }),
                 secondaryButton: .cancel(Text("No"), action: {})

@@ -125,6 +125,12 @@ class MMRect
         return float2(x, y)
     }
     
+    /// Returns the middle of the rect
+    func middle() -> float2
+    {
+        return float2(x, y) + float2(width, height) / 2.0
+    }
+    
     /// Returns the size of the rect as float2
     func size() -> float2
     {
