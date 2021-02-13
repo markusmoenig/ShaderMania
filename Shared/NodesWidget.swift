@@ -151,10 +151,15 @@ public class NodesWidget    : ObservableObject
     {
         let rect = MMRect()
                 
+        var extraSpaceForSlots : Float = 0
+        if let shader = node.shader {
+            extraSpaceForSlots = 20 * Float(shader.inputs.count)
+        }
+        
         rect.x = drawables.viewSize.x / 2 + node.nodeData.x * graphZoom
         rect.y = drawables.viewSize.y / 2 + node.nodeData.y * graphZoom
         rect.width = 120 * graphZoom
-        rect.height = 120 * graphZoom
+        rect.height = (120 + extraSpaceForSlots) * graphZoom
         
         rect.x -= rect.width / 2
         rect.y -= rect.height / 2
@@ -166,12 +171,12 @@ public class NodesWidget    : ObservableObject
 
         //drawables.drawBox.draw(x: rect.x + item.rect.x, y: rect.y + item.rect.y, width: item.rect.width, height: item.rect.height, round: 12 * graphZoom, borderSize: 1, fillColor: skin.normalInteriorColor, borderColor: selected ? skin.selectedBorderColor : skin.normalInteriorColor)
         drawables.drawBox(position: rect.position(), size: rect.size(), rounding: 8 * graphZoom, borderSize: 1, fillColor: skin.normalInteriorColor, borderColor: selected ? skin.selectedBorderColor : skin.normalInteriorColor)
-        drawables.drawText(position: rect.position() + float2(8, 4) * graphZoom, text: node.name, size: 15 * graphZoom, color: skin.normalTextColor)
+        drawables.drawText(position: rect.position() + float2(9, 5) * graphZoom, text: node.name, size: 15 * graphZoom, color: skin.normalTextColor)
         
         drawables.drawLine(startPos: rect.position() + float2(6,24) * graphZoom, endPos: rect.position() + float2(rect.width - 8 * graphZoom, 24 * graphZoom), radius: 0.6, fillColor: skin.normalBorderColor)
         
         if node.previewTexture != nil {
-            drawables.drawBox(position: rect.position() + float2(18,34) * graphZoom, size: float2(80,80) * graphZoom, rounding: 8 * graphZoom, fillColor: skin.normalInteriorColor, texture: node.previewTexture)
+            drawables.drawBox(position: rect.position() + float2(20,34 + extraSpaceForSlots) * graphZoom, size: float2(80,80) * graphZoom, rounding: 8 * graphZoom, fillColor: skin.normalInteriorColor, texture: node.previewTexture)
         }
         
         /// Get the colors for a terminal
@@ -219,13 +224,22 @@ public class NodesWidget    : ObservableObject
         
         var x = rect.x - 7 * graphZoom
         var y = rect.y + 32 * graphZoom
-        for i in 0..<4 {
-            
-            let tColors = terminalColor(i)
-            drawables.drawDisk(position: float2(x, y), radius: 7 * graphZoom, borderSize: 1, fillColor: tColors.0, borderColor: tColors.1)
-            node.nodeIn[i].set(x, y, 14 * graphZoom, 14 * graphZoom)
+        
+        if let shader = node.shader {
 
-            y += 20 * graphZoom
+            for (i, name) in shader.inputs.enumerated() {
+                if i >= 4 {
+                    break
+                }
+                
+                let tColors = terminalColor(i)
+                drawables.drawDisk(position: float2(x, y), radius: 7 * graphZoom, borderSize: 1, fillColor: tColors.0, borderColor: tColors.1)
+                node.nodeIn[i].set(x, y, 14 * graphZoom, 14 * graphZoom)
+
+                drawables.drawText(position: float2(x, y) + float2(20, 1) * graphZoom, text: name, size: 15 * graphZoom, color: skin.normalTextColor)
+                
+                y += 20 * graphZoom
+            }
         }
         
         x = rect.x + rect.width - 7 * graphZoom

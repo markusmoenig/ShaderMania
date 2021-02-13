@@ -7,22 +7,43 @@
 
 import MetalKit
 
+// https://stackoverflow.com/questions/24092884/get-nth-character-of-a-string-in-swift-programming-language
+extension String {
+
+    var length: Int {
+        return count
+    }
+
+    subscript (i: Int) -> String {
+        return self[i ..< i + 1]
+    }
+
+    func substring(fromIndex: Int) -> String {
+        return self[min(fromIndex, length) ..< length]
+    }
+
+    func substring(toIndex: Int) -> String {
+        return self[0 ..< max(0, toIndex)]
+    }
+
+    subscript (r: Range<Int>) -> String {
+        let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
+                                            upper: min(length, max(0, r.upperBound))))
+        let start = index(startIndex, offsetBy: range.lowerBound)
+        let end = index(start, offsetBy: range.upperBound - range.lowerBound)
+        return String(self[start ..< end])
+    }
+}
+
 class Shader                : NSObject
 {
     var isValid             : Bool = false
     var pipelineStateDesc   : MTLRenderPipelineDescriptor!
     var pipelineState       : MTLRenderPipelineState!
     
-    var hasBindings         : Bool = false
+    var inputs              : [String] = []
     
-    var intVar              : [String: (Int, Any)] = [:]
-    var floatVar            : [String: (Int, Any)] = [:]
-    var float2Var           : [String: (Int, Any)] = [:]
-    var float3Var           : [String: (Int, Any)] = [:]
-    var float4Var           : [String: (Int, Any)] = [:]
-
     deinit {
-        print("release shader")
         pipelineStateDesc = nil
         pipelineState = nil
     }
@@ -74,7 +95,33 @@ class ShaderCompiler
             parseErrors.append(error)
         }
         
-        let parsedCode = code + asset.value
+        var processed = asset.value
+        
+        // Substitute ParamInput (the input slots
+        
+        while processed.contains("ParamInput") {
+            if let range = processed.range(of: "ParamInput") {
+                let startIndex : Int = range.lowerBound.utf16Offset(in: processed)
+                var index : Int = range.upperBound.utf16Offset(in: processed) + 1
+                var params = ""
+                while processed[index] != ">" && processed[index] != "\n" {
+                    params.append(processed[index])
+                    index += 1
+                }
+                if processed[index] == ">" {
+                    index += 1
+                    let pairs = splitParameters(params)
+                    if let name = pairs["name"] {
+                        let start = String.Index(utf16Offset: startIndex, in: processed)
+                        let end = String.Index(utf16Offset: index, in: processed)
+                        processed.replaceSubrange(start..<end, with: "data.slot\(shader.inputs.count);")
+                        shader.inputs.append(name)
+                    }
+                }
+            } else { break }
+        }
+        
+        let parsedCode = code + processed
         ns = code as NSString
         var lineNr : Int32 = 0
                 
@@ -150,6 +197,23 @@ class ShaderCompiler
         }
         
         core.device.makeLibrary(source: parsedCode, options: nil, completionHandler: compiledCB)
+    }
+    
+    /// Splits the parameters into key and value pairs
+    func splitParameters(_ parameters: String) -> [String: String]
+    {
+        var rc : [String: String] = [:]
+        
+        let cArray = parameters.split(separator: ",")
+        for param in cArray {
+            let dArray = param.split(separator: ":")
+            if dArray.count == 2 {
+                let key = dArray[0].trimmingCharacters(in: .whitespaces).lowercased()
+                let value = dArray[1].trimmingCharacters(in: .whitespaces).replacingOccurrences(of: "\"", with: "", options: NSString.CompareOptions.literal, range: nil)
+                rc[key] = value
+            }
+        }
+        return rc
     }
     
     func getHeaderCode(noOp: Bool = false) -> String
