@@ -35,8 +35,7 @@ class ScriptEditor
         self.core = core
         self.colorScheme = colorScheme
         
-        if let asset = core.assetFolder.getAsset("Final", .Shader) {
-            core.assetFolder.select(asset.id)
+        if let asset = core.assetFolder.current {
             createSession(asset)
             setTheme(colorScheme)
         }

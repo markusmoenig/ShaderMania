@@ -14,10 +14,13 @@ class AssetFolder       : Codable
     
     var core            : Core!
     var current         : Asset? = nil
+    var currentId       : UUID? = nil
+
+    var customSize      : SIMD2<Int>? = nil
             
     private enum CodingKeys: String, CodingKey {
         case assets
-        case groups
+        case currentId
     }
     
     init()
@@ -35,6 +38,7 @@ class AssetFolder       : Codable
         if let value = try? String(contentsOfFile: path, encoding: String.Encoding.utf8) {
             assets.append(Asset(type: .Shader, name: "Shader", value: value))
             current = assets[0]
+            currentId = assets[0].id
         }
     }
     
@@ -42,12 +46,16 @@ class AssetFolder       : Codable
     {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         assets = try container.decode([Asset].self, forKey: .assets)
+        if let id = try container.decodeIfPresent(UUID?.self, forKey: .currentId) {
+            select(id!)
+        }
     }
     
     func encode(to encoder: Encoder) throws
     {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(assets, forKey: .assets)
+        try container.encode(currentId, forKey: .currentId)
     }
     
     func addShader(_ name: String)
@@ -129,8 +137,9 @@ class AssetFolder       : Codable
     
     func select(_ id: UUID)
     {
+        currentId = id
         for asset in assets {
-            if asset.id == id {
+            if asset.id == id && core != nil {
                 if asset.scriptName.isEmpty {
                     core.scriptEditor?.createSession(asset)
                 }
@@ -308,8 +317,6 @@ class Asset         : Codable, Equatable
     var dataIndex   : Int = 0
     var dataScale   : Double = 1
     
-    var size        : SIMD2<Int>? = nil
-
     // For the script based assets
     var scriptName  = ""
 

@@ -40,14 +40,20 @@ struct ContentView: View {
     @State private var importingImage       : Bool = false
     @State private var exportingImage       : Bool = false
 
-
     @Environment(\.colorScheme) var deviceColorScheme: ColorScheme
 
+    #if os(macOS)
+    let leftPanelWidth                      : CGFloat = 200
+    #else
+    let leftPanelWidth                      : CGFloat = 250
+    #endif
+    
     var body: some View {
         
         NavigationView() {
 
             ParameterView(document: document, updateView: $updateView)
+                .frame(minWidth: leftPanelWidth, idealWidth: leftPanelWidth, maxWidth: leftPanelWidth)
 
             /*
             LeftPanelView(document: document, updateView: $updateView, showAssetNamePopover: $showAssetNamePopover, assetName: $assetName, showDeleteAssetAlert: $showDeleteAssetAlert)
@@ -89,6 +95,7 @@ struct ContentView: View {
                                 .zIndex(0)
                                 .animation(.default)
                                 .allowsHitTesting(true)
+                                //.frame(maxHeight: geometry.size.height / 2.3)
                         }                        
                     }
                     
@@ -150,7 +157,7 @@ struct ContentView: View {
                 .disabled(document.core.state == .Idle)
                 
                 Divider()
-                    .padding(.horizontal, 10)
+                    .padding(.horizontal, 2)
                     .opacity(0)
 
                 Button(action: {
@@ -459,11 +466,9 @@ struct ContentView: View {
                 
                 Button("Clear Custom", action: {
                     
-                    if let final = document.core.assetFolder.getAsset("Final", .Shader) {
-                        final.size = nil
-                        if let asset = document.core.assetFolder.current {
-                            document.core.createPreview(asset)
-                        }
+                    document.core.assetFolder.customSize = nil
+                    if let asset = document.core.assetFolder.current {
+                        document.core.createPreview(asset)
                     }
                     updateView.toggle()
                 })

@@ -114,7 +114,6 @@ class Project
             
         for asset in collected {
 
-            print("rendering", asset.name)
             if asset.type == .Shader {
                 drawShader(asset, preview, device)
             }

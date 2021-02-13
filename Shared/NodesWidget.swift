@@ -80,7 +80,7 @@ public class NodesWidget    : ObservableObject
     var dragStart           = float2(0, 0)
     var mouseMovedPos       : float2? = nil
     
-    var highTerminals       : [(UUID, Int)] = []
+    var firstDraw           = true
 
     init(_ core: Core)
     {
@@ -91,7 +91,20 @@ public class NodesWidget    : ObservableObject
     
     public func draw()
     {
-        highTerminals = []
+        if firstDraw {
+            
+            currentNode = core.assetFolder.current
+            
+            if currentNode != nil {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    self.compileAndUpdatePreview(self.currentNode!)
+                }
+            }
+            
+            selectNode(currentNode!)
+            firstDraw = false
+        }
+        
         drawables.encodeStart()
         
         let skin = NodeSkin(drawables.font, fontScale: 0.4, graphZoom: graphZoom)
@@ -230,13 +243,18 @@ public class NodesWidget    : ObservableObject
         if let node = currentNode {
             node.value = value
             node.shader = nil
-            core.project!.compileAssets(assetFolder: core.assetFolder!, forAsset: node, compiler: core.shaderCompiler, finished: { () in
-                
-                self.core.createPreview(node, updatePreviewTextures: true)
-                self.core.scriptEditor?.setErrors(node.errors)
-                self.update()
-            })
+            compileAndUpdatePreview(node)
         }
+    }
+    
+    /// Compile and update the project for a given node
+    func compileAndUpdatePreview(_ node: Asset)
+    {
+        core.project!.compileAssets(assetFolder: core.assetFolder!, forAsset: node, compiler: core.shaderCompiler, finished: { () in
+            
+            self.core.scriptEditor?.setErrors(node.errors)
+            self.update()
+        })
     }
     
     /// Called before nodes get deleted, make sure to break its connections
@@ -286,6 +304,7 @@ public class NodesWidget    : ObservableObject
         core.scriptEditor?.setAssetSession(asset)
         currentNode = asset
         core.assetFolder!.current = asset
+        core.assetFolder!.currentId = asset.id
         core.selectionChanged.send(asset)
         core.createPreview(asset)
     }
@@ -393,7 +412,22 @@ public class NodesWidget    : ObservableObject
         update()
     }
     
+    var scaleBuffer : Float = 0
+    func pinchGesture(_ scale: Float,_ firstTouch: Bool)
+    {
+        if firstTouch == true {
+            scaleBuffer = graphZoom
+        }
+        
+        graphZoom = max(0.2, scaleBuffer * scale)
+        graphZoom = min(1, graphZoom)
+        update()
+    }
+    
     func update() {
+        if let node = currentNode {
+            core.createPreview(node, updatePreviewTextures: true)
+        }
         drawables.update()
     }
 }

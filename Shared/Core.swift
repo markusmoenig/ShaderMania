@@ -150,6 +150,8 @@ public class Core       : ObservableObject
     
     public func setupNodesView(_ view: DMTKView)
     {
+        view.platformInit()
+
         nodesView = view
         view.core = self
         nodesWidget = NodesWidget(self)

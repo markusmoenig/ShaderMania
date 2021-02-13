@@ -115,6 +115,13 @@ public class DMTKView       : MTKView
         let tapRecognizer = UITapGestureRecognizer(target: self, action:(#selector(self.handleTapGesture(_:))))
         tapRecognizer.numberOfTapsRequired = 1
         addGestureRecognizer(tapRecognizer)
+        
+        let panRecognizer = UIPanGestureRecognizer(target: self, action:(#selector(self.handlePanGesture(_:))))
+        panRecognizer.minimumNumberOfTouches = 2
+        addGestureRecognizer(panRecognizer)
+        
+        let pinchRecognizer = UIPinchGestureRecognizer(target: self, action:(#selector(self.handlePinchGesture(_:))))
+        addGestureRecognizer(pinchRecognizer)
     }
     
     @objc func handleTapGesture(_ recognizer: UITapGestureRecognizer)
@@ -133,20 +140,46 @@ public class DMTKView       : MTKView
         }
     }
     
+    var lastX, lastY    : Float?
+    @objc func handlePanGesture(_ recognizer: UIPanGestureRecognizer)
+    {
+        if recognizer.numberOfTouches > 1 {
+            let translation = recognizer.translation(in: self)
+            
+            if ( recognizer.state == .began ) {
+                lastX = 0
+                lastY = 0
+            }
+            
+            let delta = float3(Float(translation.x) - lastX!, Float(translation.y) - lastY!, Float(recognizer.numberOfTouches))
+            
+            lastX = Float(translation.x)
+            lastY = Float(translation.y)
+            
+            core.nodesWidget.scrollWheel(delta)
+        }
+    }
+    
+    var firstTouch      : Bool = false
+    @objc func handlePinchGesture(_ recognizer: UIPinchGestureRecognizer)
+    {
+        core.nodesWidget.pinchGesture(Float(recognizer.scale), firstTouch)
+        firstTouch = false
+    }
+    
     func setMousePos(_ x: Float, _ y: Float)
     {
         mousePos.x = x
         mousePos.y = y
-        
-        mousePos.x /= Float(bounds.width) / core.texture!.width// / core.scaleFactor
-        mousePos.y /= Float(bounds.height) / core.texture!.height// / core.scaleFactor
     }
     
     override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         mouseIsDown = true
+        firstTouch = true
         if let touch = touches.first {
             let point = touch.location(in: self)
             setMousePos(Float(point.x), Float(point.y))
+            core.nodesWidget.touchDown(mousePos)
         }
     }
     
@@ -154,6 +187,7 @@ public class DMTKView       : MTKView
         if let touch = touches.first {
             let point = touch.location(in: self)
             setMousePos(Float(point.x), Float(point.y))
+            core.nodesWidget.touchMoved(mousePos)
         }
     }
     
@@ -161,7 +195,8 @@ public class DMTKView       : MTKView
         mouseIsDown = false
         if let touch = touches.first {
             let point = touch.location(in: self)
-                setMousePos(Float(point.x), Float(point.y))
+            setMousePos(Float(point.x), Float(point.y))
+            core.nodesWidget.touchUp(mousePos)
         }
     }
     
