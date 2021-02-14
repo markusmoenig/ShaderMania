@@ -174,6 +174,16 @@ class Project
             }
         }
 
+        /// Update the parameter data for the shader
+        if let shader = asset.shader {
+            if shader.paramDataBuffer != nil {
+                shader.paramDataBuffer!.setPurgeableState(.empty)
+                shader.paramDataBuffer = nil
+            }
+            shader.paramDataBuffer = device.makeBuffer(bytes: shader.paramData, length: shader.paramData.count * MemoryLayout<SIMD4<Float>>.stride, options: [])!
+            renderEncoder.setFragmentBuffer(shader.paramDataBuffer, offset: 0, index: 5)
+        }
+
         renderEncoder.setRenderPipelineState(asset.shader!.pipelineState)
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         renderEncoder.endEncoding()

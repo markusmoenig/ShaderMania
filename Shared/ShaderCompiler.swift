@@ -35,6 +35,41 @@ extension String {
     }
 }
 
+/// A shader parameter instance
+
+class ShaderParameter
+{
+    enum ParameterType {
+        case Float
+    }
+    
+    enum ParameterUIType {
+        case Slider
+    }
+
+    var type                : ParameterType = .Float
+    var uiType              : ParameterUIType = .Slider
+
+    var name                = ""
+    
+    var value               = float4(0,0,0,0)
+    
+    // Possible UI params
+    
+    var min                 = Float(0)
+    var max                 = Float(1)
+
+    var step                = Float(0.1)
+    
+    var defaultValue        = Float4(0,0,0,0)
+    
+    init(_ parameters: [String: String])
+    {
+        
+    }
+}
+
+/// A shader instance
 class Shader                : NSObject
 {
     var isValid             : Bool = false
@@ -42,7 +77,12 @@ class Shader                : NSObject
     var pipelineState       : MTLRenderPipelineState!
     
     var inputs              : [String] = []
+    var parameters          : [ShaderParameter] = []
     
+    var paramData           : [float4] = [float4(), float4(), float4(), float4(), float4(), float4(), float4(), float4(), float4(),float4()]
+    
+    var paramDataBuffer     : MTLBuffer? = nil
+
     deinit {
         pipelineStateDesc = nil
         pipelineState = nil
@@ -117,6 +157,30 @@ class ShaderCompiler
                         processed.replaceSubrange(start..<end, with: "data.slot\(shader.inputs.count);")
                         shader.inputs.append(name)
                     }
+                }
+            } else { break }
+        }
+        
+        // Substitute UI parameters
+        
+        while processed.contains("ParamFloat") {
+            if let range = processed.range(of: "ParamFloat") {
+                let startIndex : Int = range.lowerBound.utf16Offset(in: processed)
+                var index : Int = range.upperBound.utf16Offset(in: processed) + 1
+                var params = ""
+                while processed[index] != ">" && processed[index] != "\n" {
+                    params.append(processed[index])
+                    index += 1
+                }
+                if processed[index] == ">" {
+                    index += 1
+                    let pairs = splitParameters(params)
+                        
+                    var parameter = ShaderParameter(pairs)
+                    
+                    let start = String.Index(utf16Offset: startIndex, in: processed)
+                    let end = String.Index(utf16Offset: index, in: processed)
+                    processed.replaceSubrange(start..<end, with: "0;")//data.slot\(shader.inputs.count);")
                 }
             } else { break }
         }
@@ -250,6 +314,8 @@ class ShaderCompiler
             texture2d<float> slot1;
             texture2d<float> slot2;
             texture2d<float> slot3;
+
+            constant float4 *parameters;
         } Data;
 
         typedef struct
@@ -287,7 +353,8 @@ class ShaderCompiler
                                       texture2d<float> slot0 [[ texture(1) ]],
                                       texture2d<float> slot1 [[ texture(2) ]],
                                       texture2d<float> slot2 [[ texture(3) ]],
-                                      texture2d<float> slot3 [[ texture(4) ]])
+                                      texture2d<float> slot3 [[ texture(4) ]],
+                                      constant float4 *parameters [[ buffer(5) ]])
         {
             float2 uv = in.textureCoordinate;
             float2 size = in.viewportSize;
@@ -303,6 +370,8 @@ class ShaderCompiler
             data.slot1 = slot1;
             data.slot2 = slot2;
             data.slot3 = slot3;
+
+            data.parameters = parameters;
 
             \(noOp ? "//" : "")mainImage(data);
             return data.outColor;

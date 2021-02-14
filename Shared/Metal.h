@@ -76,7 +76,7 @@ typedef struct
 typedef struct
 {
     float           time;
-    unsigned int    frame;
+    unsigned int    frame;    
 } MetalData;
 
 #endif /* Metal_h */
