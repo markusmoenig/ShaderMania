@@ -52,7 +52,7 @@ struct ContentView: View {
         
         NavigationView() {
 
-            ParameterView(document: document, updateView: $updateView)
+            ParameterListView(document: document, updateView: $updateView)
                 .frame(minWidth: leftPanelWidth, idealWidth: leftPanelWidth, maxWidth: leftPanelWidth)
 
             /*

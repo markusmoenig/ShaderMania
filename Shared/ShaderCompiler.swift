@@ -36,7 +36,6 @@ extension String {
 }
 
 /// A shader parameter instance
-
 class ShaderParameter
 {
     enum ParameterType {
@@ -47,12 +46,15 @@ class ShaderParameter
         case Slider
     }
 
+    var id                  = UUID()
     var type                : ParameterType = .Float
     var uiType              : ParameterUIType = .Slider
 
     var name                = ""
     
     var value               = float4(0,0,0,0)
+    
+    var index               : Int = 0
     
     // Possible UI params
     
@@ -61,11 +63,51 @@ class ShaderParameter
 
     var step                = Float(0.1)
     
-    var defaultValue        = Float4(0,0,0,0)
+    var defaultValue        = float4(0,0,0,0)
     
     init(_ parameters: [String: String])
     {
+        if let name = parameters["name"] {
+            self.name = name
+        }
+        if let uiType = parameters["ui"] {
+            if uiType.lowercased() == "slider" {
+                self.uiType = .Slider
+            }            
+        }
+        if let defaultValue = parameters["default"] {
+            if let v = Float(defaultValue) {
+                self.defaultValue.x = v
+            }
+        }
+        if let min = parameters["min"] {
+            if let v = Float(min) {
+                self.min = v
+            }
+        }
+        if let max = parameters["max"] {
+            if let v = Float(max) {
+                self.max = v
+            }
+        }
+        if let step = parameters["step"] {
+            if let v = Float(step) {
+                self.step = v
+            }
+        }
+    }
+    
+    func createShaderText(_ index: Int) -> String
+    {
+        self.index = index
         
+        var text = ""
+        
+        if type == .Float {
+            text = "data.parameters[\(index)].x"
+        }
+        
+        return text
     }
 }
 
@@ -176,11 +218,14 @@ class ShaderCompiler
                     index += 1
                     let pairs = splitParameters(params)
                         
-                    var parameter = ShaderParameter(pairs)
+                    let parameter = ShaderParameter(pairs)
+                    let paramText = parameter.createShaderText(shader.parameters.count)
+                    shader.paramData[shader.parameters.count] = parameter.defaultValue
+                    shader.parameters.append(parameter)
                     
                     let start = String.Index(utf16Offset: startIndex, in: processed)
                     let end = String.Index(utf16Offset: index, in: processed)
-                    processed.replaceSubrange(start..<end, with: "0;")//data.slot\(shader.inputs.count);")
+                    processed.replaceSubrange(start..<end, with: "\(paramText);")//data.slot\(shader.inputs.count);")
                 }
             } else { break }
         }
