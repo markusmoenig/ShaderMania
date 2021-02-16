@@ -16,6 +16,7 @@ class Project
     var commandBuffer   : MTLCommandBuffer? = nil
     
     var size            = SIMD2<Int>(0,0)
+    var lastSize        = SIMD2<Int>(0,0)
     var time            = Float(0)
     var frame           = UInt32(0)
 
@@ -108,9 +109,15 @@ class Project
 
         size = viewSize
         
-        //if let customSize = final.size {
-        //    size = customSize
-        //}
+        if let customSize = assetFolder.customSize {
+            size = customSize
+        }
+        
+        if preview == false {
+            if size != lastSize {
+                resChanged = true
+            }
+        }
 
         checkTextures(collected: collected, preview: preview, device: device)
             
@@ -121,8 +128,10 @@ class Project
             }
         }
         
-        stopDrawing()
-
+        if preview == false {
+            lastSize = size
+        }
+        
         if collected.count == 0 {
             return nil
         } else {
@@ -185,7 +194,7 @@ class Project
                 shader.paramDataBuffer = nil
             }
             
-            shader.paramDataBuffer = device.makeBuffer(bytes: shader.paramData, length: shader.paramData.count * MemoryLayout<SIMD4<Float>>.stride, options: [])!
+            shader.paramDataBuffer = device.makeBuffer(bytes: asset.shaderData, length: asset.shaderData.count * MemoryLayout<SIMD4<Float>>.stride, options: [])!
             
             renderEncoder.setFragmentBuffer(shader.paramDataBuffer, offset: 0, index: 5)
         }

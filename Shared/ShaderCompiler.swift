@@ -51,9 +51,6 @@ class ShaderParameter
     var uiType              : ParameterUIType = .Slider
 
     var name                = ""
-    
-    var value               = float4(0,0,0,0)
-    
     var index               : Int = 0
     
     // Possible UI params
@@ -174,8 +171,6 @@ class Shader                : NSObject
     var inputs              : [String] = []
     var parameters          : [ShaderParameter] = []
     
-    var paramData           : [float4] = [float4(), float4(), float4(), float4(), float4(), float4(), float4(), float4(), float4(),float4()]
-    
     var paramDataBuffer     : MTLBuffer? = nil
     
     var compileTime         : Double = 0
@@ -279,7 +274,9 @@ class ShaderCompiler
                             
                         let parameter = ShaderParameter(type, pairs)
                         let paramText = parameter.createShaderText(shader.parameters.count)
-                        shader.paramData[shader.parameters.count] = parameter.defaultValue
+                        //if asset.shaderData[shader.parameters.count].w == -100 {
+                            asset.shaderData[shader.parameters.count] = parameter.defaultValue
+                        //}
                         shader.parameters.append(parameter)
                         
                         let start = String.Index(utf16Offset: startIndex, in: processed)

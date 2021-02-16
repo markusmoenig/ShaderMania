@@ -167,7 +167,6 @@ public class Core       : ObservableObject
         clearLocalAudio()
         clearGlobalAudio()
         
-        print("here")
         view.reset()
         
         assetError.error = nil
@@ -275,6 +274,7 @@ public class Core       : ObservableObject
             
             if let texture = project?.render(assetFolder: assetFolder, device: device, time: _Time.x, frame: _Frame, viewSize: SIMD2<Int>(Int(view.frame.width), Int(view.frame.height)), forAsset: asset) {
                 
+                project?.stopDrawing()
                 startDrawing()
 
                 let renderPassDescriptor = view.currentRenderPassDescriptor

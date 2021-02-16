@@ -322,6 +322,7 @@ class Asset         : Codable, Equatable
 
     // If this is a shader
     var shader      : Shader? = nil
+    var shaderData  : [float4] = [float4(), float4(), float4(), float4(), float4(), float4(), float4(), float4(), float4(),float4()]
     var errors      : [CompileError] = []
     
     // Texture In/Out
@@ -343,6 +344,7 @@ class Asset         : Codable, Equatable
         case slots
         case output
         case nodeData
+        case shaderData
     }
     
     init(type: AssetType, name: String, value: String = "", data: [Data] = [])
@@ -374,6 +376,9 @@ class Asset         : Codable, Equatable
         if let nodeData = try container.decodeIfPresent(float4.self, forKey: .nodeData) {
             self.nodeData = nodeData
         }
+        if let shaderData = try container.decodeIfPresent([float4].self, forKey: .shaderData) {
+            self.shaderData = shaderData
+        }
     }
     
     func encode(to encoder: Encoder) throws
@@ -387,6 +392,7 @@ class Asset         : Codable, Equatable
         try container.encode(slots, forKey: .slots)
         try container.encode(output, forKey: .output)
         try container.encode(nodeData, forKey: .nodeData)
+        try container.encode(shaderData, forKey: .shaderData)
     }
     
     static func ==(lhs:Asset, rhs:Asset) -> Bool { // Implement Equatable

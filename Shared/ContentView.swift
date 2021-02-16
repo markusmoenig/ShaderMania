@@ -339,47 +339,51 @@ struct ContentView: View {
     
     var toolNodeMenu : some View {
         Menu {
-            Button("Add Image", action: {
-                editingState = .Nodes
-                editingStateText = "Nodes Only"
-            })
-            .keyboardShortcut("1")
-            Button("Add Shader", action: {
-                document.core.assetFolder.addShader("New Shader")
-                //assetName = "New Shader"
-                //showAssetNamePopover = true
-                document.core.nodesWidget.drawables.update()
-            })
-            .keyboardShortcut("2")
-            Divider()
-            Button("Rename", action: {
-                if let node = document.core.nodesWidget.currentNode {
-                    assetName = node.name
-                    showAssetNamePopover = true
-                }
-            })
-            Button("Delete", action: {
-                if document.core.nodesWidget.currentNode != nil {
-                    showDeleteAssetAlert = true
+            Section(header: Text("Add Node")) {
+                Button("Add Image", action: {
+                    editingState = .Nodes
+                    editingStateText = "Nodes Only"
+                })
+                .keyboardShortcut("1")
+                Button("Add Shader", action: {
+                    document.core.assetFolder.addShader("New Shader")
+                    //assetName = "New Shader"
+                    //showAssetNamePopover = true
                     document.core.nodesWidget.drawables.update()
-                }
-            })
-            Divider()
-            Button("Source Only", action: {
-                editingState = .Source
-                editingStateText = "Source Only"
-            })
-            .keyboardShortcut("3")
-            Button("Nodes Only", action: {
-                editingState = .Nodes
-                editingStateText = "Nodes Only"
-            })
-            .keyboardShortcut("4")
-            Button("Source & Nodes", action: {
-                editingState = .Both
-                editingStateText = "Source & Nodes"
-            })
-            .keyboardShortcut("5")
+                })
+                .keyboardShortcut("2")
+            }
+            Section(header: Text("Edit Node")) {
+                Button("Rename", action: {
+                    if let node = document.core.nodesWidget.currentNode {
+                        assetName = node.name
+                        showAssetNamePopover = true
+                    }
+                })
+                Button("Delete", action: {
+                    if document.core.nodesWidget.currentNode != nil {
+                        showDeleteAssetAlert = true
+                        document.core.nodesWidget.drawables.update()
+                    }
+                })
+            }
+            Section(header: Text("Show")) {
+                Button("Source Only", action: {
+                    editingState = .Source
+                    editingStateText = "Source Only"
+                })
+                .keyboardShortcut("3")
+                Button("Nodes Only", action: {
+                    editingState = .Nodes
+                    editingStateText = "Nodes Only"
+                })
+                .keyboardShortcut("4")
+                Button("Source & Nodes", action: {
+                    editingState = .Both
+                    editingStateText = "Source & Nodes"
+                })
+                .keyboardShortcut("5")
+            }
         }
         label: {
             Text("Nodes")
@@ -465,17 +469,14 @@ struct ContentView: View {
                     document.core.previewOpacity = 0
                     updateView.toggle()
                 })
-                .keyboardShortcut("7")
                 Button("Opacity Half", action: {
                     document.core.previewOpacity = 0.5
                     updateView.toggle()
                 })
-                .keyboardShortcut("8")
                 Button("Opacity Full", action: {
                     document.core.previewOpacity = 1.0
                     updateView.toggle()
                 })
-                .keyboardShortcut("9")
             }
             Section(header: Text("Export")) {
                 Button("Export Image...", action: {
@@ -519,7 +520,35 @@ struct ContentView: View {
                 // Handle failure.
             }
         }
-
+        // Custom Resolution Popover
+        .popover(isPresented: self.$showCustomResPopover,
+                 arrowEdge: .top
+        ) {
+            VStack(alignment: .leading) {
+                Text("Resolution:")
+                TextField("Width", text: $customResWidth, onEditingChanged: { (changed) in
+                    if let width = Int(customResWidth), width > 0 {
+                        if let height = Int(customResHeight), height > 0 {
+                            document.core.assetFolder.customSize = SIMD2<Int>(width, height)
+                            if let asset = document.core.assetFolder.current {
+                                document.core.createPreview(asset)
+                            }
+                        }
+                    }
+                })
+                TextField("Height", text: $customResHeight, onEditingChanged: { (changed) in
+                    if let width = Int(customResWidth), width > 0 {
+                        if let height = Int(customResHeight), height > 0 {
+                            document.core.assetFolder.customSize = SIMD2<Int>(width, height)
+                            if let asset = document.core.assetFolder.current {
+                                document.core.createPreview(asset)
+                            }
+                        }
+                    }
+                })
+                .frame(minWidth: 200)
+            }.padding()
+        }
     }
 }
 
