@@ -87,8 +87,6 @@ public class Core       : ObservableObject
     
     var nodesWidget     : NodesWidget!
     
-    var needsPreviews   : Bool = false
-
     public init(_ frameworkId: String? = nil)
     {
         self.frameworkId = frameworkId
@@ -169,6 +167,7 @@ public class Core       : ObservableObject
         clearLocalAudio()
         clearGlobalAudio()
         
+        print("here")
         view.reset()
         
         assetError.error = nil
@@ -272,29 +271,25 @@ public class Core       : ObservableObject
             //timeChanged.send(_Time.x)
         }
             
-        project?.startDrawing(device)
         if let asset = nodesWidget.currentNode {
-            
-            if needsPreviews {
-                
-                project?.render(assetFolder: assetFolder, device: device, time: 0, frame: 0, viewSize: SIMD2<Int>(80, 80), forAsset: asset, preview: true)
-                
-                needsPreviews = false
-            }
             
             if let texture = project?.render(assetFolder: assetFolder, device: device, time: _Time.x, frame: _Frame, viewSize: SIMD2<Int>(Int(view.frame.width), Int(view.frame.height)), forAsset: asset) {
                 
+                startDrawing()
+
                 let renderPassDescriptor = view.currentRenderPassDescriptor
                 renderPassDescriptor?.colorAttachments[0].loadAction = .clear
                 renderPassDescriptor?.colorAttachments[0].clearColor = MTLClearColorMake(0,0,0,0)
 
-                let renderEncoder = project!.commandBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
+                let renderEncoder = coreCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
                 
                 drawTexture(texture, renderEncoder: renderEncoder!)
                 renderEncoder?.endEncoding()
                 
-                project!.commandBuffer!.present(drawable)
-                
+                coreCmdBuffer?.present(drawable)
+
+                stopDrawing()
+
                 if project!.resChanged {
                     if didSend == false {
                         didSend = true
@@ -306,11 +301,19 @@ public class Core       : ObservableObject
                 }
             }
         }
-        project?.stopDrawing()
         
         if state == .Running {
             _Time.x += 1.0 / targetFPS
             _Frame += 1
+        }
+    }
+    
+    func updateNodePreview()
+    {
+        if let asset = nodesWidget.currentNode {
+            project?.startDrawing(device)
+            project?.render(assetFolder: assetFolder, device: device, time: _Time.x, frame: _Frame, viewSize: SIMD2<Int>(80, 80), forAsset: asset, preview: true)
+            project?.stopDrawing()
         }
     }
     
@@ -333,25 +336,12 @@ public class Core       : ObservableObject
     }
     
     /// Create a preview for the current asset
-    func createPreview(_ asset: Asset,_ update: Bool = true, updatePreviewTextures: Bool = false)
+    func createPreview(_ asset: Asset,_ update: Bool = true)
     {
         if state == .Idle {
-            clearLocalAudio()
+            //clearLocalAudio()
             if asset.type == .Shader {
-                needsPreviews = updatePreviewTextures
                 updateOnce()
-            } else
-            if asset.type == .Shader {
-                if let shader = asset.shader {
-                    startDrawing()
-                    
-                    let rect = MMRect( 0, 0, self.texture!.width, self.texture!.height, scale: 1 )
-                    texture?.clear()
-                    texture?.drawShader(shader, rect)
-                    
-                    stopDrawing()
-                    updateOnce()
-                }
             } else
             if asset.type == .Audio {
                 do {

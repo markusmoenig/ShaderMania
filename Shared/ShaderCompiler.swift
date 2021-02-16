@@ -39,11 +39,11 @@ extension String {
 class ShaderParameter
 {
     enum ParameterType {
-        case Float
+        case Float, Float2, Float3, Float4
     }
     
     enum ParameterUIType {
-        case Slider
+        case Slider, Color
     }
 
     var id                  = UUID()
@@ -65,34 +65,84 @@ class ShaderParameter
     
     var defaultValue        = float4(0,0,0,0)
     
-    init(_ parameters: [String: String])
+    init(_ paramType: String, _ parameters: [String: String])
     {
         if let name = parameters["name"] {
             self.name = name
         }
-        if let uiType = parameters["ui"] {
-            if uiType.lowercased() == "slider" {
-                self.uiType = .Slider
-            }            
-        }
-        if let defaultValue = parameters["default"] {
-            if let v = Float(defaultValue) {
-                self.defaultValue.x = v
+        
+        if paramType == "ParamFloat3" {
+            
+            type = .Float3
+            
+            if let uiType = parameters["ui"] {
+                if uiType.lowercased() == "color" {
+                    self.uiType = .Color
+                }
             }
-        }
-        if let min = parameters["min"] {
-            if let v = Float(min) {
-                self.min = v
+            
+            if uiType == .Color {
+                if let defaultValue = parameters["default"] {
+                    let v = String(defaultValue)
+                        
+                    func readHexString(_ hex:String) -> float3 {
+                        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+
+                        if (cString.hasPrefix("#")) {
+                            cString.remove(at: cString.startIndex)
+                        }
+
+                        if ((cString.count) != 6) {
+                            return float3()
+                        }
+
+                        var rgbValue:UInt64 = 0
+                        Scanner(string: cString).scanHexInt64(&rgbValue)
+
+                        return float3( Float((rgbValue & 0xFF0000) >> 16) / 255.0,
+                                Float((rgbValue & 0x00FF00) >> 8) / 255.0,
+                                Float(rgbValue & 0x0000FF) / 255.0)
+                    }
+                        
+                    let v3 = readHexString(v)
+                    
+                    self.defaultValue.x = v3.x
+                    self.defaultValue.y = v3.y
+                    self.defaultValue.z = v3.z
+                }
             }
-        }
-        if let max = parameters["max"] {
-            if let v = Float(max) {
-                self.max = v
+        } else
+        if paramType == "ParamFloat" {
+            if let uiType = parameters["ui"] {
+                if uiType.lowercased() == "slider" {
+                    self.uiType = .Slider
+                }
             }
-        }
-        if let step = parameters["step"] {
-            if let v = Float(step) {
-                self.step = v
+            
+            if let uiType = parameters["ui"] {
+                if uiType.lowercased() == "slider" {
+                    self.uiType = .Slider
+                }
+            }
+            if let defaultValue = parameters["default"] {
+                if let v = Float(defaultValue) {
+                    self.defaultValue.x = v
+                }
+            }
+            if let min = parameters["min"] {
+                if let v = Float(min) {
+                    self.min = v
+                }
+            }
+            if let max = parameters["max"] {
+                if let v = Float(max) {
+                    self.max = v
+                }
+            }
+            if let step = parameters["step"] {
+                if let v = Float(step) {
+                    self.step = v
+                }
             }
         }
     }
@@ -105,6 +155,9 @@ class ShaderParameter
         
         if type == .Float {
             text = "data.parameters[\(index)].x"
+        } else
+        if type == .Float3 {
+            text = "data.parameters[\(index)].xyz"
         }
         
         return text
@@ -124,6 +177,9 @@ class Shader                : NSObject
     var paramData           : [float4] = [float4(), float4(), float4(), float4(), float4(), float4(), float4(), float4(), float4(),float4()]
     
     var paramDataBuffer     : MTLBuffer? = nil
+    
+    var compileTime         : Double = 0
+    var executionTime       : Double = 0
 
     deinit {
         pipelineStateDesc = nil
@@ -205,29 +261,33 @@ class ShaderCompiler
         
         // Substitute UI parameters
         
-        while processed.contains("ParamFloat") {
-            if let range = processed.range(of: "ParamFloat") {
-                let startIndex : Int = range.lowerBound.utf16Offset(in: processed)
-                var index : Int = range.upperBound.utf16Offset(in: processed) + 1
-                var params = ""
-                while processed[index] != ">" && processed[index] != "\n" {
-                    params.append(processed[index])
-                    index += 1
-                }
-                if processed[index] == ">" {
-                    index += 1
-                    let pairs = splitParameters(params)
+        let paramTypes = ["ParamFloat3", "ParamFloat"]
+        
+        for type in paramTypes {
+            while processed.contains(type) {
+                if let range = processed.range(of: type) {
+                    let startIndex : Int = range.lowerBound.utf16Offset(in: processed)
+                    var index : Int = range.upperBound.utf16Offset(in: processed) + 1
+                    var params = ""
+                    while processed[index] != ">" && processed[index] != "\n" {
+                        params.append(processed[index])
+                        index += 1
+                    }
+                    if processed[index] == ">" {
+                        index += 1
+                        let pairs = splitParameters(params)
+                            
+                        let parameter = ShaderParameter(type, pairs)
+                        let paramText = parameter.createShaderText(shader.parameters.count)
+                        shader.paramData[shader.parameters.count] = parameter.defaultValue
+                        shader.parameters.append(parameter)
                         
-                    let parameter = ShaderParameter(pairs)
-                    let paramText = parameter.createShaderText(shader.parameters.count)
-                    shader.paramData[shader.parameters.count] = parameter.defaultValue
-                    shader.parameters.append(parameter)
-                    
-                    let start = String.Index(utf16Offset: startIndex, in: processed)
-                    let end = String.Index(utf16Offset: index, in: processed)
-                    processed.replaceSubrange(start..<end, with: "\(paramText);")//data.slot\(shader.inputs.count);")
-                }
-            } else { break }
+                        let start = String.Index(utf16Offset: startIndex, in: processed)
+                        let end = String.Index(utf16Offset: index, in: processed)
+                        processed.replaceSubrange(start..<end, with: "\(paramText);")
+                    }
+                } else { break }
+            }
         }
         
         let parsedCode = code + processed
@@ -242,10 +302,14 @@ class ShaderCompiler
             cb(nil, parseErrors)
             return
         }
-                
+                        
+        let startTime =  NSDate().timeIntervalSince1970
+
         let compiledCB : MTLNewLibraryCompletionHandler = { (library, error) in
             
             var errors: [CompileError] = []
+            
+            shader.compileTime = (NSDate().timeIntervalSince1970 - startTime) * 1000
             
             if let error = error {
                 let str = error.localizedDescription

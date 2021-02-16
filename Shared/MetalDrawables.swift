@@ -175,6 +175,34 @@ class MetalDrawables
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
     }
     
+    /// Draws a box pattern
+    func drawBoxPattern(position: float2, size: float2, rounding: Float = 0, borderSize: Float = 0, onion: Float = 0, rotation: Float = 0, fillColor: float4 = float4(1,1,1,1), borderColor: float4 = float4(0,0,0,0), texture: MTLTexture? = nil)
+    {
+        var data = BoxUniform()
+        data.screenSize = viewSize
+        data.borderSize = borderSize
+        data.size = size
+        data.fillColor = fillColor
+        data.borderColor = borderColor
+        data.onion = onion
+        data.rotation = rotation.degreesToRadians
+        data.hasTexture = texture != nil ? 1 : 0
+        data.round = rounding
+
+        let rect = MMRect(position.x - data.borderSize / 2, position.y - data.borderSize / 2, size.x + data.borderSize * 2, size.y + data.borderSize * 2, scale: 1)
+        let vertexData = createVertexData(rect)
+        
+        renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
+        renderEncoder.setVertexBytes(&viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
+        
+        renderEncoder.setFragmentBytes(&data, length: MemoryLayout<BoxUniform>.stride, index: 0)
+        if let texture = texture {
+            renderEncoder.setFragmentTexture(texture, index: 1)
+        }
+        renderEncoder.setRenderPipelineState(metalView.core.metalStates.getState(state: .DrawBackPattern))
+        renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
+    }
+    
     /// Draws a box
     func drawLine(startPos: float2, endPos: float2, radius: Float, borderSize: Float = 0, fillColor: float4 = float4(1,1,1,1), borderColor: float4 = float4(0,0,0,0))
     {

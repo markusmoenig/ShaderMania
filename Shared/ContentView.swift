@@ -95,7 +95,7 @@ struct ContentView: View {
                                 .zIndex(0)
                                 .animation(.default)
                                 .allowsHitTesting(true)
-                                //.frame(maxHeight: geometry.size.height / 2.3)
+                                .frame(maxHeight: editingState == .Both ? geometry.size.height / 2.3 : geometry.size.height)
                         }                        
                     }
                     
@@ -115,13 +115,7 @@ struct ContentView: View {
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {
                 
-                toolAddMenu
-
-                Divider()
-                    .padding(.horizontal, 2)
-                    .opacity(0)
-                
-                toolEditMenu
+                toolNodeMenu
                 
                 Divider()
                     .padding(.horizontal, 2)
@@ -343,7 +337,7 @@ struct ContentView: View {
     
     // tool bar menus
     
-    var toolAddMenu : some View {
+    var toolNodeMenu : some View {
         Menu {
             Button("Add Image", action: {
                 editingState = .Nodes
@@ -370,6 +364,22 @@ struct ContentView: View {
                     document.core.nodesWidget.drawables.update()
                 }
             })
+            Divider()
+            Button("Source Only", action: {
+                editingState = .Source
+                editingStateText = "Source Only"
+            })
+            .keyboardShortcut("3")
+            Button("Nodes Only", action: {
+                editingState = .Nodes
+                editingStateText = "Nodes Only"
+            })
+            .keyboardShortcut("4")
+            Button("Source & Nodes", action: {
+                editingState = .Both
+                editingStateText = "Source & Nodes"
+            })
+            .keyboardShortcut("5")
         }
         label: {
             Text("Nodes")
@@ -412,29 +422,6 @@ struct ContentView: View {
         }
     }
     
-    var toolEditMenu : some View {
-        Menu {
-            Button("Source", action: {
-                editingState = .Source
-                editingStateText = "Source Only"
-            })
-            .keyboardShortcut("1")
-            Button("Nodes", action: {
-                editingState = .Nodes
-                editingStateText = "Nodes Only"
-            })
-            .keyboardShortcut("2")
-            Button("Source & Nodes", action: {
-                editingState = .Both
-                editingStateText = "Source & Nodes"
-            })
-            .keyboardShortcut("3")
-        }
-        label: {
-            Text(editingStateText)
-        }
-    }
-    
     var toolPreviewMenu : some View {
         Menu {
             Section(header: Text("Preview")) {
@@ -442,17 +429,17 @@ struct ContentView: View {
                     document.core.previewFactor = 4
                     updateView.toggle()
                 })
-                .keyboardShortcut("4")
+                .keyboardShortcut("6")
                 Button("Medium", action: {
                     document.core.previewFactor = 2
                     updateView.toggle()
                 })
-                .keyboardShortcut("5")
+                .keyboardShortcut("7")
                 Button("Large", action: {
                     document.core.previewFactor = 1
                     updateView.toggle()
                 })
-                .keyboardShortcut("6")
+                .keyboardShortcut("8")
                 Button("Set Custom", action: {
                     
                     if let project = document.core.project {

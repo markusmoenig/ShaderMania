@@ -112,6 +112,8 @@ public class DMTKView       : MTKView
     
     func platformInit()
     {
+        layer.isOpaque = false
+
         let tapRecognizer = UITapGestureRecognizer(target: self, action:(#selector(self.handleTapGesture(_:))))
         tapRecognizer.numberOfTapsRequired = 1
         addGestureRecognizer(tapRecognizer)

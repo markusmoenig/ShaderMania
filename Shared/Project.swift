@@ -96,6 +96,8 @@ class Project
         self.assetFolder = assetFolder
         self.time = time
 
+        startDrawing(device)
+
         if black == nil {
             black = allocateTexture(device, width: 10, height: 10)
             clear(black!)
@@ -118,6 +120,8 @@ class Project
                 drawShader(asset, preview, device)
             }
         }
+        
+        stopDrawing()
 
         if collected.count == 0 {
             return nil
@@ -180,7 +184,9 @@ class Project
                 shader.paramDataBuffer!.setPurgeableState(.empty)
                 shader.paramDataBuffer = nil
             }
+            
             shader.paramDataBuffer = device.makeBuffer(bytes: shader.paramData, length: shader.paramData.count * MemoryLayout<SIMD4<Float>>.stride, options: [])!
+            
             renderEncoder.setFragmentBuffer(shader.paramDataBuffer, offset: 0, index: 5)
         }
 

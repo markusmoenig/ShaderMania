@@ -107,6 +107,8 @@ public class NodesWidget    : ObservableObject
         
         drawables.encodeStart()
         
+        drawables.drawBoxPattern(position: float2(0,0), size: drawables.viewSize, fillColor: float4(0.12, 0.12, 0.12, 1), borderColor: float4(0.14, 0.14, 0.14, 1))
+
         let skin = NodeSkin(drawables.font, fontScale: 0.4, graphZoom: graphZoom)
         //drawables.drawDisk(position: float2(0,0), radius: 50)
         //drawables.drawBox(position: float2(100,100), size: float2(100, 50))
@@ -267,6 +269,7 @@ public class NodesWidget    : ObservableObject
         core.project!.compileAssets(assetFolder: core.assetFolder!, forAsset: node, compiler: core.shaderCompiler, finished: { () in
             
             self.core.scriptEditor?.setErrors(node.errors)
+            self.core.selectionChanged.send(node)
             self.update()
         })
     }
@@ -439,9 +442,12 @@ public class NodesWidget    : ObservableObject
     }
     
     func update() {
+        
         if let node = currentNode {
-            core.createPreview(node, updatePreviewTextures: true)
+            core.createPreview(node)
         }
+        
+        core.updateNodePreview()
         drawables.update()
     }
 }
