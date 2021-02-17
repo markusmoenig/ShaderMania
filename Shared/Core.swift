@@ -86,6 +86,7 @@ public class Core       : ObservableObject
     var project         : Project? = nil
     
     var nodesWidget     : NodesWidget!
+    var library         : Library!
     
     public init(_ frameworkId: String? = nil)
     {
@@ -102,8 +103,9 @@ public class Core       : ObservableObject
         file = File()
 
         assetFolder = AssetFolder()
-        assetFolder.setup(self)
         
+        assetFolder.setup(self)
+
         shaderCompiler = ShaderCompiler(self)
         
         #if os(iOS)
@@ -116,6 +118,7 @@ public class Core       : ObservableObject
         #endif
         
         project = Project()
+        library = Library(self)
     }
     
     public func setupView(_ view: DMTKView)
@@ -311,9 +314,16 @@ public class Core       : ObservableObject
     func updateNodePreview()
     {
         if let asset = nodesWidget.currentNode {
-            project?.startDrawing(device)
-            project?.render(assetFolder: assetFolder, device: device, time: _Time.x, frame: _Frame, viewSize: SIMD2<Int>(80, 80), forAsset: asset, preview: true)
-            project?.stopDrawing()
+            if asset.type == .Shader {
+                project?.startDrawing(device)
+                project?.render(assetFolder: assetFolder, device: device, time: _Time.x, frame: _Frame, viewSize: SIMD2<Int>(80, 80), forAsset: asset, preview: true)
+                project?.stopDrawing()
+            } else
+            if asset.type == .Image {
+                if asset.previewTexture == nil {
+                    project?.createImageTexture(asset, preview: true, device: device)
+                }
+            }
         }
     }
     
@@ -353,22 +363,22 @@ public class Core       : ObservableObject
                 }
             } else if asset.type == .Image {
                 if asset.dataIndex < asset.data.count {
-                
-                    let data = asset.data[asset.dataIndex]
-                    
-                    let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
-                    if let texture  = try? textureLoader.newTexture(data: data, options: texOptions) {
+                                    
+                    if asset.texture == nil {
+                        project?.createImageTexture(asset, preview: false, device: device)
+                    }
+                    if let texture = asset.texture {
                         let texture2D = Texture2D(self, texture: texture)
                         
                         self.startDrawing()
                         var options : [String:Any] = [:]
                         options["texture"] = texture2D
                         
-                        let width : Float = texture2D.width * Float(asset.dataScale)
-                        let height : Float = texture2D.height * Float(asset.dataScale)
+                        //let width : Float = texture2D.width * Float(asset.dataScale)
+                        //let height : Float = texture2D.height * Float(asset.dataScale)
 
-                        options["width"] = width
-                        options["height"] = height
+                        options["width"] = view.frame.width
+                        options["height"] = view.frame.height
 
                         self.texture?.clear()
                         self.texture?.drawTexture(options)
@@ -380,13 +390,9 @@ public class Core       : ObservableObject
                         if let scriptEditor = self.scriptEditor {
                             let text = """
 
-                            Displaying image group \(asset.name) index \(asset.dataIndex) of \(asset.data.count)
+                            Displaying image \(asset.name)
                             
                             Image resolution \(Int(texture2D.width))x\(Int(texture2D.height))
-
-                            Preview resolution \(Int(width))x\(Int(height))
-
-                            Scale \(String(format: "%.02f", asset.dataScale))
 
                             """
                             scriptEditor.setAssetValue(asset, value: text)

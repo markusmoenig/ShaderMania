@@ -148,3 +148,17 @@ struct ParameterListView: View {
         }
     }
 }
+
+/// LibraryView
+struct LibraryView: View {
+    @State var document                     : ShaderManiaDocument
+    
+    @Binding var updateView                 : Bool
+
+    var body: some View {
+        VStack {
+            
+            Spacer()
+        }
+    }
+}

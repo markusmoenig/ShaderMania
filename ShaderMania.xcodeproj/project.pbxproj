@@ -56,6 +56,8 @@
 		2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D4C7825A68ECA00D2F8EA /* Views.swift */; };
 		2B77B7BB25773978002D99C0 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B77B7BA25773978002D99C0 /* File.swift */; };
 		2B77B7BC25773978002D99C0 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B77B7BA25773978002D99C0 /* File.swift */; };
+		2B7C7EEC25DCB5D400727BC0 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C7EEB25DCB5D400727BC0 /* Library.swift */; };
+		2B7C7EED25DCB5D400727BC0 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C7EEB25DCB5D400727BC0 /* Library.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -90,6 +92,7 @@
 		2B36F67525D4DE84001611BE /* OpenSans.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = OpenSans.json; sourceTree = "<group>"; };
 		2B3D4C7825A68ECA00D2F8EA /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		2B77B7BA25773978002D99C0 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
+		2B7C7EEB25DCB5D400727BC0 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +133,7 @@
 				2B0EEA772565DF7800C84C6C /* ContentView.swift */,
 				2B3D4C7825A68ECA00D2F8EA /* Views.swift */,
 				2B0EEA782565DF7800C84C6C /* Asset.swift */,
+				2B7C7EEB25DCB5D400727BC0 /* Library.swift */,
 				2B0EEA7C2565DF7800C84C6C /* Core.swift */,
 				2B0EEA7D2565DF7800C84C6C /* MathLibrary.swift */,
 				2B0EEA792565DF7800C84C6C /* Metal.h */,
@@ -315,6 +319,7 @@
 				2B0EEA8D2565DF7800C84C6C /* MathLibrary.swift in Sources */,
 				2B0EEA852565DF7800C84C6C /* Asset.swift in Sources */,
 				2B0EEA892565DF7800C84C6C /* Utils.swift in Sources */,
+				2B7C7EEC25DCB5D400727BC0 /* Library.swift in Sources */,
 				2B3D4C7925A68ECA00D2F8EA /* Views.swift in Sources */,
 				2B0EEA872565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA02565DF9A00C84C6C /* Classes.swift in Sources */,
@@ -342,6 +347,7 @@
 				2B0EEA8E2565DF7800C84C6C /* MathLibrary.swift in Sources */,
 				2B0EEA862565DF7800C84C6C /* Asset.swift in Sources */,
 				2B0EEA8A2565DF7800C84C6C /* Utils.swift in Sources */,
+				2B7C7EED25DCB5D400727BC0 /* Library.swift in Sources */,
 				2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */,
 				2B0EEA882565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA12565DF9A00C84C6C /* Classes.swift in Sources */,

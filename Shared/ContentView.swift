@@ -22,6 +22,12 @@ struct ContentView: View {
 
     @Binding var document                   : ShaderManiaDocument
 
+    @State private var showSharePopover     : Bool = false
+    @State private var libraryName          : String = ""
+    @State private var userNickName         : String = ""
+
+    @State private var showLibrary          : Bool = false
+
     @State private var showAssetNamePopover : Bool = false
     @State private var assetName            : String = ""
 
@@ -50,306 +56,212 @@ struct ContentView: View {
     
     var body: some View {
         
-        NavigationView() {
+        HStack() {
+            NavigationView() {
 
-            ParameterListView(document: document, updateView: $updateView)
-                .frame(minWidth: leftPanelWidth, idealWidth: leftPanelWidth, maxWidth: leftPanelWidth)
+                ParameterListView(document: document, updateView: $updateView)
+                    .frame(minWidth: leftPanelWidth, idealWidth: leftPanelWidth, maxWidth: leftPanelWidth)
+                
+                GeometryReader { geometry in
+                    ZStack(alignment: .topTrailing) {
 
-            /*
-            LeftPanelView(document: document, updateView: $updateView, showAssetNamePopover: $showAssetNamePopover, assetName: $assetName, showDeleteAssetAlert: $showDeleteAssetAlert)
-            .frame(minWidth: 160, idealWidth: 200, maxWidth: 200)
-            .layoutPriority(0)
-            */
-            
-            GeometryReader { geometry in
-                ZStack(alignment: .topTrailing) {
+                        VStack(spacing: 2) {
+                            
+                            if editingState == .Source || editingState == .Both {
+                                GeometryReader { geometry in
+                                    ScrollView {
 
-                    VStack(spacing: 2) {
+                                        WebView(document.core, deviceColorScheme).tabItem {
+                                        }
+                                            .animation(.default)
+                                            .frame(height: geometry.size.height)
+                                            .tag(1)
+                                            .onChange(of: deviceColorScheme) { newValue in
+                                                document.core.scriptEditor?.setTheme(newValue)
+                                            }
+                                    }
+                                    .zIndex(0)
+                                    .frame(maxWidth: .infinity)
+                                    .layoutPriority(2)
+                                    .animation(.default)
+
+                                    .onReceive(self.document.core.contentChanged) { state in
+                                        document.updated.toggle()
+                                    }
+                                }
+                            }
+                                                    
+                            if editingState == .Nodes || editingState == .Both {
+                                MetalView(document.core, .Nodes)
+                                    .zIndex(0)
+                                    .animation(.default)
+                                    .allowsHitTesting(true)
+                                    .frame(maxHeight: editingState == .Both ? geometry.size.height / 2.3 : geometry.size.height)
+                            }
+                        }
                         
-                        if editingState == .Source || editingState == .Both {
-                            GeometryReader { geometry in
-                                ScrollView {
-
-                                    WebView(document.core, deviceColorScheme).tabItem {
-                                    }
-                                        .animation(.default)
-                                        .frame(height: geometry.size.height)
-                                        .tag(1)
-                                        .onChange(of: deviceColorScheme) { newValue in
-                                            document.core.scriptEditor?.setTheme(newValue)
-                                        }
-                                }
-                                .zIndex(0)
-                                .frame(maxWidth: .infinity)
-                                .layoutPriority(2)
-                                .animation(.default)
-
-                                .onReceive(self.document.core.contentChanged) { state in
-                                    document.updated.toggle()
-                                }
-                            }
-                        }
-                                                
-                        if editingState == .Nodes || editingState == .Both {
-                            MetalView(document.core, .Nodes)
-                                .zIndex(0)
-                                .animation(.default)
-                                .allowsHitTesting(true)
-                                .frame(maxHeight: editingState == .Both ? geometry.size.height / 2.3 : geometry.size.height)
-                        }                        
+                        MetalView(document.core, .Main)
+                            .zIndex(2)
+                            .frame(minWidth: 0,
+                                   maxWidth: geometry.size.width / document.core.previewFactor,
+                                   minHeight: 0,
+                                   maxHeight: geometry.size.height / document.core.previewFactor,
+                                   alignment: .topTrailing)
+                            .opacity(helpIsVisible ? 0 : (document.core.state == .Running ? 1 : document.core.previewOpacity))
+                            .animation(.default)
+                            .allowsHitTesting(false)
                     }
+                }
+            }
+            .toolbar {
+                ToolbarItemGroup(placement: .automatic) {
                     
-                    MetalView(document.core, .Main)
-                        .zIndex(2)
-                        .frame(minWidth: 0,
-                               maxWidth: geometry.size.width / document.core.previewFactor,
-                               minHeight: 0,
-                               maxHeight: geometry.size.height / document.core.previewFactor,
-                               alignment: .topTrailing)
-                        .opacity(helpIsVisible ? 0 : (document.core.state == .Running ? 1 : document.core.previewOpacity))
-                        .animation(.default)
-                        .allowsHitTesting(false)
-                }
-            }
-        }
-        .toolbar {
-            ToolbarItemGroup(placement: .automatic) {
-                
-                toolNodeMenu
-                
-                Divider()
-                    .padding(.horizontal, 2)
-                    .opacity(0)
-                
-                toolPreviewMenu
-                
-                Divider()
-                    .padding(.horizontal, 2)
-                    .opacity(0)
-                
-                // Core Controls
-                Button(action: {
-                    document.core.stop()
-                    document.core.start()
-                    helpIsVisible = false
-                    updateView.toggle()
-                })
-                {
-                    Label("Run", systemImage: "play.fill")
-                }
-                .keyboardShortcut("r")
-                
-                Button(action: {
-                    document.core.stop()
-                    if let asset = document.core.assetFolder.current {
-                        document.core.createPreview(asset)
+                    toolNodeMenu
+                    
+                    Divider()
+                        .padding(.horizontal, 2)
+                        .opacity(0)
+                    
+                    toolPreviewMenu
+                    
+                    Divider()
+                        .padding(.horizontal, 2)
+                        .opacity(0)
+                    
+                    // Core Controls
+                    Button(action: {
+                        document.core.stop()
+                        document.core.start()
+                        helpIsVisible = false
+                        updateView.toggle()
+                    })
+                    {
+                        Label("Run", systemImage: "play.fill")
                     }
-                    updateView.toggle()
-                }) {
-                    Label("Stop", systemImage: "stop.fill")
-                }.keyboardShortcut("t")
-                .disabled(document.core.state == .Idle)
-                
-                Divider()
-                    .padding(.horizontal, 2)
-                    .opacity(0)
+                    .keyboardShortcut("r")
+                    
+                    Button(action: {
+                        document.core.stop()
+                        if let asset = document.core.assetFolder.current {
+                            document.core.createPreview(asset)
+                        }
+                        updateView.toggle()
+                    }) {
+                        Label("Stop", systemImage: "stop.fill")
+                    }.keyboardShortcut("t")
+                    .disabled(document.core.state == .Idle)
+                    
+                    Divider()
+                        .padding(.horizontal, 2)
+                        .opacity(0)
 
-                Button(action: {
-                    document.help.send()
-                }) {
-                    Label("Help", systemImage: "questionmark")
+                    toolShare
+                    
+                    Button(action: {
+                        document.help.send()
+                    }) {
+                        Label("Help", systemImage: "questionmark")
+                    }
+                    .keyboardShortcut("h")
+                    
+                    Button(action: {
+                        showLibrary.toggle()
+                    }) {
+                        Label("Library", systemImage: "sidebar.right")
+                    }
                 }
-                .keyboardShortcut("h")
             }
-        }
-        //.onReceive(self.document.core.timeChanged) { value in
-        //    timeString = String(format: "%.02f", value)
-        //}
-        
-        .onReceive(self.document.core.createPreview) { value in
-            if let asset = document.core.assetFolder.current {
-                document.core.createPreview(asset)
-            }
-        }
-        
-        .onReceive(self.document.help) { value in
-            if self.helpIsVisible == false {
-                self.document.core.scriptEditor!.activateHelpSession()
-            } else {
+            //.onReceive(self.document.core.timeChanged) { value in
+            //    timeString = String(format: "%.02f", value)
+            //}
+            
+            .onReceive(self.document.core.createPreview) { value in
                 if let asset = document.core.assetFolder.current {
-                    self.document.core.assetFolder.select(asset.id)
+                    document.core.createPreview(asset)
                 }
             }
-            self.helpIsVisible.toggle()
-        }
-        
-        .onReceive(self.document.exportImage) { value in
-            exportingImage = true
-        }
-        
-        .onReceive(self.document.core.updateUI) { value in
-            updateView.toggle()
-        }
-    
-        /*
-        if rightSideBarIsVisible == true {
-            if helpIsVisible == true {
-                /*
-                HelpIndexView(document.core)
-                    .frame(minWidth: 160, idealWidth: 160, maxWidth: 160)
-                    .layoutPriority(0)
-                    .animation(.easeInOut)
-                */
-            } else {
-                VStack {
+            
+            .onReceive(self.document.help) { value in
+                if self.helpIsVisible == false {
+                    self.document.core.scriptEditor!.activateHelpSession()
+                } else {
                     if let asset = document.core.assetFolder.current {
-                        if asset.type == .Texture {
-                            Button("Attach Image", action: {
-                                importingImage = true
-                            })
-                            .padding(4)
-                            .padding(.top, 10)
-                        }
-                        if asset.type == .Shader || asset.type == .Buffer {
-                            BufferInputsView(document: document, updateView: $updateView)
-
-                            if asset.type == .Buffer {
-                                BufferOutputView(document: document, updateView: $updateView)
-                            }
-                        }
-                    }
-                    Spacer()
-                }
-                .frame(minWidth: 160, idealWidth: 160, maxWidth: 160)
-                .layoutPriority(0)
-                .animation(.easeInOut)
-                
-                // Custom Resolution Popover
-                .popover(isPresented: self.$showCustomResPopover,
-                         arrowEdge: .top
-                ) {
-                    VStack(alignment: .leading) {
-                        Text("Resolution:")
-                        TextField("Width", text: $customResWidth, onEditingChanged: { (changed) in
-                            if let width = Int(customResWidth), width > 0 {
-                                if let height = Int(customResHeight), height > 0 {
-                                    if let final = document.core.assetFolder.getAsset("Final", .Shader) {
-                                        final.size = SIMD2<Int>(width, height)
-                                        if let asset = document.core.assetFolder.current {
-                                            document.core.createPreview(asset)
-                                        }
-                                    }
-                                }
-                            }
-                        })
-                        TextField("Height", text: $customResHeight, onEditingChanged: { (changed) in
-                            if let width = Int(customResWidth), width > 0 {
-                                if let height = Int(customResHeight), height > 0 {
-                                    if let final = document.core.assetFolder.getAsset("Final", .Shader) {
-                                        final.size = SIMD2<Int>(width, height)
-                                        if let asset = document.core.assetFolder.current {
-                                            document.core.createPreview(asset)
-                                        }
-                                    }
-                                }
-                            }
-                        })
-                        .frame(minWidth: 200)
-                    }.padding()
-                }
-                
-                // Import Image
-                .fileImporter(
-                    isPresented: $importingImage,
-                    allowedContentTypes: [.item],
-                    allowsMultipleSelection: false
-                ) { result in
-                    do {
-                        let selectedFiles = try result.get()
-                        if selectedFiles.count > 0 {
-                            if let asset = document.core.assetFolder.current {
-                                document.core.assetFolder.attachImage(asset, selectedFiles[0])
-                                asset.name = selectedFiles[0].deletingPathExtension().lastPathComponent
-                                document.core.assetFolder.current = nil
-                                document.core.assetFolder.select(asset.id)
-                                updateView.toggle()
-                                document.core.createPreview(asset)
-                            }
-                        }
-                    } catch {
-                        // Handle failure.
+                        self.document.core.assetFolder.select(asset.id)
                     }
                 }
+                self.helpIsVisible.toggle()
+            }
+            
+            .onReceive(self.document.exportImage) { value in
+                exportingImage = true
+            }
+            
+            .onReceive(self.document.core.updateUI) { value in
+                updateView.toggle()
+            }
                 
-                // Export Image
-                .fileExporter(
-                    isPresented: $exportingImage,
-                    document: document,
-                    contentType: .png,
-                    defaultFilename: "Image"
-                ) { result in
-                    do {
-                        let url = try result.get()
-                        let core = document.core
-                        if let project = core.project {
-                            if let texture = project.render(assetFolder: core.assetFolder, device: core.device, time: 0, frame: 0, viewSize: SIMD2<Int>(Int(core.view.frame.width), Int(core.view.frame.height))) {
-                                
-                                project.stopDrawing(syncTexture: texture, waitUntilCompleted: true)
-                                
-                                if let cgiTexture = project.makeCGIImage(core.device, core.metalStates.getComputeState(state: .MakeCGIImage), texture) {
-                                    if let image = makeCGIImage(texture: cgiTexture, forImage: true) {
-                                        if let imageDestination = CGImageDestinationCreateWithURL(url as CFURL, kUTTypePNG, 1, nil) {
-                                            CGImageDestinationAddImage(imageDestination, image, nil)
-                                            CGImageDestinationFinalize(imageDestination)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } catch {
-                        // Handle failure.
-                    }
-                }
-                
-                // Delete an asset
-                .alert(isPresented: $showDeleteAssetAlert) {
-                    Alert(
-                        title: Text("Do you want to remove the asset '\(document.core.assetFolder.current!.name)' ?"),
-                        message: Text("This action cannot be undone!"),
-                        primaryButton: .destructive(Text("Yes"), action: {
-                            if let asset = document.core.assetFolder.current {
-                                document.core.assetFolder.removeAsset(asset)
-                                for a in document.core.assetFolder.assets {
-                                    document.core.assetFolder.select(a.id)
-                                    break
-                                }
-                                self.updateView.toggle()
-                            }
-                        }),
-                        secondaryButton: .cancel(Text("No"), action: {})
-                    )
-                }
+            if showLibrary == true {
+                LibraryView(document: document, updateView: $updateView)
+                    .frame(minWidth: 220, idealWidth: 220, maxWidth: 220)
+                    .animation(.easeInOut)
             }
         }
-        */
-        
     }
     
     // tool bar menus
+    
+    var toolShare : some View {
+
+        Button(action: {
+            
+            libraryName = document.core.assetFolder.libraryName
+            userNickName = document.core.library.userNickName
+            showSharePopover = true
+        }) {
+            Label("Share", systemImage: "square.and.arrow.up")
+        }
+        // Edit Node name
+        .popover(isPresented: self.$showSharePopover,
+                 arrowEdge: .top
+        ) {
+            VStack(alignment: .leading) {
+                Text("Shader Library Name")
+                TextField("Name", text: $libraryName, onEditingChanged: { (changed) in
+                    document.core.assetFolder.libraryName = libraryName
+                    updateView.toggle()
+                })
+                .frame(minWidth: 200)
+                
+                Text("Your User Nickname")
+                TextField("Nickname", text: $userNickName, onEditingChanged: { (changed) in
+                    document.core.library.userNickName = userNickName
+                    updateView.toggle()
+                })
+                .frame(minWidth: 200)
+                
+                Button("Upload", action: {
+                    document.core.library.uploadFolder()
+                })
+                .disabled(document.core.assetFolder.libraryName.count == 0 || document.core.library.userNickName.count == 0)
+                .padding(.top, 10)
+
+            }.padding()
+        }
+    }
     
     var toolNodeMenu : some View {
         Menu {
             Section(header: Text("Add Node")) {
                 Button("Add Image", action: {
-                    editingState = .Nodes
-                    editingStateText = "Nodes Only"
+                    importingImage = true
                 })
                 .keyboardShortcut("1")
                 Button("Add Shader", action: {
                     document.core.assetFolder.addShader("New Shader")
-                    //assetName = "New Shader"
-                    //showAssetNamePopover = true
-                    document.core.nodesWidget.drawables.update()
+                    document.core.nodesWidget.selectNode(document.core.assetFolder.current!)
+                    document.core.nodesWidget.update()
+                    document.core.contentChanged.send()
+                    updateView.toggle()
                 })
                 .keyboardShortcut("2")
             }
@@ -358,12 +270,14 @@ struct ContentView: View {
                     if let node = document.core.nodesWidget.currentNode {
                         assetName = node.name
                         showAssetNamePopover = true
+                        document.core.contentChanged.send()
                     }
                 })
                 Button("Delete", action: {
                     if document.core.nodesWidget.currentNode != nil {
                         showDeleteAssetAlert = true
-                        document.core.nodesWidget.drawables.update()
+                        document.core.nodesWidget.update()
+                        document.core.contentChanged.send()
                     }
                 })
             }
@@ -423,6 +337,29 @@ struct ContentView: View {
                 }),
                 secondaryButton: .cancel(Text("No"), action: {})
             )
+        }
+        // Import Image
+        .fileImporter(
+            isPresented: $importingImage,
+            allowedContentTypes: [.item],
+            allowsMultipleSelection: false
+        ) { result in
+            do {
+                let selectedFiles = try result.get()
+                
+                document.core.assetFolder.addImages("New", [selectedFiles[0]])
+                if selectedFiles.count > 0 {
+                    if let asset = document.core.assetFolder.current {
+                        asset.name = selectedFiles[0].deletingPathExtension().lastPathComponent
+                        document.core.nodesWidget.selectNode(asset)
+                        document.core.nodesWidget.update()
+                        document.core.contentChanged.send()
+                        updateView.toggle()
+                    }
+                }
+            } catch {
+                // Handle failure.
+            }
         }
     }
     

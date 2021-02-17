@@ -46,11 +46,11 @@ class Texture2D                 : NSObject
     
     deinit
     {
-        print("release texture")
+        /*
         if texture != nil {
             texture!.setPurgeableState(.empty)
             texture = nil
-        }
+        }*/
     }
 
     func allocateTexture(width: Int, height: Int)

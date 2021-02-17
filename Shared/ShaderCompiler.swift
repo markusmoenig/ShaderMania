@@ -434,6 +434,19 @@ class ShaderCompiler
             vector_float2 textureCoordinate;
         } VertexData;
 
+
+        float4 getLinearSample(texture2d<float> texture, float2 uv)
+        {
+            constexpr sampler textureSampler(mag_filter::linear, min_filter::linear);
+            return texture.sample(textureSampler, float2(uv.x, 1.0 - uv.y));
+        }
+
+        float4 getNearestSample(texture2d<float> texture, float2 uv)
+        {
+            constexpr sampler textureSampler(mag_filter::nearest, min_filter::nearest);
+            return texture.sample(textureSampler, float2(uv.x, 1.0 - uv.y));
+        }
+
         // Quad Vertex Function
         vertex RasterizerData
         __procVertex(uint vertexID [[ vertex_id ]],

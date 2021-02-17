@@ -167,7 +167,6 @@ func makeCGIImage(texture: MTLTexture, forImage: Bool) -> CGImage?
     bitmapContext.data?.copyMemory(from: imageBytes, byteCount: imageByteCount)
     let image = bitmapContext.makeImage()
     return image
-
 }
 
 struct RenderSettings {

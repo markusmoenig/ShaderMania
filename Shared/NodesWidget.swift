@@ -140,7 +140,9 @@ public class NodesWidget    : ObservableObject
                         let dRect = getTerminal(connTo, id: -1)
                         let sRect = getTerminal(asset, id: index)
                         
-                        drawables.drawLine(startPos: sRect.middle(), endPos: dRect.middle(), radius: 0.6, fillColor: skin.selectedTerminalColor)
+                        if sRect.x != 0.0 && sRect.y != 0.0 {
+                            drawables.drawLine(startPos: sRect.middle(), endPos: dRect.middle(), radius: 0.6, fillColor: skin.selectedTerminalColor)
+                        }
                     }
                 }
             }

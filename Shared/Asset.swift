@@ -17,6 +17,8 @@ class AssetFolder       : Codable
     var currentId       : UUID? = nil
 
     var customSize      : SIMD2<Int>? = nil
+    
+    var libraryName     : String = ""
             
     private enum CodingKeys: String, CodingKey {
         case assets
@@ -399,6 +401,19 @@ class Asset         : Codable, Equatable
         try container.encode(nodeData, forKey: .nodeData)
         try container.encode(shaderData, forKey: .shaderData)
         try container.encode(shaderDataNames, forKey: .shaderDataNames)
+    }
+    
+    deinit
+    {
+        if texture != nil {
+            texture!.setPurgeableState(.empty)
+            texture = nil
+        }
+        
+        if previewTexture != nil {
+            previewTexture!.setPurgeableState(.empty)
+            previewTexture = nil
+        }
     }
     
     static func ==(lhs:Asset, rhs:Asset) -> Bool { // Implement Equatable

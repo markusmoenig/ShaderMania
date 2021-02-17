@@ -97,6 +97,10 @@ class Project
         self.assetFolder = assetFolder
         self.time = time
 
+        //if forAsset.type == .Image {
+            //return forAsset.texture
+        //}
+        
         startDrawing(device)
 
         if black == nil {
@@ -238,6 +242,28 @@ class Project
                     if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
                         textureCache[asset.id] = texture
                     }
+                }
+            }
+        }
+    }
+    
+    /// Create the image texture for the asset
+    func createImageTexture(_ asset: Asset, preview: Bool, device: MTLDevice)
+    {
+        if textureLoader == nil {
+            textureLoader = MTKTextureLoader(device: device)
+        }
+        
+        if textureCache[asset.id] == nil {
+            let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
+            if preview == true {
+                if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
+                    asset.previewTexture = texture
+                }
+            } else
+            if preview == false {
+                if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
+                    asset.texture = texture
                 }
             }
         }
