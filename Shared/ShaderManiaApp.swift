@@ -11,12 +11,14 @@ import Combine
 @main
 struct ShaderManiaApp: App {
     
+    @StateObject var storeManager           = StoreManager()
+
     private let exportAsImage               = PassthroughSubject<Void, Never>()
     private let help                        = PassthroughSubject<Void, Never>()
 
     var body: some Scene {
         DocumentGroup(newDocument: ShaderManiaDocument()) { file in
-            ContentView(document: file.$document)
+            ContentView(document: file.$document, storeManager: storeManager)
                 .onReceive(exportAsImage) { _ in
                     file.document.exportImage.send()
                 }

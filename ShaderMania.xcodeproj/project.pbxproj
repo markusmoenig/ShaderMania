@@ -58,6 +58,9 @@
 		2B77B7BC25773978002D99C0 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B77B7BA25773978002D99C0 /* File.swift */; };
 		2B7C7EEC25DCB5D400727BC0 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C7EEB25DCB5D400727BC0 /* Library.swift */; };
 		2B7C7EED25DCB5D400727BC0 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C7EEB25DCB5D400727BC0 /* Library.swift */; };
+		2B7C7EFC25DD0E0900727BC0 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */; };
+		2B7C7EFD25DD0E0900727BC0 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */; };
+		2B7C7F0325DD0E6D00727BC0 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B7C7F0225DD0E6D00727BC0 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -93,6 +96,8 @@
 		2B3D4C7825A68ECA00D2F8EA /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		2B77B7BA25773978002D99C0 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		2B7C7EEB25DCB5D400727BC0 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
+		2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
+		2B7C7F0225DD0E6D00727BC0 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +113,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B0EEAC3256619D000C84C6C /* CloudKit.framework in Frameworks */,
+				2B7C7F0325DD0E6D00727BC0 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,6 +136,7 @@
 			children = (
 				2B0EEA4E2565DF3900C84C6C /* ShaderManiaApp.swift */,
 				2B0EEA4F2565DF3900C84C6C /* ShaderManiaDocument.swift */,
+				2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */,
 				2B0EEA772565DF7800C84C6C /* ContentView.swift */,
 				2B3D4C7825A68ECA00D2F8EA /* Views.swift */,
 				2B0EEA782565DF7800C84C6C /* Asset.swift */,
@@ -194,6 +201,7 @@
 		2B0EEAC1256619D000C84C6C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2B7C7F0225DD0E6D00727BC0 /* StoreKit.framework */,
 				2B0EEAC2256619D000C84C6C /* CloudKit.framework */,
 			);
 			name = Frameworks;
@@ -314,6 +322,7 @@
 				2B0EEA812565DF7800C84C6C /* MetalView.swift in Sources */,
 				2B0EEA912565DF7800C84C6C /* Metal.metal in Sources */,
 				2B0EEAA22565DF9A00C84C6C /* Font.swift in Sources */,
+				2B7C7EFC25DD0E0900727BC0 /* StoreManager.swift in Sources */,
 				2B0EEA642565DF3A00C84C6C /* ShaderManiaDocument.swift in Sources */,
 				2B0EEA932565DF7800C84C6C /* MetalStates.swift in Sources */,
 				2B0EEA8D2565DF7800C84C6C /* MathLibrary.swift in Sources */,
@@ -342,6 +351,7 @@
 				2B0EEA822565DF7800C84C6C /* MetalView.swift in Sources */,
 				2B0EEA922565DF7800C84C6C /* Metal.metal in Sources */,
 				2B0EEAA32565DF9A00C84C6C /* Font.swift in Sources */,
+				2B7C7EFD25DD0E0900727BC0 /* StoreManager.swift in Sources */,
 				2B0EEA652565DF3A00C84C6C /* ShaderManiaDocument.swift in Sources */,
 				2B0EEA942565DF7800C84C6C /* MetalStates.swift in Sources */,
 				2B0EEA8E2565DF7800C84C6C /* MathLibrary.swift in Sources */,

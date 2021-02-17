@@ -21,6 +21,7 @@ struct ContentView: View {
     @State var editingStateText             : String = " Source & Nodes"
 
     @Binding var document                   : ShaderManiaDocument
+    @StateObject var storeManager           : StoreManager
 
     @State private var showSharePopover     : Bool = false
     @State private var libraryName          : String = ""
@@ -151,11 +152,12 @@ struct ContentView: View {
                     }.keyboardShortcut("t")
                     .disabled(document.core.state == .Idle)
                     
-                    Divider()
-                        .padding(.horizontal, 2)
-                        .opacity(0)
+                    //Divider()
+                        //.padding(.horizontal, 2)
+                        //.opacity(0)
 
-                    toolShare
+                    toolShareMenu
+                    toolGiftMenu
                     
                     Button(action: {
                         document.help.send()
@@ -210,7 +212,7 @@ struct ContentView: View {
     
     // tool bar menus
     
-    var toolShare : some View {
+    var toolShareMenu : some View {
 
         Button(action: {
             
@@ -361,6 +363,65 @@ struct ContentView: View {
                 // Handle failure.
             }
         }
+        
+        // Init StoreManager
+        .onAppear(perform: {
+            if storeManager.myProducts.isEmpty {
+                DispatchQueue.main.async {
+                    storeManager.getProducts()
+                }
+            }
+        })
+    }
+    
+    var toolGiftMenu : some View {
+        Menu {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Small Tip")
+                        .font(.headline)
+                    Text("Tip of $2 for the author")
+                        .font(.caption2)
+                }
+                Button(action: {
+                    storeManager.purchaseId("com.moenig.ShaderMania.IAP.Tip2")
+                }) {
+                    Text("Buy for $2")
+                }
+                .foregroundColor(.blue)
+                Divider()
+                VStack(alignment: .leading) {
+                    Text("Medium Tip")
+                        .font(.headline)
+                    Text("Tip of $5 for the author")
+                        .font(.caption2)
+                }
+                Button(action: {
+                    storeManager.purchaseId("com.moenig.ShaderMania.IAP.Tip5")
+                }) {
+                    Text("Buy for $5")
+                }
+                .foregroundColor(.blue)
+                Divider()
+                VStack(alignment: .leading) {
+                    Text("Large Tip")
+                        .font(.headline)
+                    Text("Tip of $10 for the author")
+                        .font(.caption2)
+                }
+                Button(action: {
+                    storeManager.purchaseId("com.moenig.ShaderMania.IAP.Tip10")
+                }) {
+                    Text("Buy for $10")
+                }
+                .foregroundColor(.blue)
+                Divider()
+                Text("You are awesome! ❤️❤️")
+            }
+        }
+        label: {
+            Label("Dollar", systemImage: "gift")//dollarsign.circle")
+        }
     }
     
     var toolPreviewMenu : some View {
@@ -491,6 +552,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(document: .constant(ShaderManiaDocument()))
+        ContentView(document: .constant(ShaderManiaDocument()), storeManager: StoreManager())
     }
 }
