@@ -228,39 +228,20 @@ class ShaderCompiler
             parseErrors.append(error)
         }
         
-        var processed = asset.value
-        
-        // Substitute ParamInput (the input slots
-        
-        while processed.contains("ParamInput") {
-            if let range = processed.range(of: "ParamInput") {
-                let startIndex : Int = range.lowerBound.utf16Offset(in: processed)
-                var index : Int = range.upperBound.utf16Offset(in: processed) + 1
-                var params = ""
-                while processed[index] != ">" && processed[index] != "\n" {
-                    params.append(processed[index])
-                    index += 1
-                }
-                if processed[index] == ">" {
-                    index += 1
-                    let pairs = splitParameters(params)
-                    if let name = pairs["name"] {
-                        let start = String.Index(utf16Offset: startIndex, in: processed)
-                        let end = String.Index(utf16Offset: index, in: processed)
-                        processed.replaceSubrange(start..<end, with: "data.slot\(shader.inputs.count);")
-                        shader.inputs.append(name)
-                    }
-                }
-            } else { break }
-        }
-        
-        // Substitute UI parameters
-        
-        let paramTypes = ["ParamFloat3", "ParamFloat"]
-        
-        for type in paramTypes {
-            while processed.contains(type) {
-                if let range = processed.range(of: type) {
+        ns = (code + asset.value) as NSString
+        var lineNr : Int32 = 0
+                
+        var parsedCode = ""
+
+        ns.enumerateLines { (str, _) in
+            lineNr += 1
+            
+            var processed = str
+            
+            // Substitute ParamInput (the input slots
+            
+            while processed.contains("ParamInput") {
+                if let range = processed.range(of: "ParamInput") {
                     let startIndex : Int = range.lowerBound.utf16Offset(in: processed)
                     var index : Int = range.upperBound.utf16Offset(in: processed) + 1
                     var params = ""
@@ -270,29 +251,52 @@ class ShaderCompiler
                     }
                     if processed[index] == ">" {
                         index += 1
-                        let pairs = splitParameters(params)
-                            
-                        let parameter = ShaderParameter(type, pairs)
-                        let paramText = parameter.createShaderText(shader.parameters.count)
-                        //if asset.shaderData[shader.parameters.count].w == -100 {
-                            asset.shaderData[shader.parameters.count] = parameter.defaultValue
-                        //}
-                        shader.parameters.append(parameter)
-                        
-                        let start = String.Index(utf16Offset: startIndex, in: processed)
-                        let end = String.Index(utf16Offset: index, in: processed)
-                        processed.replaceSubrange(start..<end, with: "\(paramText);")
+                        let pairs = self.splitParameters(params)
+                        if let name = pairs["name"] {
+                            let start = String.Index(utf16Offset: startIndex, in: processed)
+                            let end = String.Index(utf16Offset: index, in: processed)
+                            processed.replaceSubrange(start..<end, with: "data.slot\(shader.inputs.count);")
+                            shader.inputs.append(name)
+                        }
                     }
                 } else { break }
             }
-        }
-        
-        let parsedCode = code + processed
-        ns = code as NSString
-        var lineNr : Int32 = 0
-                
-        ns.enumerateLines { (str, _) in
-            lineNr += 1
+            
+            // Substitute UI parameters
+            
+            let paramTypes = ["ParamFloat3", "ParamFloat"]
+            
+            for type in paramTypes {
+                while processed.contains(type) {
+                    if let range = processed.range(of: type) {
+                        let startIndex : Int = range.lowerBound.utf16Offset(in: processed)
+                        var index : Int = range.upperBound.utf16Offset(in: processed) + 1
+                        var params = ""
+                        while processed[index] != ">" && processed[index] != "\n" {
+                            params.append(processed[index])
+                            index += 1
+                        }
+                        if processed[index] == ">" {
+                            index += 1
+                            let pairs = self.splitParameters(params)
+                                
+                            let parameter = ShaderParameter(type, pairs)
+                            let paramText = parameter.createShaderText(shader.parameters.count)
+                            if asset.shaderDataNames[shader.parameters.count] != parameter.name {
+                                asset.shaderData[shader.parameters.count] = parameter.defaultValue
+                                asset.shaderDataNames[shader.parameters.count] = parameter.name
+                            }
+                            shader.parameters.append(parameter)
+                            
+                            let start = String.Index(utf16Offset: startIndex, in: processed)
+                            let end = String.Index(utf16Offset: index, in: processed)
+                            processed.replaceSubrange(start..<end, with: "\(paramText);")
+                        }
+                    } else { break }
+                }
+            }
+            
+            parsedCode += processed + "\n"
         }
         
         if parseErrors.count > 0 {            
