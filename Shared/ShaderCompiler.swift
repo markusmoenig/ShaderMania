@@ -39,11 +39,11 @@ extension String {
 class ShaderParameter
 {
     enum ParameterType {
-        case Float, Float2, Float3, Float4
+        case Float, Float2, Float3, Float4, Text
     }
     
     enum ParameterUIType {
-        case Slider, Color
+        case Slider, Color, Button
     }
 
     var id                  = UUID()
@@ -62,10 +62,21 @@ class ShaderParameter
     
     var defaultValue        = float4(0,0,0,0)
     
+    var url                 : URL? = nil
+    
     init(_ paramType: String, _ parameters: [String: String])
     {
         if let name = parameters["name"] {
             self.name = name
+        }
+        
+        if paramType == "ParamUrl" {
+            type = .Text
+            uiType = .Button
+            
+            if let url = parameters["url"] {
+                self.url = URL(string: "https://" + url)
+            }
         }
         
         if paramType == "ParamFloat3" {
@@ -134,6 +145,9 @@ class ShaderParameter
             if let max = parameters["max"] {
                 if let v = Float(max) {
                     self.max = v
+                    if v <= self.min {
+                        self.max = self.min + 1
+                    }
                 }
             }
             if let step = parameters["step"] {
@@ -264,7 +278,7 @@ class ShaderCompiler
             
             // Substitute UI parameters
             
-            let paramTypes = ["ParamFloat3", "ParamFloat"]
+            let paramTypes = ["ParamFloat3", "ParamFloat", "ParamUrl"]
             
             for type in paramTypes {
                 while processed.contains(type) {
@@ -275,6 +289,9 @@ class ShaderCompiler
                         while processed[index] != ">" && processed[index] != "\n" {
                             params.append(processed[index])
                             index += 1
+                            if index > processed.count {
+                                break
+                            }
                         }
                         if processed[index] == ">" {
                             index += 1
@@ -291,6 +308,8 @@ class ShaderCompiler
                             let start = String.Index(utf16Offset: startIndex, in: processed)
                             let end = String.Index(utf16Offset: index, in: processed)
                             processed.replaceSubrange(start..<end, with: "\(paramText);")
+                        } else {
+                            processed = processed.replacingOccurrences(of: type, with: "")
                         }
                     } else { break }
                 }
@@ -414,7 +433,8 @@ class ShaderCompiler
         typedef struct
         {
             float2          uv;
-            float2          size;
+            float2          viewSize;
+            float2          fragCoord;
             float           time;
             unsigned int    frame;
 
@@ -484,7 +504,8 @@ class ShaderCompiler
 
             Data data;
             data.uv = uv;
-            data.size = size;
+            data.viewSize = size;
+            data.fragCoord = size * uv;
             data.time = metalData.time;
             data.frame = metalData.frame;
             data.outColor = float4(0,0,0,1);

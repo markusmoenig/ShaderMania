@@ -92,6 +92,36 @@ struct FloatSliderParameterView: View {
     }
 }
 
+/// UrlParameterView
+struct UrlParameterView: View {
+    @State var document                     : ShaderManiaDocument
+    @State var parameter                    : ShaderParameter
+
+    @Binding var updateView                 : Bool
+
+    init(document: ShaderManiaDocument, parameter: ShaderParameter, updateView: Binding<Bool>)
+    {
+        self._document = State(initialValue: document)
+        self._parameter = State(initialValue: parameter)
+        self._updateView = updateView
+    }
+
+    var body: some View {
+
+        VStack(alignment: .leading) {
+            HStack {
+                if let url = parameter.url {
+                    Link(parameter.name, destination: url)
+                    //Button(parameter.url!.absoluteString) {
+                     //   print(url.absoluteString)
+                    //    openURL(URL(string: url.absoluteString())!)
+                    //}
+                }
+            }
+        }
+    }
+}
+
 /// ParameterListView
 struct ParameterListView: View {
     @State var document                     : ShaderManiaDocument
@@ -117,6 +147,11 @@ struct ParameterListView: View {
                             } else
                             if parameter.type == .Float3 && parameter.uiType == .Color {
                                 Float3ColorParameterView(document: document, parameter: parameter, updateView: $updateView)
+                                    .padding(2)
+                                    .padding(.leading, 6)
+                            } else
+                            if parameter.type == .Text && parameter.uiType == .Button {
+                                UrlParameterView(document: document, parameter: parameter, updateView: $updateView)
                                     .padding(2)
                                     .padding(.leading, 6)
                             }
@@ -157,6 +192,9 @@ struct LibraryView: View {
 
     var body: some View {
         VStack {
+            
+            Text("Shader Library")
+            Divider()
             
             Spacer()
         }

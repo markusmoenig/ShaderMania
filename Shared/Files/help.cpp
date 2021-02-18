@@ -1,8 +1,6 @@
 
 /*
- * ShaderMania 1.0
- *
- * Shaders are being executed from top to bottom. Rearrange them via drag and drop.
+ * ShaderMania 1.5
  *
  * To learn more about shader development:
  *
@@ -16,7 +14,9 @@
 typedef struct
 {
     float2              uv;         // UV coordinate 0..1
-    float2              size;       // Viewport size
+    float2              viewSize;   // Viewport size
+    float2              fragCoord;  // uv * viewSize
+    
     float               time;       // Global time
     unsigned int        frame;      // Frame number
 
@@ -28,8 +28,21 @@ typedef struct
     texture2d<float>    slot3;
 } Data;
 
-// To read from a texture slot:
- 
-constexpr sampler textureSampler(mag_filter::linear, min_filter::linear);
-float4 sample = data.slot0.sample(textureSampler, data.uv);
+// Variables with UI parameters, parameter data is stored and reset when the parameter name changes
+// Up to 10 parameters per node are supported
 
+// Float slider parameter
+float size = ParamFloat<UI: "Slider", name: "Disk Size", min: 0, max: 1, default: 0.8>
+
+// Float3 color picker parameter
+float3 diskColor = ParamFloat3<UI: "Color", name: "Disk Color", default: #ffffff>
+ 
+// Url, ShaderMania will add https:// at the front automatically
+ParamUrl<name: "Watch Tutorial", url: "url without https://">
+
+// Input slots (up to 4 are supported per node)
+texture2d<float> input = ParamInput<name: "Input">
+
+// To read from input slots
+getLinearSample(texture2d<float>, float2 coord);
+getNearestSample(texture2d<float>, float2 coord);
