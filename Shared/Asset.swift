@@ -19,10 +19,15 @@ class AssetFolder       : Codable
     var customSize      : SIMD2<Int>? = nil
     
     var libraryName     : String = ""
-            
+    var libraryTags     : String = ""
+    var libraryDescription : String = ""
+
     private enum CodingKeys: String, CodingKey {
         case assets
         case currentId
+        case libraryName
+        case libraryTags
+        case libraryDescription
     }
     
     init()
@@ -51,6 +56,15 @@ class AssetFolder       : Codable
         if let id = try container.decodeIfPresent(UUID?.self, forKey: .currentId) {
             select(id!)
         }
+        if let libraryName = try container.decodeIfPresent(String.self, forKey: .libraryName) {
+            self.libraryName = libraryName
+        }
+        if let libraryTags = try container.decodeIfPresent(String.self, forKey: .libraryTags) {
+            self.libraryTags = libraryTags
+        }
+        if let libraryDescription = try container.decodeIfPresent(String.self, forKey: .libraryDescription) {
+            self.libraryDescription = libraryDescription
+        }
     }
     
     func encode(to encoder: Encoder) throws
@@ -58,6 +72,9 @@ class AssetFolder       : Codable
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(assets, forKey: .assets)
         try container.encode(currentId, forKey: .currentId)
+        try container.encode(libraryName, forKey: .libraryName)
+        try container.encode(libraryTags, forKey: .libraryTags)
+        try container.encode(libraryDescription, forKey: .libraryDescription)
     }
     
     func addShader(_ name: String)
@@ -141,13 +158,17 @@ class AssetFolder       : Codable
     {
         currentId = id
         for asset in assets {
-            if asset.id == id && core != nil {
-                if asset.scriptName.isEmpty {
-                    core.scriptEditor?.createSession(asset)
-                }
-                core.scriptEditor?.setAssetSession(asset)
+            if asset.id == id {
                 
                 current = asset
+
+                if core != nil {
+                    if asset.scriptName.isEmpty {
+                        core.scriptEditor?.createSession(asset)
+                    }
+                    core.scriptEditor?.setAssetSession(asset)
+                }
+                
                 break
             }
         }

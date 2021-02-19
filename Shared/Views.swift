@@ -156,7 +156,7 @@ struct ParameterListView: View {
                                     .padding(.leading, 6)
                             }
                         }
-                    
+                        Divider()
                     }
                     
                     VStack(alignment: .leading) {
@@ -184,19 +184,185 @@ struct ParameterListView: View {
     }
 }
 
+/// ShaderList
+struct ShaderList: View {
+    @State var document                     : ShaderManiaDocument
+    
+    @Binding var updateView                 : Bool
+    @Binding var shaders                    : LibraryShaderList?
+
+    @State var detailedShader               : LibraryShader? = nil
+    @State var authorOfShader               : LibraryShader? = nil
+
+    var body: some View {
+        if let authorOfShader = authorOfShader {
+            VStack(alignment: .center) {
+                HStack() {
+                    Button(action: {
+                        self.authorOfShader = nil
+                    })
+                    {
+                        Label("Back to Shader", systemImage: "arrowshape.turn.up.backward")
+                    }
+                    
+                    Spacer()
+                }
+                
+                if let userRecord = authorOfShader.userRecord {
+                    Text((userRecord["nickName"] as! String))
+                    Text((userRecord["description"] as! String))
+                        .padding(.top, 4)
+                }
+                
+                HStack {
+                    Text("Shaders")
+                        .foregroundColor(.secondary)
+                        .padding(.top, 4)
+                    
+                    Spacer()
+                }
+                
+                ScrollView {
+                    VStack {
+                        if let shaders = self.shaders {
+                            ForEach(shaders.shaders, id: \.id) { shader in
+                                    
+                                Button(action: {
+                                    detailedShader = shader
+                                    self.authorOfShader = nil
+                                })
+                                {
+                                    VStack(alignment: .center, spacing: 2) {
+                                        Image(shader.cgiImage!, scale: 1.0, label: Text(shader.name))
+                                        Text(shader.name)
+                                    }
+
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                        }
+                    }
+                }
+            }
+        } else
+        if let detailedShader = detailedShader {
+        
+            VStack(alignment: .center) {
+                HStack() {
+                    Button(action: {
+                        self.detailedShader = nil
+                    })
+                    {
+                        Label("Back to List", systemImage: "arrowshape.turn.up.backward")
+                    }
+                    
+                    Spacer()
+                }
+                                    
+                Image(detailedShader.cgiImage!, scale: 1.0, label: Text(detailedShader.name))
+                    .padding(.top, 10)
+                Text(detailedShader.name)
+                
+                if let userRecord = detailedShader.userRecord {
+                    Button(action: {
+                        authorOfShader = detailedShader
+                        document.core.library.requestShadersOfShaderAuthor(detailedShader)
+                    })
+                    {
+                        Text("Author: " + (userRecord["nickName"] as! String))
+                    }
+                }
+                
+                HStack {
+                    Text("Description")
+                        .foregroundColor(Color.secondary)
+                    Spacer()
+                }
+                HStack {
+                    Text(detailedShader.description)
+                    Spacer()
+                }
+                .padding(.top, 2)
+
+            }
+            
+        } else {
+            ScrollView {
+                VStack {
+                    if let shaders = self.shaders {
+                        ForEach(shaders.shaders, id: \.id) { shader in
+                                
+                            Button(action: {
+                                detailedShader = shader
+                            })
+                            {
+                                VStack(alignment: .center, spacing: 2) {
+                                    Image(shader.cgiImage!, scale: 1.0, label: Text(shader.name))
+                                    Text(shader.name)
+                                }
+
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 /// LibraryView
 struct LibraryView: View {
     @State var document                     : ShaderManiaDocument
     
     @Binding var updateView                 : Bool
 
+    @State var shaders                      : LibraryShaderList? = nil
+    
+    @State var searchTerm                   : String = ""
+    
     var body: some View {
         VStack {
             
             Text("Shader Library")
+            
+            HStack {
+                Image(systemName: "magnifyingglass").foregroundColor(.secondary)
+                TextField("Search", text: $searchTerm, onEditingChanged: { (changed) in
+                    document.core.library.requestShaders(searchTerm)
+                })
+                if searchTerm != "" {
+                    Image(systemName: "xmark.circle.fill")
+                        .imageScale(.medium)
+                        .foregroundColor(.secondary)
+                        .padding(3)
+                        .onTapGesture {
+                            withAnimation {
+                                searchTerm = ""
+                                document.core.library.requestShaders(searchTerm)
+                              }
+                        }
+                }
+            }
+            .padding(2)
             Divider()
             
+            ShaderList(document: document, updateView: $updateView, shaders: $shaders)
+            
             Spacer()
+        }
+        
+        .onAppear(perform: {
+            shaders = nil
+            shaders = self.document.core.library.currentList
+            updateView.toggle()
+        })
+
+        .onReceive(self.document.core.libraryChanged) { list in
+            print("received")
+            shaders = nil
+            shaders = list
+            updateView.toggle()
         }
     }
 }

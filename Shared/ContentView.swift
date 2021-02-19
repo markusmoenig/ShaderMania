@@ -25,7 +25,10 @@ struct ContentView: View {
 
     @State private var showSharePopover     : Bool = false
     @State private var libraryName          : String = ""
+    @State private var libraryTags          : String = ""
+    @State private var libraryDescription   : String = ""
     @State private var userNickName         : String = ""
+    @State private var userDescription      : String = ""
 
     @State private var showLibrary          : Bool = false
 
@@ -217,7 +220,12 @@ struct ContentView: View {
         Button(action: {
             
             libraryName = document.core.assetFolder.libraryName
+            libraryTags = document.core.assetFolder.libraryTags
+            libraryDescription = document.core.assetFolder.libraryDescription
+            
             userNickName = document.core.library.userNickName
+            userDescription = document.core.library.userDescription
+            
             showSharePopover = true
         }) {
             Label("Share", systemImage: "square.and.arrow.up")
@@ -228,18 +236,40 @@ struct ContentView: View {
         ) {
             VStack(alignment: .leading) {
                 Text("Shader Library Name")
+                    .foregroundColor(Color.secondary)
                 TextField("Name", text: $libraryName, onEditingChanged: { (changed) in
                     document.core.assetFolder.libraryName = libraryName
                     updateView.toggle()
                 })
-                .frame(minWidth: 200)
+                .frame(minWidth: 300)
                 
-                Text("Your User Nickname")
-                TextField("Nickname", text: $userNickName, onEditingChanged: { (changed) in
+                Text("Shader Description")
+                    .foregroundColor(Color.secondary)
+                    .padding(.top, 5)
+                TextEditor(text: $libraryDescription)
+                .onChange(of: libraryDescription) { value in
+                    document.core.assetFolder.libraryDescription = libraryDescription
+                 }
+                .frame(minWidth: 300, minHeight: 60)
+
+                Divider()
+                
+                Text("Your User Nickname - Required")
+                    .foregroundColor(Color.secondary)
+                TextField("Required", text: $userNickName, onEditingChanged: { (changed) in
                     document.core.library.userNickName = userNickName
                     updateView.toggle()
                 })
-                .frame(minWidth: 200)
+                .frame(minWidth: 300)
+                
+                Text("About You - Optional")
+                    .foregroundColor(Color.secondary)
+                    .padding(.top, 5)
+                TextEditor(text: $userDescription)
+                .onChange(of: userDescription) { value in
+                    document.core.library.userDescription = userDescription
+                 }
+                .frame(minWidth: 300, minHeight: 60)
                 
                 Button("Upload", action: {
                     document.core.library.uploadFolder()

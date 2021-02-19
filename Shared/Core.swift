@@ -73,6 +73,8 @@ public class Core       : ObservableObject
     let contentChanged  = PassthroughSubject<Void, Never>()
     let selectionChanged = PassthroughSubject<Asset?, Never>()
 
+    let libraryChanged  = PassthroughSubject<LibraryShaderList?, Never>()
+
     var assetError      = CompileError()
     let coreError       = PassthroughSubject<Void, Never>()
     
@@ -147,6 +149,8 @@ public class Core       : ObservableObject
         checkTexture()
         
         assetFolder.assetCompileAll()
+        
+        library.requestShaders()
     }
     
     public func setupNodesView(_ view: DMTKView)
