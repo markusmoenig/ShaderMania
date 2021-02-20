@@ -1,6 +1,30 @@
 
 void mainImage(thread Data &data)
 {
+    float2 uv = (data.fragCoord.xy-data.viewSize.xy*.5) / data.viewSize.y;
+    
+    uv *= float2x2(.707, -.707, .707, .707);
+    
+    float scale = ParamFloat<UI: "Slider", name: "Scale", min: 0.1, max: 30, default: 15>
+    uv *= scale;
+    
+    // ParamUrl<name: "Watch Tutorial", url: "www.youtube.com/watch?v=cQXAbndD5CQ">
 
-    data.outColor = float4(data.uv, 0, 1);
+    float2 gv = fract(uv)-.5;
+    float2 id = floor(uv);
+    
+    float m = 0.;
+    float t;
+    for(float y=-1.; y<=1.; y++) {
+        for(float x=-1.; x<=1.; x++) {
+            float2 offs = float2(x, y);
+            
+            t = -data.time + length(id-offs)*.2;
+            float r = mix(.4, 1.5, sin(t)*.5+.5);
+            float c = smoothstep(r, r*.9, length(gv+offs));
+            m = m*(1.-c) + c*(1.-m);
+        }
+    }
+
+    data.outColor = float4(float3(m), 1.0);
 }

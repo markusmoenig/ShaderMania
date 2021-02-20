@@ -285,7 +285,6 @@ public class NodesWidget    : ObservableObject
                     for (index, nodeUUID) in asset.slots {
                         if nodeUUID == node.id {
                             asset.slots[index] = nil
-                            print("connection deleted")
                         }
                     }
                 }
@@ -343,6 +342,7 @@ public class NodesWidget    : ObservableObject
                         //canConnect = false
                         asset.slots[t] = nil
                         // Disconnect instead of not allowing to connect when slot is already taken
+                        core.contentChanged.send()
                     }
                     
                     if canConnect {
@@ -409,6 +409,8 @@ public class NodesWidget    : ObservableObject
             } else {
                 connectingNode!.slots[connectingTerminalId!] = currentNode!.id
             }
+            
+            core.contentChanged.send()
         }
 
         action = .None

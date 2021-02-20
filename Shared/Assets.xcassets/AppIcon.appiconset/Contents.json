@@ -71,25 +71,25 @@
       "size" : "40x40"
     },
     {
-      "filename" : "Image 2-1.png",
+      "filename" : "Space 2-2.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "76x76"
     },
     {
-      "filename" : "Image 2.png",
+      "filename" : "Space 2-1.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "76x76"
     },
     {
-      "filename" : "Image 2-2.png",
+      "filename" : "Space 2.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "83.5x83.5"
     },
     {
-      "filename" : "Image-1.png",
+      "filename" : "Space.png",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"
@@ -130,19 +130,19 @@
       "size" : "256x256"
     },
     {
-      "filename" : "RoundedIcon 2-1.png",
+      "filename" : "Space_Rounded 2-1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
     },
     {
-      "filename" : "RoundedIcon 2.png",
+      "filename" : "Space_Rounded 2.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "512x512"
     },
     {
-      "filename" : "RoundedIcon.png",
+      "filename" : "Space_Rounded.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "512x512"

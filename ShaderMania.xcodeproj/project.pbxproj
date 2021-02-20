@@ -54,6 +54,7 @@
 		2B36F67925D4DE84001611BE /* OpenSans.json in Resources */ = {isa = PBXBuildFile; fileRef = 2B36F67525D4DE84001611BE /* OpenSans.json */; };
 		2B3D4C7925A68ECA00D2F8EA /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D4C7825A68ECA00D2F8EA /* Views.swift */; };
 		2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D4C7825A68ECA00D2F8EA /* Views.swift */; };
+		2B6B9C7625E0BC6000F266DF /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B6B9C7525E0BC6000F266DF /* CloudKit.framework */; };
 		2B77B7BB25773978002D99C0 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B77B7BA25773978002D99C0 /* File.swift */; };
 		2B77B7BC25773978002D99C0 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B77B7BA25773978002D99C0 /* File.swift */; };
 		2B7C7EEC25DCB5D400727BC0 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C7EEB25DCB5D400727BC0 /* Library.swift */; };
@@ -94,6 +95,8 @@
 		2B36F67425D4DE84001611BE /* OpenSans.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = OpenSans.tiff; sourceTree = "<group>"; };
 		2B36F67525D4DE84001611BE /* OpenSans.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = OpenSans.json; sourceTree = "<group>"; };
 		2B3D4C7825A68ECA00D2F8EA /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
+		2B6B9C7225E0BC4E00F266DF /* ShaderMania.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShaderMania.entitlements; sourceTree = "<group>"; };
+		2B6B9C7525E0BC6000F266DF /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.4.sdk/System/Library/Frameworks/CloudKit.framework; sourceTree = DEVELOPER_DIR; };
 		2B77B7BA25773978002D99C0 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		2B7C7EEB25DCB5D400727BC0 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
@@ -105,6 +108,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B6B9C7625E0BC6000F266DF /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,6 +127,7 @@
 		2B0EEA482565DF3900C84C6C = {
 			isa = PBXGroup;
 			children = (
+				2B6B9C7225E0BC4E00F266DF /* ShaderMania.entitlements */,
 				2B0EEA4D2565DF3900C84C6C /* Shared */,
 				2B0EEA582565DF3A00C84C6C /* iOS */,
 				2B0EEA5F2565DF3A00C84C6C /* macOS */,
@@ -201,6 +206,7 @@
 		2B0EEAC1256619D000C84C6C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2B6B9C7525E0BC6000F266DF /* CloudKit.framework */,
 				2B7C7F0225DD0E6D00727BC0 /* StoreKit.framework */,
 				2B0EEAC2256619D000C84C6C /* CloudKit.framework */,
 			);
@@ -492,6 +498,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ShaderMania.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G6R6L3VH62;
 				ENABLE_PREVIEWS = YES;
@@ -516,6 +523,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ShaderMania.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G6R6L3VH62;
 				ENABLE_PREVIEWS = YES;

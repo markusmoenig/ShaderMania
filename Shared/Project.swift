@@ -126,9 +126,16 @@ class Project
         checkTextures(collected: collected, preview: preview, device: device)
             
         for asset in collected {
-
             if asset.type == .Shader {
                 drawShader(asset, preview, device)
+            }
+        }
+        
+        if preview {
+            for asset in assetFolder.assets {
+                if asset.previewTexture != nil && collected.contains(asset) == false {
+                    clear(asset.previewTexture!, float4(0,0,0,0))
+                }
             }
         }
         

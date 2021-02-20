@@ -18,7 +18,7 @@ struct ContentView: View {
     }
     
     @State var editingState                 : EditingState = .Both
-    @State var editingStateText             : String = " Source & Nodes"
+    @State var editingStateText             : String = "Source & Nodes"
 
     @Binding var document                   : ShaderManiaDocument
     @StateObject var storeManager           : StoreManager
@@ -30,7 +30,7 @@ struct ContentView: View {
     @State private var userNickName         : String = ""
     @State private var userDescription      : String = ""
 
-    @State private var showLibrary          : Bool = false
+    @State private var showLibrary          : Bool = true
 
     @State private var showAssetNamePopover : Bool = false
     @State private var assetName            : String = ""
@@ -100,7 +100,7 @@ struct ContentView: View {
                                     .zIndex(0)
                                     .animation(.default)
                                     .allowsHitTesting(true)
-                                    .frame(maxHeight: editingState == .Both ? geometry.size.height / 2.3 : geometry.size.height)
+                                    .frame(maxHeight: editingState == .Both ? geometry.size.height / 2.5 : geometry.size.height)
                             }
                         }
                         

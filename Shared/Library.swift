@@ -7,6 +7,7 @@
 
 import Foundation
 import CloudKit
+import CoreGraphics
 
 class LibraryShader
 {
@@ -150,6 +151,14 @@ class Library
             predicate = NSPredicate(value: true)
         } else {
             predicate = NSPredicate(format: "self contains %@", searchFor)
+            /*
+            query(predicate, { (list) -> () in
+                self.currentList = list
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.core.libraryChanged.send(self.currentList)
+                }
+            })*/
         }
         
         getShaders(predicate, { (list) -> () in
@@ -176,6 +185,29 @@ class Library
         })
     }
     
+    func query(_ predicate: NSPredicate,_ cb: @escaping (LibraryShaderList)->())
+    {
+        let query = CKQuery(recordType: "Shaders", predicate: predicate)
+
+        let queryOperation = CKQueryOperation(query: query)
+        queryOperation.desiredKeys = ["recordName", "description", ""]
+        //queryOperation.queuePriority = .veryHigh
+        
+        queryOperation.recordFetchedBlock = { (record: CKRecord!) -> Void in
+            print("got something")
+            if let shaderRecord = record {
+            //this is where you are appending to your array
+                //self.moviesArray.append(moviesRecord)
+                print(shaderRecord.recordID.recordName)
+            }
+        }
+        
+        queryOperation.queryCompletionBlock = { cursor, error in
+        }
+        
+        publicDatabase.add(queryOperation)
+    }
+
     func getShaders(_ predicate: NSPredicate,_ cb: @escaping (LibraryShaderList)->())
     {
         let list = LibraryShaderList()
@@ -238,5 +270,19 @@ class Library
             
             cb(list)
         }
+    }
+    
+    /// Adds the library to the curent project
+    func addShaderToProject(_ shader: LibraryShader)
+    {
+        if let folder = shader.folder {
+            for asset in folder.assets {
+                if asset.type == .Shader || asset.type == .Image {
+                    core.assetFolder.assets.append(asset)
+                }
+            }
+        }
+        core.nodesWidget.update()
+        core.contentChanged.send()
     }
 }

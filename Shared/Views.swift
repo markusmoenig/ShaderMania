@@ -210,6 +210,7 @@ struct ShaderList: View {
                 
                 if let userRecord = authorOfShader.userRecord {
                     Text((userRecord["nickName"] as! String))
+                        .padding(.top, 5)
                     Text((userRecord["description"] as! String))
                         .padding(.top, 4)
                 }
@@ -278,12 +279,20 @@ struct ShaderList: View {
                         .foregroundColor(Color.secondary)
                     Spacer()
                 }
+                .padding(.top, 5)
                 HStack {
                     Text(detailedShader.description)
                     Spacer()
                 }
                 .padding(.top, 2)
-
+                
+                Button(action: {
+                    document.core.library.addShaderToProject(detailedShader)
+                })
+                {
+                    Text("Add to Project")
+                }
+                .padding(.top, 5)
             }
             
         } else {
