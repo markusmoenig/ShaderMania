@@ -211,6 +211,12 @@ struct ContentView: View {
                     .animation(.easeInOut)
             }
         }
+        // For Mac Screenshots, 1440x900
+        //.frame(minWidth: 1440, minHeight: 806)
+        //.frame(maxWidth: 1440, maxHeight: 806)
+        // For Mac App Previews 1920x1080
+        //.frame(minWidth: 1920, minHeight: 978)
+        //.frame(maxWidth: 1920, maxHeight: 978)
     }
     
     // tool bar menus

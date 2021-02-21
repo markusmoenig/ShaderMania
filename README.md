@@ -4,19 +4,33 @@
 
 ![screenshot](images/screen.png)
 
-ShaderMania is an editor for procedural Metal fragment shaders featuring realtime preview and playback.
+### Create, edit, share and learn about Metal shaders with ShaderMania
 
-macOS Big Sur or iOS 14.x is required.
+ShaderMania features live coding of Metal fragment shaders with realtime preview and playback. Shaders are displayed as nodes which can be connected as needed.
 
-Features:
+ShaderMania features a database of public shaders including tutorial shaders with links to explanation videos.
 
-* Syntax check and compilation of your shaders with realtime preview.
+ShaderMania is 100% free, optionally you can make a small donation to the author (in the AppStore or via [PayPal](https://paypal.me/markusmoenig)).
+
+A physical keyboard is recommended for coding shaders.
+
+Features
+
+* Flexible node system supporting Shaders and Images. Named input slots for shaders can be created inside the shader source code.
+* Connect shader nodes to be able to chain shaders.
+* Optional abstracted parameter definition which supports display of variables as sliders to live change shader values in the user interface.
+* Tutorial shaders can display a button with a link to their video urls.
+* Realtime syntax check and compilation of your shaders with realtime preview.
 * Render to custom resolutions and export your shader output to PNG.
 * Display of syntax errors and warnings.
-* Add textures to your project by importing images.
-* Shaders can be chained with each shader supporting up to 4 inputs (shaders or textures).
-* Common code shader code which is shared by all shaders.
 
-A help file explains the parameters and syntax of the main entry point for each shader.
+Database
 
-Thanks to [Kali](https://www.shadertoy.com/user/Kali) for allowing me to use his [Fractal Land](https://www.shadertoy.com/view/XsBXWt) shader for the app and it's icon.
+* Upload your shaders to the public shader database
+* Browse shaders in the Database and learn / experiment.
+* Add the nodes of shaders in the database to your project.
+
+### Acknowledgements
+
+* Thanks to [The Art of Code](https://www.youtube.com/channel/UCcAlTqd9zID6aNX3TzwxJXg) for allowing me to use his tutorial shaders.
+* Thanks to [Kali](https://www.shadertoy.com/user/Kali) for allowing me to use his [Fractal Land](https://www.shadertoy.com/view/XsBXWt) shader for the app.
