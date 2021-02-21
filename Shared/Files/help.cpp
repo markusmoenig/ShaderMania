@@ -7,6 +7,8 @@
  *
  * You can add nodes from existing shaders from the Shader Library by clicking on the shader and selecting "Add to Project".
  *
+ * For more information have a look at the Wiki at https://github.com/markusmoenig/ShaderMania/wiki
+ *
  */
 
 // Incoming Data structure
@@ -17,7 +19,7 @@ typedef struct
     float2              viewSize;   // Viewport size
     float2              fragCoord;  // uv * viewSize
     
-    float               time;       // Global time
+    float               time;       // Global time in seconds
     unsigned int        frame;      // Frame number
 
     float4              outColor;   // The resulting RGBA color, set to (0,0,0,1) by default
