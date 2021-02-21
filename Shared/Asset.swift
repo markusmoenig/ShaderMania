@@ -406,7 +406,7 @@ class Asset         : Codable, Equatable
         }
         if let shaderDataNames = try container.decodeIfPresent([String].self, forKey: .shaderDataNames) {
             self.shaderDataNames = shaderDataNames
-        }
+        }        
     }
     
     func encode(to encoder: Encoder) throws

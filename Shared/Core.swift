@@ -394,7 +394,7 @@ public class Core       : ObservableObject
                         if let scriptEditor = self.scriptEditor {
                             let text = """
 
-                            Displaying image \(asset.name)
+                            Displaying image \"\(asset.name)\"
                             
                             Image resolution \(Int(texture2D.width))x\(Int(texture2D.height))
 

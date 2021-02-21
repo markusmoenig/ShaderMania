@@ -2,6 +2,7 @@
 void mainImage(thread Data &data)
 {
     float2 uv = (data.fragCoord.xy-data.viewSize.xy*.5) / data.viewSize.y;
+    uv.x += 0.045;
     
     uv *= float2x2(.707, -.707, .707, .707);
     

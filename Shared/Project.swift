@@ -22,7 +22,6 @@ class Project
 
     var assetFolder     : AssetFolder? = nil
     
-    var textureCache    : [UUID:MTLTexture] = [:]
     var textureLoader   : MTKTextureLoader? = nil
     
     var resChanged      : Bool = false
@@ -38,13 +37,6 @@ class Project
     
     func clear() {
         if black != nil { black!.setPurgeableState(.empty); black = nil }
-
-        for (id, _) in textureCache {
-            if textureCache[id] != nil {
-                textureCache[id]!.setPurgeableState(.empty)
-            }
-        }
-        textureCache = [:]
     }
     
     func collectShadersFor(assetFolder: AssetFolder, asset: Asset,_ collected: inout [Asset])
@@ -133,7 +125,7 @@ class Project
         
         if preview {
             for asset in assetFolder.assets {
-                if asset.previewTexture != nil && collected.contains(asset) == false {
+                if asset.type == .Shader && asset.previewTexture != nil && collected.contains(asset) == false {
                     clear(asset.previewTexture!, float4(0,0,0,0))
                 }
             }
@@ -244,10 +236,16 @@ class Project
                     textureLoader = MTKTextureLoader(device: device)
                 }
                 
-                if textureCache[asset.id] == nil {
+                if preview == false && asset.texture == nil {
                     let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
                     if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
-                        textureCache[asset.id] = texture
+                        asset.texture = texture
+                    }
+                } else
+                if preview == true && asset.previewTexture == nil {
+                    let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
+                    if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
+                        asset.previewTexture = texture
                     }
                 }
             }
@@ -261,14 +259,16 @@ class Project
             textureLoader = MTKTextureLoader(device: device)
         }
         
-        if textureCache[asset.id] == nil {
+        if preview == true && asset.previewTexture == nil {
+        
             let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
-            if preview == true {
-                if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
-                    asset.previewTexture = texture
-                }
-            } else
+            if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
+                asset.previewTexture = texture
+            }
+        } else
+        if preview == false && asset.texture == nil {
             if preview == false {
+                let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
                 if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
                     asset.texture = texture
                 }

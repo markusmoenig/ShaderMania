@@ -368,7 +368,6 @@ struct LibraryView: View {
         })
 
         .onReceive(self.document.core.libraryChanged) { list in
-            print("received")
             shaders = nil
             shaders = list
             updateView.toggle()
