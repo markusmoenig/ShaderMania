@@ -137,6 +137,7 @@ struct ParameterListView: View {
 
                     if shader.parameters.count > 0 {
                         Text("Parameters for \(node.name)")
+                            .padding(.top, 2)
                         Divider()
 
                         ForEach(shader.parameters, id: \.id) { parameter in
@@ -334,6 +335,7 @@ struct LibraryView: View {
         VStack {
             
             Text("Shader Library")
+                .padding(.top, 2)
             
             HStack {
                 Image(systemName: "magnifyingglass").foregroundColor(.secondary)

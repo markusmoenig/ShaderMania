@@ -12,8 +12,6 @@ ShaderMania features a database of public shaders including tutorial shaders wit
 
 ShaderMania is 100% free, optionally you can make a small donation to the author (in the AppStore or via [PayPal](https://paypal.me/markusmoenig)).
 
-A physical keyboard is recommended for coding shaders.
-
 Features
 
 * Flexible node system supporting Shaders and Images. Named input slots for shaders can be created inside the shader source code.
