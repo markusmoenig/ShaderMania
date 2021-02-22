@@ -4,13 +4,15 @@
 
 ![screenshot](images/screen.png)
 
-### Create, edit, share and learn about Metal shaders with ShaderMania
+## Create, edit, share and learn about Metal shaders on macOS and iOS
 
 ShaderMania features live coding of Metal fragment shaders with realtime preview and playback. Shaders are displayed as nodes which can be connected as needed.
 
 ShaderMania features a database of public shaders including tutorial shaders with links to explanation videos.
 
 ShaderMania is 100% free, optionally you can make a small donation to the author (in the AppStore or via [PayPal](https://paypal.me/markusmoenig)).
+
+A physical keyboard is recommended for coding shaders.
 
 Features
 
@@ -28,7 +30,7 @@ Database
 * Browse shaders in the Database and learn / experiment.
 * Add the nodes of shaders in the database to your project.
 
-### Acknowledgements
+## Acknowledgements
 
 * Thanks to [The Art of Code](https://www.youtube.com/channel/UCcAlTqd9zID6aNX3TzwxJXg) for allowing me to use his tutorial shaders.
 * Thanks to [Kali](https://www.shadertoy.com/user/Kali) for allowing me to use his [Fractal Land](https://www.shadertoy.com/view/XsBXWt) shader for the app.
