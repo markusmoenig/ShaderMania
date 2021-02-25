@@ -261,8 +261,10 @@ struct ShaderList: View {
                     Spacer()
                 }
                                     
-                Image(detailedShader.cgiImage!, scale: 1.0, label: Text(detailedShader.name))
-                    .padding(.top, 10)
+                if let image = detailedShader.cgiImage {
+                    Image(image, scale: 1.0, label: Text(detailedShader.name))
+                        .padding(.top, 10)
+                }
                 Text(detailedShader.name)
                 
                 if let userRecord = detailedShader.userRecord {

@@ -98,6 +98,12 @@ class Library
 
             record["description"] = core.assetFolder.libraryDescription
             record["json"] = encodedFolder
+            record["tags"] = folder.libraryName
+            
+            var tagList = folder.libraryDescription.lowercased().split(separator: " ")
+            tagList.append(String.SubSequence(folder.libraryName.lowercased()))
+            
+            record["tagList"] = tagList as __CKRecordObjCValue
 
             var uploadComponents = [CKRecord]()
             uploadComponents.append(record)
@@ -145,29 +151,47 @@ class Library
     /// Request shaders based on the search field
     func requestShaders(_ searchFor: String = "")
     {
-        let predicate: NSPredicate
-        
         if searchFor == "" {
-            predicate = NSPredicate(value: true)
-        } else {
-            predicate = NSPredicate(format: "self contains %@", searchFor)
-            /*
-            query(predicate, { (list) -> () in
+            let predicate = NSPredicate(value: true)
+            
+            currentList = getShaders(predicate, { (list) -> () in
                 self.currentList = list
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     self.core.libraryChanged.send(self.currentList)
                 }
+            })
+        } else {
+            //predicate = NSPredicate(format: "self contains %@", searchFor)
+            //predicate = NSPredicate(format: "allTokens TOKENMATCHES[cdl]  %@"), searchFor)
+            
+            let p1 = NSPredicate(format: "tags BEGINSWITH %@", searchFor)
+            let p2 = NSPredicate(format: "tagList CONTAINS %@", searchFor)
+
+            let mergeList = LibraryShaderList()
+
+            currentList = getShaders(p1, { (list) -> () in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.core.libraryChanged.send(self.currentList)
+                }
+            }, mergeList)
+            
+            currentList = getShaders(p2, { (list) -> () in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.core.libraryChanged.send(self.currentList)
+                }
+            }, mergeList)
+            
+            /*
+            query(predicate, { (list) -> () in
+                self.currentList = list
+                
+                print("got", list.shaders.count)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.core.libraryChanged.send(self.currentList)
+                }
             })*/
         }
-        
-        getShaders(predicate, { (list) -> () in
-            self.currentList = list
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.core.libraryChanged.send(self.currentList)
-            }
-        })
     }
     
     /// Get the shaders for the author of this shader
@@ -176,7 +200,7 @@ class Library
         let reference = CKRecord.Reference(recordID: shader.userRecord!.recordID, action: .none)
         let predicate = NSPredicate(format: "creatorUserRecordID == %@", reference)
         
-        getShaders(predicate, { (list) -> () in
+        authorList = getShaders(predicate, { (list) -> () in
             self.authorList = list
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -188,9 +212,8 @@ class Library
     func query(_ predicate: NSPredicate,_ cb: @escaping (LibraryShaderList)->())
     {
         let query = CKQuery(recordType: "Shaders", predicate: predicate)
-
         let queryOperation = CKQueryOperation(query: query)
-        queryOperation.desiredKeys = ["recordName", "description", ""]
+        //queryOperation.desiredKeys = [""]
         //queryOperation.queuePriority = .veryHigh
         
         queryOperation.recordFetchedBlock = { (record: CKRecord!) -> Void in
@@ -208,9 +231,9 @@ class Library
         publicDatabase.add(queryOperation)
     }
 
-    func getShaders(_ predicate: NSPredicate,_ cb: @escaping (LibraryShaderList)->())
+    @discardableResult func getShaders(_ predicate: NSPredicate,_ cb: @escaping (LibraryShaderList)->(),_ mergeList: LibraryShaderList? = nil) -> LibraryShaderList
     {
-        let list = LibraryShaderList()
+        let list = mergeList == nil ? LibraryShaderList() : mergeList!
         let publicQuery = CKQuery(recordType: "Shaders", predicate: predicate)
         let sort = NSSortDescriptor(key: "creationDate", ascending: false)
         publicQuery.sortDescriptors = [sort]
@@ -257,6 +280,9 @@ class Library
                                             if let image = makeCGIImage(texture: cgiTexture, forImage: true) {
                                                 list.shaders.append(shader)
                                                 shader.cgiImage = image
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                    self.core.libraryChanged.send(list)
+                                                }
                                             }
                                         }
                                     }
@@ -270,6 +296,8 @@ class Library
             
             cb(list)
         }
+        
+        return list
     }
     
     /// Adds the library to the curent project
