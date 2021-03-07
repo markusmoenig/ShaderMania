@@ -30,6 +30,10 @@ Database
 * Browse shaders in the Database and learn / experiment.
 * Add the nodes of shaders in the database to your project.
 
+## How to help
+
+As mentioned above, a small donation to the author (in the AppStore or via [PayPal](https://paypal.me/markusmoenig)) helps. But simply rating or reviewing ShaderMania in the AppStore is also a great help as it improves visibility.
+
 ## Acknowledgements
 
 * Thanks to [The Art of Code](https://www.youtube.com/channel/UCcAlTqd9zID6aNX3TzwxJXg) for allowing me to use his tutorial shaders.
