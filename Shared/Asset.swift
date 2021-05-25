@@ -97,10 +97,11 @@ class AssetFolder       : Codable
         try container.encode(libraryDescription, forKey: .libraryDescription)
     }
     
-    func addShader(_ name: String)
+    /// Adds an empty shader to the project
+    func addShader(_ name: String) -> Asset?
     {
         guard let path = Bundle.main.path(forResource: "EmptyShader", ofType: "", inDirectory: "Files/default") else {
-            return
+            return nil
         }
         
         if let shaderTemplate = try? String(contentsOfFile: path, encoding: String.Encoding.utf8) {
@@ -108,7 +109,9 @@ class AssetFolder       : Codable
             assets.append(asset)
             select(asset.id)
             core.scriptEditor?.createSession(asset)
+            return asset
         }
+        return nil
     }
     
     func addImages(_ name: String, _ urls: [URL], existingAsset: Asset? = nil)
@@ -310,7 +313,7 @@ class AssetFolder       : Codable
         }
     }
     
-    // Create a preview for the current asset
+    /// Create a preview for the current asset
     func createPreview()
     {
         if let asset = current {
@@ -339,6 +342,7 @@ class AssetFolder       : Codable
     }
 }
 
+/// A general purpose class representing an asset in the project
 class Asset         : Codable, Equatable
 {
     enum AssetType  : Int, Codable {

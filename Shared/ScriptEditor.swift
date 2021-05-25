@@ -87,6 +87,7 @@ class ScriptEditor
          })
     }
     
+    /// Creates an editor session for the given asset
     func createSession(_ asset: Asset,_ cb: (()->())? = nil)
     {
         if asset.scriptName.isEmpty {

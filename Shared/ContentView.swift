@@ -75,14 +75,17 @@ struct ContentView: View {
                                 GeometryReader { geometry in
                                     ScrollView {
 
-                                        WebView(document.core, deviceColorScheme).tabItem {
-                                        }
-                                            .animation(.default)
-                                            .frame(height: geometry.size.height)
-                                            .tag(1)
-                                            .onChange(of: deviceColorScheme) { newValue in
-                                                document.core.scriptEditor?.setTheme(newValue)
+                                        if document.core.assetFolder.assets.isEmpty == false {
+                                            WebView(document.core, deviceColorScheme).tabItem {
                                             }
+                                                .animation(.default)
+                                            
+                                                .frame(height: geometry.size.height)
+                                                .tag(1)
+                                                .onChange(of: deviceColorScheme) { newValue in
+                                                    document.core.scriptEditor?.setTheme(newValue)
+                                                }
+                                        }
                                     }
                                     .zIndex(0)
                                     .frame(maxWidth: .infinity)
@@ -295,12 +298,13 @@ struct ContentView: View {
                 })
                 .keyboardShortcut("1")
                 Button("Add Shader", action: {
-                    document.core.assetFolder.addShader("New Shader")
-                    document.core.nodesWidget.selectNode(document.core.assetFolder.current!)
-                    document.core.nodesWidget.compileAndUpdatePreview(document.core.assetFolder.current!)
-                    document.core.nodesWidget.update()
-                    document.core.contentChanged.send()
-                    updateView.toggle()
+                    if let asset = document.core.assetFolder.addShader("New Shader") {
+                        document.core.nodesWidget.selectNode(asset)
+                        document.core.nodesWidget.compileAndUpdatePreview(asset)
+                        document.core.nodesWidget.update()
+                        document.core.contentChanged.send()
+                        updateView.toggle()
+                    }
                 })
                 .keyboardShortcut("2")
             }
@@ -367,7 +371,7 @@ struct ContentView: View {
                         document.core.nodesWidget.nodeIsAboutToBeDeleted(asset)
                         document.core.assetFolder.removeAsset(asset)
                         for a in document.core.assetFolder.assets {
-                            document.core.assetFolder.select(a.id)
+                            document.core.nodesWidget.selectNode(a)
                             break
                         }
                         self.updateView.toggle()
