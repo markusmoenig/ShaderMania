@@ -1,0 +1,5 @@
+
+void mainImage(thread Data &data)
+{
+    data.outColor = float4(1, 0, 0, 1);
+}

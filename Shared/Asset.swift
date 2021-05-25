@@ -99,7 +99,7 @@ class AssetFolder       : Codable
     
     func addShader(_ name: String)
     {
-        guard let path = Bundle.main.path(forResource: "Shader", ofType: "", inDirectory: "Files/default") else {
+        guard let path = Bundle.main.path(forResource: "EmptyShader", ofType: "", inDirectory: "Files/default") else {
             return
         }
         
@@ -304,7 +304,9 @@ class AssetFolder       : Codable
     {
         if let index = assets.firstIndex(of: asset) {
             assets.remove(at: index)
-            select(assets[0].id)
+            if assets.isEmpty == false {
+                select(assets[0].id)
+            }
         }
     }
     

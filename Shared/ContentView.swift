@@ -297,6 +297,7 @@ struct ContentView: View {
                 Button("Add Shader", action: {
                     document.core.assetFolder.addShader("New Shader")
                     document.core.nodesWidget.selectNode(document.core.assetFolder.current!)
+                    document.core.nodesWidget.compileAndUpdatePreview(document.core.assetFolder.current!)
                     document.core.nodesWidget.update()
                     document.core.contentChanged.send()
                     updateView.toggle()
