@@ -147,9 +147,7 @@ public class Core       : ObservableObject
         
         view.platformInit()
         checkTexture()
-        
-        assetFolder.assetCompileAll()
-        
+                
         library.requestShaders()
     }
     

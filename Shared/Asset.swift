@@ -240,68 +240,6 @@ class AssetFolder       : Codable
         return nil
     }
     
-    func assetUpdated(id: UUID, value: String)//, deltaStart: Int32, deltaEnd: Int32)
-    {
-        /*
-        for asset in assets {
-            if asset.id == id {
-                asset.value = value
-                core.contentChanged.send()
-                if core.state == .Idle {
-                    if asset.type == .Common {
-                        assetCompile(asset)
-                        //assetCompileAll()
-                    } else {
-                        assetCompile(asset)
-                    }
-                }
-            }
-        }
-        */
-    }
-    
-    /// Compiles the Buffer or Shader asset
-    func assetCompile(_ asset: Asset)
-    {
-        /*
-        if asset.type == .Shader || asset.type == .Buffer || asset.type == .Common {
-            core.shaderCompiler.compile(asset: asset, cb: { (shader, errors) in
-                if shader == nil {
-                    if Thread.isMainThread {
-                        self.core.scriptEditor?.setErrors(errors)
-                    } else {
-                        DispatchQueue.main.sync {
-                            self.core.scriptEditor?.setErrors(errors)
-                        }
-                    }
-                } else {
-                    asset.shader = nil
-                    asset.shader = shader
-                    
-                    if Thread.isMainThread {
-                        self.core.createPreview(asset)
-                        //self.core.scriptEditor?.clearAnnotations()
-                        self.core.scriptEditor?.setErrors(errors)
-                    } else {
-                        DispatchQueue.main.sync {
-                            self.core.createPreview(asset)
-                            //self.core.scriptEditor?.clearAnnotations()
-                            self.core.scriptEditor?.setErrors(errors)
-                        }
-                    }
-                }
-            })
-        }*/
-    }
-    
-    /// Compiles all assets, used after loading the project
-    func assetCompileAll()
-    {
-        for asset in assets {
-            assetCompile(asset)
-        }
-    }
-    
     /// Safely removes an asset from the project
     func removeAsset(_ asset: Asset)
     {
