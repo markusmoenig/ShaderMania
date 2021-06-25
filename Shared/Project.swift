@@ -192,12 +192,12 @@ class Project
 
         /// Update the parameter data for the shader
         if let shader = asset.shader {
-            if shader.paramDataBuffer != nil {
-                shader.paramDataBuffer!.setPurgeableState(.empty)
-                shader.paramDataBuffer = nil
-            }
             
-            shader.paramDataBuffer = device.makeBuffer(bytes: asset.shaderData, length: asset.shaderData.count * MemoryLayout<SIMD4<Float>>.stride, options: [])!
+            if shader.paramDataBuffer == nil {
+                shader.paramDataBuffer = device.makeBuffer(bytes: asset.shaderData, length: asset.shaderData.count * MemoryLayout<SIMD4<Float>>.stride, options: [])!
+            } else {
+                shader.paramDataBuffer!.contents().copyMemory(from: asset.shaderData, byteCount: asset.shaderData.count * MemoryLayout<SIMD4<Float>>.stride)
+            }
             
             renderEncoder.setFragmentBuffer(shader.paramDataBuffer, offset: 0, index: 5)
         }

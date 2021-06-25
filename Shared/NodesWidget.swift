@@ -105,50 +105,51 @@ public class NodesWidget    : ObservableObject
             firstDraw = false
         }
         
-        drawables.encodeStart()
-        
-        drawables.drawBoxPattern(position: float2(0,0), size: drawables.viewSize, fillColor: float4(0.12, 0.12, 0.12, 1), borderColor: float4(0.14, 0.14, 0.14, 1))
+        if let _ = drawables.encodeStart() {
+            
+            drawables.drawBoxPattern(position: float2(0,0), size: drawables.viewSize, fillColor: float4(0.12, 0.12, 0.12, 1), borderColor: float4(0.14, 0.14, 0.14, 1))
 
-        let skin = NodeSkin(drawables.font, fontScale: 0.4, graphZoom: graphZoom)
-        //drawables.drawDisk(position: float2(0,0), radius: 50)
-        //drawables.drawBox(position: float2(100,100), size: float2(100, 50))
-        
-        if let assets = core.assetFolder?.assets {
-            for asset in assets {
-                
-                //print(asset.type, asset.name)
-                drawNode(asset, asset === currentNode, skin)
-            }
-        }
-        
-        if action == .Connecting {
-            if let id = currentTerminalId {
-                let rect = getTerminal(currentNode!, id: id)
-                
-                if let mousePos = mouseMovedPos {
-                    drawables.drawLine(startPos: rect.middle(), endPos: mousePos, radius: 0.6, fillColor: skin.selectedTerminalColor)
+            let skin = NodeSkin(drawables.font, fontScale: 0.4, graphZoom: graphZoom)
+            //drawables.drawDisk(position: float2(0,0), radius: 50)
+            //drawables.drawBox(position: float2(100,100), size: float2(100, 50))
+            
+            if let assets = core.assetFolder?.assets {
+                for asset in assets {
+                    
+                    //print(asset.type, asset.name)
+                    drawNode(asset, asset === currentNode, skin)
                 }
             }
-        }
-        
-        // Draw Connections
-        if let assets = core.assetFolder?.assets {
-            for asset in assets {
-                
-                for (index, nodeUUID) in asset.slots {
-                    if let connTo = core.assetFolder!.getAssetById(nodeUUID) {
-                        let dRect = getTerminal(connTo, id: -1)
-                        let sRect = getTerminal(asset, id: index)
-                        
-                        if sRect.x != 0.0 && sRect.y != 0.0 {
-                            drawables.drawLine(startPos: sRect.middle(), endPos: dRect.middle(), radius: 0.6, fillColor: skin.selectedTerminalColor)
+            
+            if action == .Connecting {
+                if let id = currentTerminalId {
+                    let rect = getTerminal(currentNode!, id: id)
+                    
+                    if let mousePos = mouseMovedPos {
+                        drawables.drawLine(startPos: rect.middle(), endPos: mousePos, radius: 0.6, fillColor: skin.selectedTerminalColor)
+                    }
+                }
+            }
+            
+            // Draw Connections
+            if let assets = core.assetFolder?.assets {
+                for asset in assets {
+                    
+                    for (index, nodeUUID) in asset.slots {
+                        if let connTo = core.assetFolder!.getAssetById(nodeUUID) {
+                            let dRect = getTerminal(connTo, id: -1)
+                            let sRect = getTerminal(asset, id: index)
+                            
+                            if sRect.x != 0.0 && sRect.y != 0.0 {
+                                drawables.drawLine(startPos: sRect.middle(), endPos: dRect.middle(), radius: 0.6, fillColor: skin.selectedTerminalColor)
+                            }
                         }
                     }
                 }
             }
+            
+            drawables.encodeEnd()
         }
-        
-        drawables.encodeEnd()
     }
     
     func drawNode(_ node: Asset,_ selected: Bool,_ skin: NodeSkin)
