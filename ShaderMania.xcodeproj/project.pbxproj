@@ -62,6 +62,14 @@
 		2B7C7EFC25DD0E0900727BC0 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */; };
 		2B7C7EFD25DD0E0900727BC0 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */; };
 		2B7C7F0325DD0E6D00727BC0 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B7C7F0225DD0E6D00727BC0 /* StoreKit.framework */; };
+		2B995CD4274CA305009E976C /* AssetFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CD3274CA305009E976C /* AssetFolder.swift */; };
+		2B995CD5274CA305009E976C /* AssetFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CD3274CA305009E976C /* AssetFolder.swift */; };
+		2B995CD7274CB6BE009E976C /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CD6274CB6BE009E976C /* PersistenceController.swift */; };
+		2B995CD8274CB6BE009E976C /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CD6274CB6BE009E976C /* PersistenceController.swift */; };
+		2B995CDB274CB769009E976C /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CD9274CB769009E976C /* DataModel.xcdatamodeld */; };
+		2B995CDC274CB769009E976C /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CD9274CB769009E976C /* DataModel.xcdatamodeld */; };
+		2B995CDE274CB90E009E976C /* BrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CDD274CB90E009E976C /* BrowserView.swift */; };
+		2B995CDF274CB90E009E976C /* BrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CDD274CB90E009E976C /* BrowserView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -95,12 +103,16 @@
 		2B36F67425D4DE84001611BE /* OpenSans.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = OpenSans.tiff; sourceTree = "<group>"; };
 		2B36F67525D4DE84001611BE /* OpenSans.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = OpenSans.json; sourceTree = "<group>"; };
 		2B3D4C7825A68ECA00D2F8EA /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
-		2B6B9C7225E0BC4E00F266DF /* ShaderMania.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShaderMania.entitlements; sourceTree = "<group>"; };
+		2B6B9C7225E0BC4E00F266DF /* iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iOS.entitlements; sourceTree = "<group>"; };
 		2B6B9C7525E0BC6000F266DF /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.4.sdk/System/Library/Frameworks/CloudKit.framework; sourceTree = DEVELOPER_DIR; };
 		2B77B7BA25773978002D99C0 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		2B7C7EEB25DCB5D400727BC0 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
 		2B7C7F0225DD0E6D00727BC0 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		2B995CD3274CA305009E976C /* AssetFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetFolder.swift; sourceTree = "<group>"; };
+		2B995CD6274CB6BE009E976C /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		2B995CDA274CB769009E976C /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		2B995CDD274CB90E009E976C /* BrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,7 +139,6 @@
 		2B0EEA482565DF3900C84C6C = {
 			isa = PBXGroup;
 			children = (
-				2B6B9C7225E0BC4E00F266DF /* ShaderMania.entitlements */,
 				2B0EEA4D2565DF3900C84C6C /* Shared */,
 				2B0EEA582565DF3A00C84C6C /* iOS */,
 				2B0EEA5F2565DF3A00C84C6C /* macOS */,
@@ -141,20 +152,19 @@
 			children = (
 				2B0EEA4E2565DF3900C84C6C /* ShaderManiaApp.swift */,
 				2B0EEA4F2565DF3900C84C6C /* ShaderManiaDocument.swift */,
-				2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */,
 				2B0EEA772565DF7800C84C6C /* ContentView.swift */,
+				2B995CD2274C6FEA009E976C /* Model */,
+				2B995CD1274C6FD1009E976C /* Views */,
 				2B3D4C7825A68ECA00D2F8EA /* Views.swift */,
-				2B0EEA782565DF7800C84C6C /* Asset.swift */,
+				2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */,
 				2B7C7EEB25DCB5D400727BC0 /* Library.swift */,
-				2B0EEA7C2565DF7800C84C6C /* Core.swift */,
 				2B0EEA7D2565DF7800C84C6C /* MathLibrary.swift */,
-				2B0EEA792565DF7800C84C6C /* Metal.h */,
 				2B0EEA7F2565DF7800C84C6C /* Metal.metal */,
+				2B0EEA792565DF7800C84C6C /* Metal.h */,
 				2B0EEA802565DF7800C84C6C /* MetalStates.swift */,
 				2B0EEA762565DF7800C84C6C /* MetalView.swift */,
 				2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */,
 				2B36F66725D3BFCC001611BE /* NodesWidget.swift */,
-				2B0EEABA2566035700C84C6C /* Project.swift */,
 				2B0EEA7A2565DF7800C84C6C /* ShaderCompiler.swift */,
 				2B0EEA7E2565DF7800C84C6C /* ScriptEditor.swift */,
 				2B0EEA7B2565DF7800C84C6C /* Utils.swift */,
@@ -163,6 +173,7 @@
 				2B36F67325D4DE53001611BE /* Fonts */,
 				2B0EEAA62565DFA800C84C6C /* Files */,
 				2B0EEA512565DF3A00C84C6C /* Assets.xcassets */,
+				2B995CD6274CB6BE009E976C /* PersistenceController.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -180,6 +191,7 @@
 			isa = PBXGroup;
 			children = (
 				2B0EEA592565DF3A00C84C6C /* Info.plist */,
+				2B6B9C7225E0BC4E00F266DF /* iOS.entitlements */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -220,6 +232,26 @@
 				2B36F67425D4DE84001611BE /* OpenSans.tiff */,
 			);
 			path = Fonts;
+			sourceTree = "<group>";
+		};
+		2B995CD1274C6FD1009E976C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2B995CDD274CB90E009E976C /* BrowserView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		2B995CD2274C6FEA009E976C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				2B0EEA782565DF7800C84C6C /* Asset.swift */,
+				2B995CD3274CA305009E976C /* AssetFolder.swift */,
+				2B0EEA7C2565DF7800C84C6C /* Core.swift */,
+				2B0EEABA2566035700C84C6C /* Project.swift */,
+				2B995CD9274CB769009E976C /* DataModel.xcdatamodeld */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -329,6 +361,7 @@
 				2B0EEA912565DF7800C84C6C /* Metal.metal in Sources */,
 				2B0EEAA22565DF9A00C84C6C /* Font.swift in Sources */,
 				2B7C7EFC25DD0E0900727BC0 /* StoreManager.swift in Sources */,
+				2B995CD4274CA305009E976C /* AssetFolder.swift in Sources */,
 				2B0EEA642565DF3A00C84C6C /* ShaderManiaDocument.swift in Sources */,
 				2B0EEA932565DF7800C84C6C /* MetalStates.swift in Sources */,
 				2B0EEA8D2565DF7800C84C6C /* MathLibrary.swift in Sources */,
@@ -339,11 +372,14 @@
 				2B0EEA872565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA02565DF9A00C84C6C /* Classes.swift in Sources */,
 				2B36F66D25D3C8A0001611BE /* MetalDrawables.swift in Sources */,
+				2B995CD7274CB6BE009E976C /* PersistenceController.swift in Sources */,
 				2B0EEA832565DF7800C84C6C /* ContentView.swift in Sources */,
 				2B77B7BB25773978002D99C0 /* File.swift in Sources */,
 				2B0EEA622565DF3A00C84C6C /* ShaderManiaApp.swift in Sources */,
 				2B0EEA8B2565DF7800C84C6C /* Core.swift in Sources */,
 				2B36F66825D3BFCC001611BE /* NodesWidget.swift in Sources */,
+				2B995CDE274CB90E009E976C /* BrowserView.swift in Sources */,
+				2B995CDB274CB769009E976C /* DataModel.xcdatamodeld in Sources */,
 				2B0EEA8F2565DF7800C84C6C /* ScriptEditor.swift in Sources */,
 				2B0EEA9E2565DF9A00C84C6C /* Texture2D.swift in Sources */,
 				2B0EEABB2566035700C84C6C /* Project.swift in Sources */,
@@ -358,6 +394,7 @@
 				2B0EEA922565DF7800C84C6C /* Metal.metal in Sources */,
 				2B0EEAA32565DF9A00C84C6C /* Font.swift in Sources */,
 				2B7C7EFD25DD0E0900727BC0 /* StoreManager.swift in Sources */,
+				2B995CD5274CA305009E976C /* AssetFolder.swift in Sources */,
 				2B0EEA652565DF3A00C84C6C /* ShaderManiaDocument.swift in Sources */,
 				2B0EEA942565DF7800C84C6C /* MetalStates.swift in Sources */,
 				2B0EEA8E2565DF7800C84C6C /* MathLibrary.swift in Sources */,
@@ -368,11 +405,14 @@
 				2B0EEA882565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA12565DF9A00C84C6C /* Classes.swift in Sources */,
 				2B36F66E25D3C8A0001611BE /* MetalDrawables.swift in Sources */,
+				2B995CD8274CB6BE009E976C /* PersistenceController.swift in Sources */,
 				2B0EEA842565DF7800C84C6C /* ContentView.swift in Sources */,
 				2B77B7BC25773978002D99C0 /* File.swift in Sources */,
 				2B0EEA632565DF3A00C84C6C /* ShaderManiaApp.swift in Sources */,
 				2B0EEA8C2565DF7800C84C6C /* Core.swift in Sources */,
 				2B36F66925D3BFCC001611BE /* NodesWidget.swift in Sources */,
+				2B995CDF274CB90E009E976C /* BrowserView.swift in Sources */,
+				2B995CDC274CB769009E976C /* DataModel.xcdatamodeld in Sources */,
 				2B0EEA902565DF7800C84C6C /* ScriptEditor.swift in Sources */,
 				2B0EEA9F2565DF9A00C84C6C /* Texture2D.swift in Sources */,
 				2B0EEABC2566035700C84C6C /* Project.swift in Sources */,
@@ -635,6 +675,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		2B995CD9274CB769009E976C /* DataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				2B995CDA274CB769009E976C /* DataModel.xcdatamodel */,
+			);
+			currentVersion = 2B995CDA274CB769009E976C /* DataModel.xcdatamodel */;
+			path = DataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 2B0EEA492565DF3900C84C6C /* Project object */;
 }

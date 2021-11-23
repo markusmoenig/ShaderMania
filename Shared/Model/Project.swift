@@ -36,7 +36,7 @@ class Project
     }
     
     func clear() {
-        if black != nil { black!.setPurgeableState(.empty); black = nil }
+        if black != nil { black!.setPurgeableState(.volatile); black = nil }
     }
     
     func collectShadersFor(assetFolder: AssetFolder, asset: Asset,_ collected: inout [Asset])
@@ -216,7 +216,7 @@ class Project
                 if preview == false {
                     if asset.texture == nil || asset.texture!.width != size.x || asset.texture!.height != size.y {
                         if asset.texture != nil {
-                            asset.texture!.setPurgeableState(.empty)
+                            asset.texture!.setPurgeableState(.volatile)
                             asset.texture = nil
                         }
                         asset.texture = allocateTexture(device, width: size.x, height: size.y)
@@ -348,7 +348,7 @@ class Project
     
     func makeCGIImage(_ device: MTLDevice,_ state: MTLComputePipelineState,_ texture: MTLTexture) -> MTLTexture?
     {
-        if temp != nil { temp!.setPurgeableState(.empty); temp = nil }
+        if temp != nil { temp!.setPurgeableState(.volatile); temp = nil }
 
         temp = allocateTexture(device, width: texture.width, height: texture.height)
         runComputeState(device, state, outTexture: temp!, inTexture: texture, syncronize: true)

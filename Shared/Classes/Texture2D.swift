@@ -56,7 +56,7 @@ class Texture2D                 : NSObject
     func allocateTexture(width: Int, height: Int)
     {
         if texture != nil {
-            texture!.setPurgeableState(.empty)
+            texture!.setPurgeableState(.volatile)
             texture = nil
         }
             

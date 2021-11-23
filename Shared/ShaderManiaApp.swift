@@ -11,6 +11,8 @@ import Combine
 @main
 struct ShaderManiaApp: App {
     
+    let persistenceController = PersistenceController.shared
+
     @StateObject var storeManager           = StoreManager()
 
     private let exportAsImage               = PassthroughSubject<Void, Never>()
@@ -19,6 +21,8 @@ struct ShaderManiaApp: App {
     var body: some Scene {
         DocumentGroup(newDocument: ShaderManiaDocument()) { file in
             ContentView(document: file.$document, storeManager: storeManager)
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+
                 .onReceive(exportAsImage) { _ in
                     file.document.exportImage.send()
                 }

@@ -13,6 +13,8 @@ import MobileCoreServices
 
 struct ContentView: View {
     
+    @Environment(\.managedObjectContext) var managedObjectContext
+
     enum EditingState {
         case Source, Nodes, Both
     }
@@ -66,7 +68,40 @@ struct ContentView: View {
                 ParameterListView(document: document, updateView: $updateView)
                     .frame(minWidth: leftPanelWidth, idealWidth: leftPanelWidth, maxWidth: leftPanelWidth)
                 
-                GeometryReader { geometry in
+                VStack(spacing: 0) {
+                    
+                    HSplitView {
+                        
+                        WebView(document.core, deviceColorScheme).tabItem {
+                        }
+                            .animation(.default)
+                            .onChange(of: deviceColorScheme) { newValue in
+                                document.core.scriptEditor?.setTheme(newValue)
+                            }
+                        
+                        VSplitView {
+                            
+                            MetalView(document.core, .Main)
+                                /*
+                                .frame(minWidth: 0,
+                                       maxWidth: geometry.size.width / document.core.previewFactor,
+                                       minHeight: 0,
+                                       maxHeight: geometry.size.height / document.core.previewFactor,
+                                       alignment: .topTrailing)
+                                 
+                                .opacity(helpIsVisible ? 0 : (document.core.state == .Running ? 1 : document.core.previewOpacity))
+                                 */
+                                //.animation(.default)
+                                //.allowsHitTesting(false)
+                            
+                            MetalView(document.core, .Nodes)
+                                //.animation(.default)
+                                .allowsHitTesting(true)
+                                //.frame(maxHeight: editingState == .Both ? geometry.size.height / 2.5 : geometry.size.height)
+                        }
+                    }
+                    
+                    /*
                     ZStack(alignment: .topTrailing) {
 
                         VStack(spacing: 2) {
@@ -118,8 +153,15 @@ struct ContentView: View {
                             .animation(.default)
                             .allowsHitTesting(false)
                     }
+                     */
+                    
+                    //if showBrowser {
+                        BrowserView(document: $document)
+                            .frame(maxHeight: 140)
+                    //}
                 }
             }
+            
             .toolbar {
                 ToolbarItemGroup(placement: .automatic) {
                     
@@ -155,7 +197,7 @@ struct ContentView: View {
                         updateView.toggle()
                     }) {
                         Label("Stop", systemImage: "stop.fill")
-                    }.keyboardShortcut("t")
+                    }.keyboardShortcut(".")
                     .disabled(document.core.state == .Idle)
                     
                     //Divider()
@@ -208,11 +250,12 @@ struct ContentView: View {
                 updateView.toggle()
             }
                 
+            /*
             if showLibrary == true {
                 LibraryView(document: document, updateView: $updateView)
                     .frame(minWidth: 220, idealWidth: 220, maxWidth: 220)
                     .animation(.easeInOut)
-            }
+            }*/
         }
         // For Mac Screenshots, 1440x900
         //.frame(minWidth: 1440, minHeight: 806)
@@ -263,6 +306,7 @@ struct ContentView: View {
 
                 Divider()
                 
+                /*
                 Text("Your User Nickname - Required")
                     .foregroundColor(Color.secondary)
                 TextField("Required", text: $userNickName, onEditingChanged: { (changed) in
@@ -279,6 +323,7 @@ struct ContentView: View {
                     document.core.library.userDescription = userDescription
                  }
                 .frame(minWidth: 300, minHeight: 60)
+                 */
                 
                 Button("Upload", action: {
                     document.core.library.uploadFolder()
@@ -588,11 +633,5 @@ struct ContentView: View {
                 .frame(minWidth: 200)
             }.padding()
         }
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView(document: .constant(ShaderManiaDocument()), storeManager: StoreManager())
     }
 }

@@ -61,7 +61,7 @@ class Font
     
     deinit {
         if let texture = atlas {
-            texture.setPurgeableState(.empty)
+            texture.setPurgeableState(.volatile)
             atlas = nil
             bmFont = nil
         }
