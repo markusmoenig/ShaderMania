@@ -6,7 +6,7 @@
 //
 
 import MetalKit
-
+/*
 struct BMChar       : Decodable {
     let id          : Int
     let index       : Int
@@ -147,3 +147,6 @@ class Font
         return rect;
     }
 }
+ 
+*/
+

@@ -30,7 +30,7 @@ class MetalDrawables
     var scaleFactor     : Float
     var viewSize        = float2(0,0)
     
-    var font            : Font! = nil
+    //var font            : Font! = nil
 
     init(_ metalView: DMTKView)
     {
@@ -86,7 +86,7 @@ class MetalDrawables
     
     @discardableResult func encodeStart(_ clearColor: float4 = float4(0.125, 0.129, 0.137, 1)) -> MTLRenderCommandEncoder?
     {
-        if font == nil { font = Font(name: "OpenSans", core: metalView.core) }
+        //if font == nil { font = Font(name: "OpenSans", core: metalView.core) }
         
         viewportSize = vector_uint2( UInt32(metalView.bounds.width), UInt32(metalView.bounds.height) )
         viewSize = float2(Float(metalView.bounds.width), Float(metalView.bounds.height))
@@ -240,7 +240,7 @@ class MetalDrawables
         renderEncoder.setRenderPipelineState(metalView.core.metalStates.getState(state: .DrawLine))
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
     }
-    
+    /*
     /// Draws the given text
     func drawText(position: float2, text: String, size: Float, color: float4 = float4(1,1,1,1))
     {
@@ -285,7 +285,7 @@ class MetalDrawables
                 }
             }
         }
-    }
+    }*/
     
     /// Creates vertex data for the given rectangle
     func createVertexData(_ rect: MMRect) -> [Float]

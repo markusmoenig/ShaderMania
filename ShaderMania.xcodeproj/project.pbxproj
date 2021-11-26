@@ -33,19 +33,13 @@
 		2B0EEA922565DF7800C84C6C /* Metal.metal in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA7F2565DF7800C84C6C /* Metal.metal */; };
 		2B0EEA932565DF7800C84C6C /* MetalStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA802565DF7800C84C6C /* MetalStates.swift */; };
 		2B0EEA942565DF7800C84C6C /* MetalStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA802565DF7800C84C6C /* MetalStates.swift */; };
-		2B0EEA9E2565DF9A00C84C6C /* Texture2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA9B2565DF9A00C84C6C /* Texture2D.swift */; };
-		2B0EEA9F2565DF9A00C84C6C /* Texture2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA9B2565DF9A00C84C6C /* Texture2D.swift */; };
 		2B0EEAA02565DF9A00C84C6C /* Classes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA9C2565DF9A00C84C6C /* Classes.swift */; };
 		2B0EEAA12565DF9A00C84C6C /* Classes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA9C2565DF9A00C84C6C /* Classes.swift */; };
-		2B0EEAA22565DF9A00C84C6C /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA9D2565DF9A00C84C6C /* Font.swift */; };
-		2B0EEAA32565DF9A00C84C6C /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA9D2565DF9A00C84C6C /* Font.swift */; };
 		2B0EEAA72565DFA800C84C6C /* Files in Resources */ = {isa = PBXBuildFile; fileRef = 2B0EEAA62565DFA800C84C6C /* Files */; };
 		2B0EEAA82565DFA800C84C6C /* Files in Resources */ = {isa = PBXBuildFile; fileRef = 2B0EEAA62565DFA800C84C6C /* Files */; };
 		2B0EEABB2566035700C84C6C /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEABA2566035700C84C6C /* Project.swift */; };
 		2B0EEABC2566035700C84C6C /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEABA2566035700C84C6C /* Project.swift */; };
 		2B0EEAC3256619D000C84C6C /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B0EEAC2256619D000C84C6C /* CloudKit.framework */; };
-		2B36F66825D3BFCC001611BE /* NodesWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66725D3BFCC001611BE /* NodesWidget.swift */; };
-		2B36F66925D3BFCC001611BE /* NodesWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66725D3BFCC001611BE /* NodesWidget.swift */; };
 		2B36F66D25D3C8A0001611BE /* MetalDrawables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */; };
 		2B36F66E25D3C8A0001611BE /* MetalDrawables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */; };
 		2B36F67625D4DE84001611BE /* OpenSans.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 2B36F67425D4DE84001611BE /* OpenSans.tiff */; };
@@ -70,6 +64,78 @@
 		2B995CDC274CB769009E976C /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CD9274CB769009E976C /* DataModel.xcdatamodeld */; };
 		2B995CDE274CB90E009E976C /* BrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CDD274CB90E009E976C /* BrowserView.swift */; };
 		2B995CDF274CB90E009E976C /* BrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CDD274CB90E009E976C /* BrowserView.swift */; };
+		2B995D00274E1C7C009E976C /* MMColorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE1274E1C7B009E976C /* MMColorWidget.swift */; };
+		2B995D01274E1C7C009E976C /* MMColorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE1274E1C7B009E976C /* MMColorWidget.swift */; };
+		2B995D02274E1C7C009E976C /* MMFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE2274E1C7B009E976C /* MMFile.swift */; };
+		2B995D03274E1C7C009E976C /* MMFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE2274E1C7B009E976C /* MMFile.swift */; };
+		2B995D04274E1C7C009E976C /* MMCompute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE3274E1C7B009E976C /* MMCompute.swift */; };
+		2B995D05274E1C7C009E976C /* MMCompute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE3274E1C7B009E976C /* MMCompute.swift */; };
+		2B995D06274E1C7C009E976C /* MMFloatPopUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE4274E1C7B009E976C /* MMFloatPopUp.swift */; };
+		2B995D07274E1C7C009E976C /* MMFloatPopUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE4274E1C7B009E976C /* MMFloatPopUp.swift */; };
+		2B995D08274E1C7C009E976C /* MMLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE5274E1C7B009E976C /* MMLabel.swift */; };
+		2B995D09274E1C7C009E976C /* MMLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE5274E1C7B009E976C /* MMLabel.swift */; };
+		2B995D0A274E1C7C009E976C /* MMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE6274E1C7B009E976C /* MMView.swift */; };
+		2B995D0B274E1C7C009E976C /* MMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE6274E1C7B009E976C /* MMView.swift */; };
+		2B995D0E274E1C7C009E976C /* MMAnimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE8274E1C7B009E976C /* MMAnimate.swift */; };
+		2B995D0F274E1C7C009E976C /* MMAnimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CE8274E1C7B009E976C /* MMAnimate.swift */; };
+		2B995D12274E1C7C009E976C /* MMUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CEA274E1C7B009E976C /* MMUtils.swift */; };
+		2B995D13274E1C7C009E976C /* MMUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CEA274E1C7B009E976C /* MMUtils.swift */; };
+		2B995D14274E1C7C009E976C /* MMDrawable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CEB274E1C7B009E976C /* MMDrawable.swift */; };
+		2B995D15274E1C7C009E976C /* MMDrawable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CEB274E1C7B009E976C /* MMDrawable.swift */; };
+		2B995D16274E1C7C009E976C /* MMSliderWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CEC274E1C7B009E976C /* MMSliderWidget.swift */; };
+		2B995D17274E1C7C009E976C /* MMSliderWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CEC274E1C7B009E976C /* MMSliderWidget.swift */; };
+		2B995D18274E1C7C009E976C /* MMTreeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CED274E1C7B009E976C /* MMTreeWidget.swift */; };
+		2B995D19274E1C7C009E976C /* MMTreeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CED274E1C7B009E976C /* MMTreeWidget.swift */; };
+		2B995D1A274E1C7C009E976C /* MMScrollArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CEE274E1C7B009E976C /* MMScrollArea.swift */; };
+		2B995D1B274E1C7C009E976C /* MMScrollArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CEE274E1C7B009E976C /* MMScrollArea.swift */; };
+		2B995D1C274E1C7C009E976C /* MMScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CEF274E1C7C009E976C /* MMScreen.swift */; };
+		2B995D1D274E1C7C009E976C /* MMScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CEF274E1C7C009E976C /* MMScreen.swift */; };
+		2B995D1E274E1C7C009E976C /* MMFloatWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF0274E1C7C009E976C /* MMFloatWidget.swift */; };
+		2B995D1F274E1C7C009E976C /* MMFloatWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF0274E1C7C009E976C /* MMFloatWidget.swift */; };
+		2B995D20274E1C7C009E976C /* MMSkin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF1274E1C7C009E976C /* MMSkin.swift */; };
+		2B995D21274E1C7C009E976C /* MMSkin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF1274E1C7C009E976C /* MMSkin.swift */; };
+		2B995D23274E1C7C009E976C /* MMBaseView_mac.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF2274E1C7C009E976C /* MMBaseView_mac.swift */; };
+		2B995D24274E1C7C009E976C /* MMBaseView__ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF3274E1C7C009E976C /* MMBaseView__ios.swift */; };
+		2B995D26274E1C7C009E976C /* MMRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF4274E1C7C009E976C /* MMRenderer.swift */; };
+		2B995D27274E1C7C009E976C /* MMRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF4274E1C7C009E976C /* MMRenderer.swift */; };
+		2B995D28274E1C7C009E976C /* MMWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF5274E1C7C009E976C /* MMWidget.swift */; };
+		2B995D29274E1C7C009E976C /* MMWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF5274E1C7C009E976C /* MMWidget.swift */; };
+		2B995D2A274E1C7C009E976C /* MMInfoArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF6274E1C7C009E976C /* MMInfoArea.swift */; };
+		2B995D2B274E1C7C009E976C /* MMInfoArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF6274E1C7C009E976C /* MMInfoArea.swift */; };
+		2B995D2C274E1C7C009E976C /* MMRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF7274E1C7C009E976C /* MMRegion.swift */; };
+		2B995D2D274E1C7C009E976C /* MMRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF7274E1C7C009E976C /* MMRegion.swift */; };
+		2B995D2E274E1C7C009E976C /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 2B995CF8274E1C7C009E976C /* Fonts */; };
+		2B995D2F274E1C7C009E976C /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 2B995CF8274E1C7C009E976C /* Fonts */; };
+		2B995D30274E1C7C009E976C /* MMTabWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF9274E1C7C009E976C /* MMTabWidget.swift */; };
+		2B995D31274E1C7C009E976C /* MMTabWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CF9274E1C7C009E976C /* MMTabWidget.swift */; };
+		2B995D32274E1C7C009E976C /* MMScrollButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CFA274E1C7C009E976C /* MMScrollButton.swift */; };
+		2B995D33274E1C7C009E976C /* MMScrollButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CFA274E1C7C009E976C /* MMScrollButton.swift */; };
+		2B995D34274E1C7C009E976C /* MMTabButtonWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CFB274E1C7C009E976C /* MMTabButtonWidget.swift */; };
+		2B995D35274E1C7C009E976C /* MMTabButtonWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CFB274E1C7C009E976C /* MMTabButtonWidget.swift */; };
+		2B995D36274E1C7C009E976C /* MMFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CFC274E1C7C009E976C /* MMFragment.swift */; };
+		2B995D37274E1C7C009E976C /* MMFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CFC274E1C7C009E976C /* MMFragment.swift */; };
+		2B995D38274E1C7C009E976C /* MMListWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CFD274E1C7C009E976C /* MMListWidget.swift */; };
+		2B995D39274E1C7C009E976C /* MMListWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CFD274E1C7C009E976C /* MMListWidget.swift */; };
+		2B995D3A274E1C7C009E976C /* MMTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CFE274E1C7C009E976C /* MMTimeline.swift */; };
+		2B995D3B274E1C7C009E976C /* MMTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CFE274E1C7C009E976C /* MMTimeline.swift */; };
+		2B995D3C274E1C7C009E976C /* MMFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CFF274E1C7C009E976C /* MMFont.swift */; };
+		2B995D3D274E1C7C009E976C /* MMFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B995CFF274E1C7C009E976C /* MMFont.swift */; };
+		2BC6A3A2274F21FF00F8A500 /* MetalManiaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A1274F21FF00F8A500 /* MetalManiaView.swift */; };
+		2BC6A3A3274F21FF00F8A500 /* MetalManiaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A1274F21FF00F8A500 /* MetalManiaView.swift */; };
+		2BC6A3B1274F342A00F8A500 /* NodeGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A5274F342A00F8A500 /* NodeGraph.swift */; };
+		2BC6A3B2274F342A00F8A500 /* NodeGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A5274F342A00F8A500 /* NodeGraph.swift */; };
+		2BC6A3B5274F342A00F8A500 /* Behavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A7274F342A00F8A500 /* Behavior.swift */; };
+		2BC6A3B6274F342A00F8A500 /* Behavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A7274F342A00F8A500 /* Behavior.swift */; };
+		2BC6A3B9274F342A00F8A500 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A9274F342A00F8A500 /* Node.swift */; };
+		2BC6A3BA274F342A00F8A500 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A9274F342A00F8A500 /* Node.swift */; };
+		2BC6A3BD274F342A00F8A500 /* NodeUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AB274F342A00F8A500 /* NodeUI.swift */; };
+		2BC6A3BE274F342A00F8A500 /* NodeUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AB274F342A00F8A500 /* NodeUI.swift */; };
+		2BC6A3C3274F342A00F8A500 /* Node.metal in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AE274F342A00F8A500 /* Node.metal */; };
+		2BC6A3C4274F342A00F8A500 /* Node.metal in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AE274F342A00F8A500 /* Node.metal */; };
+		2BC6A3C5274F342A00F8A500 /* Variables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AF274F342A00F8A500 /* Variables.swift */; };
+		2BC6A3C6274F342A00F8A500 /* Variables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AF274F342A00F8A500 /* Variables.swift */; };
+		2BC6A3CA27506B3200F8A500 /* NodeRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3C927506B3200F8A500 /* NodeRegion.swift */; };
+		2BC6A3CB27506B3200F8A500 /* NodeRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3C927506B3200F8A500 /* NodeRegion.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -113,6 +179,50 @@
 		2B995CD6274CB6BE009E976C /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		2B995CDA274CB769009E976C /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
 		2B995CDD274CB90E009E976C /* BrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserView.swift; sourceTree = "<group>"; };
+		2B995CE1274E1C7B009E976C /* MMColorWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMColorWidget.swift; sourceTree = "<group>"; };
+		2B995CE2274E1C7B009E976C /* MMFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFile.swift; sourceTree = "<group>"; };
+		2B995CE3274E1C7B009E976C /* MMCompute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMCompute.swift; sourceTree = "<group>"; };
+		2B995CE4274E1C7B009E976C /* MMFloatPopUp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFloatPopUp.swift; sourceTree = "<group>"; };
+		2B995CE5274E1C7B009E976C /* MMLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMLabel.swift; sourceTree = "<group>"; };
+		2B995CE6274E1C7B009E976C /* MMView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMView.swift; sourceTree = "<group>"; };
+		2B995CE7274E1C7B009E976C /* MMBaseView__tvos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMBaseView__tvos.swift; sourceTree = "<group>"; };
+		2B995CE8274E1C7B009E976C /* MMAnimate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMAnimate.swift; sourceTree = "<group>"; };
+		2B995CEA274E1C7B009E976C /* MMUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMUtils.swift; sourceTree = "<group>"; };
+		2B995CEB274E1C7B009E976C /* MMDrawable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMDrawable.swift; sourceTree = "<group>"; };
+		2B995CEC274E1C7B009E976C /* MMSliderWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMSliderWidget.swift; sourceTree = "<group>"; };
+		2B995CED274E1C7B009E976C /* MMTreeWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMTreeWidget.swift; sourceTree = "<group>"; };
+		2B995CEE274E1C7B009E976C /* MMScrollArea.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMScrollArea.swift; sourceTree = "<group>"; };
+		2B995CEF274E1C7C009E976C /* MMScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMScreen.swift; sourceTree = "<group>"; };
+		2B995CF0274E1C7C009E976C /* MMFloatWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFloatWidget.swift; sourceTree = "<group>"; };
+		2B995CF1274E1C7C009E976C /* MMSkin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMSkin.swift; sourceTree = "<group>"; };
+		2B995CF2274E1C7C009E976C /* MMBaseView_mac.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMBaseView_mac.swift; sourceTree = "<group>"; };
+		2B995CF3274E1C7C009E976C /* MMBaseView__ios.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMBaseView__ios.swift; sourceTree = "<group>"; };
+		2B995CF4274E1C7C009E976C /* MMRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMRenderer.swift; sourceTree = "<group>"; };
+		2B995CF5274E1C7C009E976C /* MMWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMWidget.swift; sourceTree = "<group>"; };
+		2B995CF6274E1C7C009E976C /* MMInfoArea.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMInfoArea.swift; sourceTree = "<group>"; };
+		2B995CF7274E1C7C009E976C /* MMRegion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMRegion.swift; sourceTree = "<group>"; };
+		2B995CF8274E1C7C009E976C /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
+		2B995CF9274E1C7C009E976C /* MMTabWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMTabWidget.swift; sourceTree = "<group>"; };
+		2B995CFA274E1C7C009E976C /* MMScrollButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMScrollButton.swift; sourceTree = "<group>"; };
+		2B995CFB274E1C7C009E976C /* MMTabButtonWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMTabButtonWidget.swift; sourceTree = "<group>"; };
+		2B995CFC274E1C7C009E976C /* MMFragment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFragment.swift; sourceTree = "<group>"; };
+		2B995CFD274E1C7C009E976C /* MMListWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMListWidget.swift; sourceTree = "<group>"; };
+		2B995CFE274E1C7C009E976C /* MMTimeline.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMTimeline.swift; sourceTree = "<group>"; };
+		2B995CFF274E1C7C009E976C /* MMFont.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFont.swift; sourceTree = "<group>"; };
+		2BC6A3A1274F21FF00F8A500 /* MetalManiaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalManiaView.swift; sourceTree = "<group>"; };
+		2BC6A3A5274F342A00F8A500 /* NodeGraph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeGraph.swift; sourceTree = "<group>"; };
+		2BC6A3A6274F342A00F8A500 /* ObjectNodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectNodes.swift; sourceTree = "<group>"; };
+		2BC6A3A7274F342A00F8A500 /* Behavior.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Behavior.swift; sourceTree = "<group>"; };
+		2BC6A3A8274F342A00F8A500 /* SceneNodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneNodes.swift; sourceTree = "<group>"; };
+		2BC6A3A9274F342A00F8A500 /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
+		2BC6A3AA274F342A00F8A500 /* GameNodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameNodes.swift; sourceTree = "<group>"; };
+		2BC6A3AB274F342A00F8A500 /* NodeUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeUI.swift; sourceTree = "<group>"; };
+		2BC6A3AC274F342A00F8A500 /* BehaviorLeaves.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BehaviorLeaves.swift; sourceTree = "<group>"; };
+		2BC6A3AD274F342A00F8A500 /* NodeList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeList.swift; sourceTree = "<group>"; };
+		2BC6A3AE274F342A00F8A500 /* Node.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Node.metal; sourceTree = "<group>"; };
+		2BC6A3AF274F342A00F8A500 /* Variables.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Variables.swift; sourceTree = "<group>"; };
+		2BC6A3B0274F342A00F8A500 /* ReferenceList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReferenceList.swift; sourceTree = "<group>"; };
+		2BC6A3C927506B3200F8A500 /* NodeRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeRegion.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,6 +265,7 @@
 				2B0EEA772565DF7800C84C6C /* ContentView.swift */,
 				2B995CD2274C6FEA009E976C /* Model */,
 				2B995CD1274C6FD1009E976C /* Views */,
+				2BC6A3A4274F341400F8A500 /* Nodes */,
 				2B3D4C7825A68ECA00D2F8EA /* Views.swift */,
 				2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */,
 				2B7C7EEB25DCB5D400727BC0 /* Library.swift */,
@@ -169,6 +280,7 @@
 				2B0EEA7E2565DF7800C84C6C /* ScriptEditor.swift */,
 				2B0EEA7B2565DF7800C84C6C /* Utils.swift */,
 				2B77B7BA25773978002D99C0 /* File.swift */,
+				2B995CE0274E1C4A009E976C /* MetalMania */,
 				2B0EEA9A2565DF9A00C84C6C /* Classes */,
 				2B36F67325D4DE53001611BE /* Fonts */,
 				2B0EEAA62565DFA800C84C6C /* Files */,
@@ -238,6 +350,7 @@
 			isa = PBXGroup;
 			children = (
 				2B995CDD274CB90E009E976C /* BrowserView.swift */,
+				2BC6A3A1274F21FF00F8A500 /* MetalManiaView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -252,6 +365,63 @@
 				2B995CD9274CB769009E976C /* DataModel.xcdatamodeld */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		2B995CE0274E1C4A009E976C /* MetalMania */ = {
+			isa = PBXGroup;
+			children = (
+				2B995CF8274E1C7C009E976C /* Fonts */,
+				2B995CE8274E1C7B009E976C /* MMAnimate.swift */,
+				2B995CF3274E1C7C009E976C /* MMBaseView__ios.swift */,
+				2B995CE7274E1C7B009E976C /* MMBaseView__tvos.swift */,
+				2B995CF2274E1C7C009E976C /* MMBaseView_mac.swift */,
+				2B995CE1274E1C7B009E976C /* MMColorWidget.swift */,
+				2B995CE3274E1C7B009E976C /* MMCompute.swift */,
+				2B995CEB274E1C7B009E976C /* MMDrawable.swift */,
+				2B995CE2274E1C7B009E976C /* MMFile.swift */,
+				2B995CE4274E1C7B009E976C /* MMFloatPopUp.swift */,
+				2B995CF0274E1C7C009E976C /* MMFloatWidget.swift */,
+				2B995CFF274E1C7C009E976C /* MMFont.swift */,
+				2B995CFC274E1C7C009E976C /* MMFragment.swift */,
+				2B995CF6274E1C7C009E976C /* MMInfoArea.swift */,
+				2B995CE5274E1C7B009E976C /* MMLabel.swift */,
+				2B995CFD274E1C7C009E976C /* MMListWidget.swift */,
+				2B995CF7274E1C7C009E976C /* MMRegion.swift */,
+				2B995CF4274E1C7C009E976C /* MMRenderer.swift */,
+				2B995CEF274E1C7C009E976C /* MMScreen.swift */,
+				2B995CEE274E1C7B009E976C /* MMScrollArea.swift */,
+				2B995CFA274E1C7C009E976C /* MMScrollButton.swift */,
+				2B995CF1274E1C7C009E976C /* MMSkin.swift */,
+				2B995CEC274E1C7B009E976C /* MMSliderWidget.swift */,
+				2B995CFB274E1C7C009E976C /* MMTabButtonWidget.swift */,
+				2B995CF9274E1C7C009E976C /* MMTabWidget.swift */,
+				2B995CFE274E1C7C009E976C /* MMTimeline.swift */,
+				2B995CED274E1C7B009E976C /* MMTreeWidget.swift */,
+				2B995CEA274E1C7B009E976C /* MMUtils.swift */,
+				2B995CE6274E1C7B009E976C /* MMView.swift */,
+				2B995CF5274E1C7C009E976C /* MMWidget.swift */,
+			);
+			path = MetalMania;
+			sourceTree = "<group>";
+		};
+		2BC6A3A4274F341400F8A500 /* Nodes */ = {
+			isa = PBXGroup;
+			children = (
+				2BC6A3C927506B3200F8A500 /* NodeRegion.swift */,
+				2BC6A3A7274F342A00F8A500 /* Behavior.swift */,
+				2BC6A3AC274F342A00F8A500 /* BehaviorLeaves.swift */,
+				2BC6A3AA274F342A00F8A500 /* GameNodes.swift */,
+				2BC6A3AE274F342A00F8A500 /* Node.metal */,
+				2BC6A3A9274F342A00F8A500 /* Node.swift */,
+				2BC6A3A5274F342A00F8A500 /* NodeGraph.swift */,
+				2BC6A3AD274F342A00F8A500 /* NodeList.swift */,
+				2BC6A3AB274F342A00F8A500 /* NodeUI.swift */,
+				2BC6A3A6274F342A00F8A500 /* ObjectNodes.swift */,
+				2BC6A3B0274F342A00F8A500 /* ReferenceList.swift */,
+				2BC6A3A8274F342A00F8A500 /* SceneNodes.swift */,
+				2BC6A3AF274F342A00F8A500 /* Variables.swift */,
+			);
+			path = Nodes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -334,6 +504,7 @@
 			files = (
 				2B36F67825D4DE84001611BE /* OpenSans.json in Resources */,
 				2B0EEAA72565DFA800C84C6C /* Files in Resources */,
+				2B995D2E274E1C7C009E976C /* Fonts in Resources */,
 				2B36F67625D4DE84001611BE /* OpenSans.tiff in Resources */,
 				2B0EEA682565DF3A00C84C6C /* Assets.xcassets in Resources */,
 			);
@@ -345,6 +516,7 @@
 			files = (
 				2B36F67925D4DE84001611BE /* OpenSans.json in Resources */,
 				2B0EEAA82565DFA800C84C6C /* Files in Resources */,
+				2B995D2F274E1C7C009E976C /* Fonts in Resources */,
 				2B36F67725D4DE84001611BE /* OpenSans.tiff in Resources */,
 				2B0EEA692565DF3A00C84C6C /* Assets.xcassets in Resources */,
 			);
@@ -358,31 +530,63 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B0EEA812565DF7800C84C6C /* MetalView.swift in Sources */,
+				2B995D18274E1C7C009E976C /* MMTreeWidget.swift in Sources */,
+				2B995D06274E1C7C009E976C /* MMFloatPopUp.swift in Sources */,
+				2B995D26274E1C7C009E976C /* MMRenderer.swift in Sources */,
 				2B0EEA912565DF7800C84C6C /* Metal.metal in Sources */,
-				2B0EEAA22565DF9A00C84C6C /* Font.swift in Sources */,
+				2B995D08274E1C7C009E976C /* MMLabel.swift in Sources */,
 				2B7C7EFC25DD0E0900727BC0 /* StoreManager.swift in Sources */,
+				2B995D34274E1C7C009E976C /* MMTabButtonWidget.swift in Sources */,
 				2B995CD4274CA305009E976C /* AssetFolder.swift in Sources */,
+				2B995D14274E1C7C009E976C /* MMDrawable.swift in Sources */,
+				2BC6A3A2274F21FF00F8A500 /* MetalManiaView.swift in Sources */,
 				2B0EEA642565DF3A00C84C6C /* ShaderManiaDocument.swift in Sources */,
 				2B0EEA932565DF7800C84C6C /* MetalStates.swift in Sources */,
+				2BC6A3CA27506B3200F8A500 /* NodeRegion.swift in Sources */,
 				2B0EEA8D2565DF7800C84C6C /* MathLibrary.swift in Sources */,
+				2BC6A3B5274F342A00F8A500 /* Behavior.swift in Sources */,
+				2BC6A3B1274F342A00F8A500 /* NodeGraph.swift in Sources */,
+				2B995D12274E1C7C009E976C /* MMUtils.swift in Sources */,
+				2B995D32274E1C7C009E976C /* MMScrollButton.swift in Sources */,
+				2B995D3A274E1C7C009E976C /* MMTimeline.swift in Sources */,
 				2B0EEA852565DF7800C84C6C /* Asset.swift in Sources */,
 				2B0EEA892565DF7800C84C6C /* Utils.swift in Sources */,
+				2B995D00274E1C7C009E976C /* MMColorWidget.swift in Sources */,
+				2B995D16274E1C7C009E976C /* MMSliderWidget.swift in Sources */,
 				2B7C7EEC25DCB5D400727BC0 /* Library.swift in Sources */,
 				2B3D4C7925A68ECA00D2F8EA /* Views.swift in Sources */,
+				2BC6A3B9274F342A00F8A500 /* Node.swift in Sources */,
+				2B995D02274E1C7C009E976C /* MMFile.swift in Sources */,
+				2BC6A3C5274F342A00F8A500 /* Variables.swift in Sources */,
+				2B995D3C274E1C7C009E976C /* MMFont.swift in Sources */,
 				2B0EEA872565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA02565DF9A00C84C6C /* Classes.swift in Sources */,
 				2B36F66D25D3C8A0001611BE /* MetalDrawables.swift in Sources */,
 				2B995CD7274CB6BE009E976C /* PersistenceController.swift in Sources */,
+				2B995D04274E1C7C009E976C /* MMCompute.swift in Sources */,
 				2B0EEA832565DF7800C84C6C /* ContentView.swift in Sources */,
 				2B77B7BB25773978002D99C0 /* File.swift in Sources */,
+				2B995D28274E1C7C009E976C /* MMWidget.swift in Sources */,
+				2BC6A3C3274F342A00F8A500 /* Node.metal in Sources */,
 				2B0EEA622565DF3A00C84C6C /* ShaderManiaApp.swift in Sources */,
+				2B995D2A274E1C7C009E976C /* MMInfoArea.swift in Sources */,
+				2BC6A3BD274F342A00F8A500 /* NodeUI.swift in Sources */,
 				2B0EEA8B2565DF7800C84C6C /* Core.swift in Sources */,
-				2B36F66825D3BFCC001611BE /* NodesWidget.swift in Sources */,
 				2B995CDE274CB90E009E976C /* BrowserView.swift in Sources */,
+				2B995D36274E1C7C009E976C /* MMFragment.swift in Sources */,
+				2B995D38274E1C7C009E976C /* MMListWidget.swift in Sources */,
 				2B995CDB274CB769009E976C /* DataModel.xcdatamodeld in Sources */,
+				2B995D1E274E1C7C009E976C /* MMFloatWidget.swift in Sources */,
+				2B995D30274E1C7C009E976C /* MMTabWidget.swift in Sources */,
+				2B995D20274E1C7C009E976C /* MMSkin.swift in Sources */,
+				2B995D0A274E1C7C009E976C /* MMView.swift in Sources */,
+				2B995D2C274E1C7C009E976C /* MMRegion.swift in Sources */,
 				2B0EEA8F2565DF7800C84C6C /* ScriptEditor.swift in Sources */,
-				2B0EEA9E2565DF9A00C84C6C /* Texture2D.swift in Sources */,
+				2B995D24274E1C7C009E976C /* MMBaseView__ios.swift in Sources */,
+				2B995D1C274E1C7C009E976C /* MMScreen.swift in Sources */,
+				2B995D1A274E1C7C009E976C /* MMScrollArea.swift in Sources */,
 				2B0EEABB2566035700C84C6C /* Project.swift in Sources */,
+				2B995D0E274E1C7C009E976C /* MMAnimate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -391,31 +595,63 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B0EEA822565DF7800C84C6C /* MetalView.swift in Sources */,
+				2B995D19274E1C7C009E976C /* MMTreeWidget.swift in Sources */,
+				2B995D07274E1C7C009E976C /* MMFloatPopUp.swift in Sources */,
+				2B995D27274E1C7C009E976C /* MMRenderer.swift in Sources */,
 				2B0EEA922565DF7800C84C6C /* Metal.metal in Sources */,
-				2B0EEAA32565DF9A00C84C6C /* Font.swift in Sources */,
+				2B995D09274E1C7C009E976C /* MMLabel.swift in Sources */,
 				2B7C7EFD25DD0E0900727BC0 /* StoreManager.swift in Sources */,
+				2B995D35274E1C7C009E976C /* MMTabButtonWidget.swift in Sources */,
 				2B995CD5274CA305009E976C /* AssetFolder.swift in Sources */,
+				2B995D15274E1C7C009E976C /* MMDrawable.swift in Sources */,
+				2BC6A3A3274F21FF00F8A500 /* MetalManiaView.swift in Sources */,
 				2B0EEA652565DF3A00C84C6C /* ShaderManiaDocument.swift in Sources */,
 				2B0EEA942565DF7800C84C6C /* MetalStates.swift in Sources */,
+				2BC6A3CB27506B3200F8A500 /* NodeRegion.swift in Sources */,
 				2B0EEA8E2565DF7800C84C6C /* MathLibrary.swift in Sources */,
+				2BC6A3B6274F342A00F8A500 /* Behavior.swift in Sources */,
+				2BC6A3B2274F342A00F8A500 /* NodeGraph.swift in Sources */,
+				2B995D13274E1C7C009E976C /* MMUtils.swift in Sources */,
+				2B995D33274E1C7C009E976C /* MMScrollButton.swift in Sources */,
+				2B995D3B274E1C7C009E976C /* MMTimeline.swift in Sources */,
 				2B0EEA862565DF7800C84C6C /* Asset.swift in Sources */,
 				2B0EEA8A2565DF7800C84C6C /* Utils.swift in Sources */,
+				2B995D01274E1C7C009E976C /* MMColorWidget.swift in Sources */,
+				2B995D17274E1C7C009E976C /* MMSliderWidget.swift in Sources */,
 				2B7C7EED25DCB5D400727BC0 /* Library.swift in Sources */,
 				2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */,
+				2BC6A3BA274F342A00F8A500 /* Node.swift in Sources */,
+				2B995D03274E1C7C009E976C /* MMFile.swift in Sources */,
+				2BC6A3C6274F342A00F8A500 /* Variables.swift in Sources */,
+				2B995D3D274E1C7C009E976C /* MMFont.swift in Sources */,
 				2B0EEA882565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA12565DF9A00C84C6C /* Classes.swift in Sources */,
 				2B36F66E25D3C8A0001611BE /* MetalDrawables.swift in Sources */,
 				2B995CD8274CB6BE009E976C /* PersistenceController.swift in Sources */,
+				2B995D05274E1C7C009E976C /* MMCompute.swift in Sources */,
 				2B0EEA842565DF7800C84C6C /* ContentView.swift in Sources */,
 				2B77B7BC25773978002D99C0 /* File.swift in Sources */,
+				2B995D29274E1C7C009E976C /* MMWidget.swift in Sources */,
+				2BC6A3C4274F342A00F8A500 /* Node.metal in Sources */,
 				2B0EEA632565DF3A00C84C6C /* ShaderManiaApp.swift in Sources */,
+				2B995D2B274E1C7C009E976C /* MMInfoArea.swift in Sources */,
+				2BC6A3BE274F342A00F8A500 /* NodeUI.swift in Sources */,
 				2B0EEA8C2565DF7800C84C6C /* Core.swift in Sources */,
-				2B36F66925D3BFCC001611BE /* NodesWidget.swift in Sources */,
 				2B995CDF274CB90E009E976C /* BrowserView.swift in Sources */,
+				2B995D37274E1C7C009E976C /* MMFragment.swift in Sources */,
+				2B995D39274E1C7C009E976C /* MMListWidget.swift in Sources */,
 				2B995CDC274CB769009E976C /* DataModel.xcdatamodeld in Sources */,
+				2B995D1F274E1C7C009E976C /* MMFloatWidget.swift in Sources */,
+				2B995D31274E1C7C009E976C /* MMTabWidget.swift in Sources */,
+				2B995D21274E1C7C009E976C /* MMSkin.swift in Sources */,
+				2B995D0B274E1C7C009E976C /* MMView.swift in Sources */,
+				2B995D2D274E1C7C009E976C /* MMRegion.swift in Sources */,
 				2B0EEA902565DF7800C84C6C /* ScriptEditor.swift in Sources */,
-				2B0EEA9F2565DF9A00C84C6C /* Texture2D.swift in Sources */,
+				2B995D1D274E1C7C009E976C /* MMScreen.swift in Sources */,
+				2B995D23274E1C7C009E976C /* MMBaseView_mac.swift in Sources */,
+				2B995D1B274E1C7C009E976C /* MMScrollArea.swift in Sources */,
 				2B0EEABC2566035700C84C6C /* Project.swift in Sources */,
+				2B995D0F274E1C7C009E976C /* MMAnimate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

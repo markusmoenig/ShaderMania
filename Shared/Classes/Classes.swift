@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+/*
 class Float4
 {
     var x           : Float = 1
@@ -185,3 +185,4 @@ class Rect2D
         self.height = height
     }
 }
+*/

@@ -310,7 +310,7 @@ class Library
                 }
             }
         }
-        core.nodesWidget.update()
+        //core.nodesWidget.update()
         core.contentChanged.send()
     }
 }

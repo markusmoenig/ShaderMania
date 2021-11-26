@@ -22,9 +22,10 @@ struct Float3ColorParameterView: View {
         self._parameter = State(initialValue: parameter)
         self._updateView = updateView
         
+        /*
         if let node = document.core.nodesWidget.currentNode {
             self._value = State(initialValue: Color(.sRGB, red: Double(node.shaderData[parameter.index].x), green: Double(node.shaderData[parameter.index].y), blue: Double(node.shaderData[parameter.index].z)))
-        }
+        }*/
     }
 
     var body: some View {
@@ -37,12 +38,13 @@ struct Float3ColorParameterView: View {
                     .onChange(of: value) { newValue in
                         if let cgColor = newValue.cgColor {
                             let v = float3(Float(cgColor.components![0]), Float(cgColor.components![1]), Float(cgColor.components![2]))
+                            /*
                             if let node = document.core.nodesWidget.currentNode {
                                 node.shaderData[parameter.index].x = v.x
                                 node.shaderData[parameter.index].y = v.y
                                 node.shaderData[parameter.index].z = v.z
                             }
-                            document.core.nodesWidget.update()
+                            document.core.nodesWidget.update()*/
                         }
                     }
             }
@@ -65,10 +67,11 @@ struct FloatSliderParameterView: View {
         self._parameter = State(initialValue: parameter)
         self._updateView = updateView
         
+        /*
         if let node = document.core.nodesWidget.currentNode {
             self._value = State(initialValue: Double(node.shaderData[parameter.index].x))
             self._valueText = State(initialValue: String(format: "%.02f", node.shaderData[parameter.index].x))
-        }
+        }*/
     }
 
     var body: some View {
@@ -80,10 +83,11 @@ struct FloatSliderParameterView: View {
                     value = v
                     valueText = String(format: "%.02f", v)
 
+                    /*
                     if let node = document.core.nodesWidget.currentNode {
                         node.shaderData[parameter.index].x = Float(v)
                         document.core.nodesWidget.update()
-                    }
+                    }*/
                 }), in: Double(parameter.min)...Double(parameter.max))//, step: Double(parameter.step))
                 Text(valueText)
                     .frame(maxWidth: 40)

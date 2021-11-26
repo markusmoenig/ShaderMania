@@ -7,6 +7,7 @@
 
 import MetalKit
 
+/*
 class Texture2D                 : NSObject
 {
     var texture                 : MTLTexture!
@@ -434,3 +435,5 @@ class Texture2D                 : NSObject
         }
     }
 }
+
+*/

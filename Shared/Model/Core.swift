@@ -20,9 +20,12 @@ public class Core       : ObservableObject
     var view            : DMTKView!
     var device          : MTLDevice!
 
-    var nodesView       : DMTKView!
+    // MetalMania based Node system
+    var nodeView        : MMView!
+    var nodeGraph       : NodeGraph!
+    var nodeRegion      : MMRegion!
 
-    var texture         : Texture2D? = nil
+    //var texture         : Texture2D? = nil
     var metalStates     : MetalStates!
     
     var file            : File? = nil
@@ -47,10 +50,10 @@ public class Core       : ObservableObject
         
     var resources       : [AnyObject] = []
     var availableFonts  : [String] = ["OpenSans", "Square", "SourceCodePro"]
-    var fonts           : [Font] = []
+    //var fonts           : [Font] = []
     
-    var _Time           = Float1(0)
-    var _Aspect         = Float2(1,1)
+    //var _Time           = Float1(0)
+    //var _Aspect         = Float2(1,1)
     var _Frame          = UInt32(0)
     var targetFPS       : Float = 60
     
@@ -87,7 +90,7 @@ public class Core       : ObservableObject
     
     var project         : Project? = nil
     
-    var nodesWidget     : NodesWidget!
+    //var nodesWidget     : NodesWidget!
     var library         : Library!
     
     public init(_ frameworkId: String? = nil)
@@ -151,13 +154,22 @@ public class Core       : ObservableObject
         library.requestShaders()
     }
     
-    public func setupNodesView(_ view: DMTKView)
+    public func setupNodesView(_ view: MMView)
     {
+        view.startup()
         view.platformInit()
 
-        nodesView = view
-        view.core = self
-        nodesWidget = NodesWidget(self)
+        nodeView = view
+        
+        nodeGraph = NodeGraph()
+        nodeGraph.setup(self)
+        
+        nodeRegion = EditorRegion(view, core: self )
+        
+        view.editorRegion = nodeRegion
+        
+        //view.core = self
+        //nodesWidget = NodesWidget(self)
     }
     
     public func load(_ data: Data)
@@ -177,14 +189,14 @@ public class Core       : ObservableObject
         assetError.error = nil
         state = .Running
         
-        _Aspect.x = 1
-        _Aspect.y = 1
+        //_Aspect.x = 1
+        //_Aspect.y = 1
 
         state = .Running
         view.enableSetNeedsDisplay = false
         view.isPaused = false
             
-        _Time.x = 0
+        //_Time.x = 0
         targetFPS = 60
         _Frame = 0
         
@@ -211,20 +223,22 @@ public class Core       : ObservableObject
         state = .Idle
         view.isPaused = true
         
-        _Time.x = 0
+        //_Time.x = 0
         _Frame = 0
         //timeChanged.send(_Time.x)
     }
     
     @discardableResult func checkTexture() -> Bool
     {
+        /*
         if texture == nil || texture!.texture.width != Int(view.frame.width) || texture!.texture.height != Int(view.frame.height) {
             
+            /*
             if texture == nil {
                 texture = Texture2D(self)
             } else {
                 texture?.allocateTexture(width: Int(view.frame.width), height: Int(view.frame.height))
-            }
+            }*/
             
             viewportSize.x = UInt32(texture!.width)
             viewportSize.y = UInt32(texture!.height)
@@ -238,7 +252,7 @@ public class Core       : ObservableObject
             //    map.setup(core: self)
             //}
             return true
-        }
+        }*/
         return false
     }
     
@@ -247,7 +261,7 @@ public class Core       : ObservableObject
         guard let drawable = view.currentDrawable else {
             return
         }
-                
+        /*
         if state == .Idle {
             if let asset = assetFolder.current {
                 if asset.type == .Texture {
@@ -311,10 +325,12 @@ public class Core       : ObservableObject
             _Time.x += 1.0 / targetFPS
             _Frame += 1
         }
+         */
     }
     
     func updateNodePreview()
     {
+        /*
         if let asset = nodesWidget.currentNode {
             if asset.type == .Shader {
                 project?.startDrawing(device)
@@ -326,7 +342,7 @@ public class Core       : ObservableObject
                     project?.createImageTexture(asset, preview: true, device: device)
                 }
             }
-        }
+        }*/
     }
     
     func startDrawing()
@@ -350,6 +366,7 @@ public class Core       : ObservableObject
     /// Create a preview for the current asset
     func createPreview(_ asset: Asset,_ update: Bool = true)
     {
+        /*
         if state == .Idle {
             //clearLocalAudio()
             if asset.type == .Shader {
@@ -464,6 +481,7 @@ public class Core       : ObservableObject
                 }
             }
         }
+         */
     }
     
     /// Clears all local audio
@@ -525,6 +543,7 @@ public class Core       : ObservableObject
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
     }
     
+    /*
     /// Creates vertex data for the given rectangle
     func createVertexData(texture: Texture2D, rect: MMRect) -> [Float]
     {
@@ -545,7 +564,7 @@ public class Core       : ObservableObject
         ]
         
         return quadVertices
-    }
+    }*/
     
     /// Creates vertex data for the given rectangle
     func createVertexData(texture: MTLTexture, rect: MMRect) -> [Float]

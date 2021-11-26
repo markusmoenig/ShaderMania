@@ -73,12 +73,12 @@ public class DMTKView       : MTKView
         
     override public func mouseDown(with event: NSEvent) {
         setMousePos(event)
-        core.nodesWidget.touchDown(mousePos)
+        //core.nodesWidget.touchDown(mousePos)
     }
     
     override public func mouseDragged(with event: NSEvent) {
         setMousePos(event)
-        core.nodesWidget.touchMoved(mousePos)
+        //core.nodesWidget.touchMoved(mousePos)
     }
     
     override public func mouseUp(with event: NSEvent) {
@@ -86,11 +86,11 @@ public class DMTKView       : MTKView
         hasTap = false
         hasDoubleTap = false
         setMousePos(event)
-        core.nodesWidget.touchUp(mousePos)
+        //core.nodesWidget.touchUp(mousePos)
     }
     
     override public func scrollWheel(with event: NSEvent) {
-        core.nodesWidget.scrollWheel(float3(Float(event.deltaX), Float(event.deltaY), Float(event.deltaZ)))
+        //core.nodesWidget.scrollWheel(float3(Float(event.deltaX), Float(event.deltaY), Float(event.deltaZ)))
     }
     
     override public func flagsChanged(with event: NSEvent) {
@@ -308,7 +308,7 @@ struct MetalView: NSViewRepresentable {
             core.setupView(mtkView)
         } else
         if viewType == .Nodes {
-            core.setupNodesView(mtkView)
+            //core.setupNodesView(mtkView)
         }
         
         return mtkView
@@ -339,7 +339,7 @@ struct MetalView: NSViewRepresentable {
                 parent.core.draw()
             } else
             if parent.viewType == .Nodes {
-                parent.core.nodesWidget.draw()
+                //parent.core.nodesWidget.draw()
             }
         }
     }

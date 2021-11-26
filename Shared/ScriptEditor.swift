@@ -295,11 +295,12 @@ class ScriptEditor
     
     func updated()
     {
+        /*
         if let asset = core.nodesWidget.currentNode {
             getAssetValue(asset, { (value) in
                 self.core.nodesWidget.nodeChanged(value)
             })
-        }
+        }*/
     }
 }
 

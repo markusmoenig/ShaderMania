@@ -84,11 +84,11 @@ struct BrowserView: View {
                 Divider()
 
                 Text(selectedName)
-                    .frame(width: 400, height: 20, alignment: .leading)
+                    .frame(height: 20, alignment: .leading)
                 
                 Spacer()
             }
-            .frame(maxHeight: 30)
+            //.frame(height: 30)
             // Edit Asset name
             .popover(isPresented: self.$showAssetNamePopover,
                      arrowEdge: .bottom
@@ -113,8 +113,12 @@ struct BrowserView: View {
                 
                 let rows: [GridItem] = Array(repeating: .init(.fixed(70)), count: 1)
                 
+                let columns = [
+                    GridItem(.adaptive(minimum: 90))
+                ]
+                
                 ScrollView(.horizontal) {
-                    LazyHGrid(rows: rows, alignment: .center) {
+                    LazyVGrid(columns: columns, alignment: .center) {
                         ForEach(shaders, id: \.self) { shader in
                             
                             //if searchResults.contains(object.name!) {
@@ -245,7 +249,7 @@ struct BrowserView: View {
             //}
         }
         }
-        .animation(.default)
+        //.animation(.default)
     }
     
     func assetEntityToImage(_ entity: ShaderEntity) -> Image? {

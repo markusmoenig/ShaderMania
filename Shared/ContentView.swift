@@ -62,16 +62,19 @@ struct ContentView: View {
     
     var body: some View {
         
-        HStack() {
+        //HStack() {
             NavigationView() {
 
                 ParameterListView(document: document, updateView: $updateView)
                     .frame(minWidth: leftPanelWidth, idealWidth: leftPanelWidth, maxWidth: leftPanelWidth)
                 
-                VStack(spacing: 0) {
+                VSplitView {
                     
+                    MetalManiaView(document.core)
+
                     HSplitView {
                         
+
                         WebView(document.core, deviceColorScheme).tabItem {
                         }
                             .animation(.default)
@@ -79,9 +82,11 @@ struct ContentView: View {
                                 document.core.scriptEditor?.setTheme(newValue)
                             }
                         
-                        VSplitView {
+                        BrowserView(document: $document)
+                        
+                        //VSplitView {
                             
-                            MetalView(document.core, .Main)
+                            //MetalView(document.core, .Main)
                                 /*
                                 .frame(minWidth: 0,
                                        maxWidth: geometry.size.width / document.core.previewFactor,
@@ -94,11 +99,13 @@ struct ContentView: View {
                                 //.animation(.default)
                                 //.allowsHitTesting(false)
                             
+                            /*
                             MetalView(document.core, .Nodes)
                                 //.animation(.default)
                                 .allowsHitTesting(true)
                                 //.frame(maxHeight: editingState == .Both ? geometry.size.height / 2.5 : geometry.size.height)
-                        }
+                             */
+                        //}
                     }
                     
                     /*
@@ -156,8 +163,8 @@ struct ContentView: View {
                      */
                     
                     //if showBrowser {
-                        BrowserView(document: $document)
-                            .frame(maxHeight: 140)
+                        //BrowserView(document: $document)
+                        //    .frame(maxHeight: 140)
                     //}
                 }
             }
@@ -256,7 +263,7 @@ struct ContentView: View {
                     .frame(minWidth: 220, idealWidth: 220, maxWidth: 220)
                     .animation(.easeInOut)
             }*/
-        }
+        //}
         // For Mac Screenshots, 1440x900
         //.frame(minWidth: 1440, minHeight: 806)
         //.frame(maxWidth: 1440, maxHeight: 806)
@@ -344,9 +351,11 @@ struct ContentView: View {
                 .keyboardShortcut("1")
                 Button("Add Shader", action: {
                     if let asset = document.core.assetFolder.addShader("New Shader") {
+                        /*
                         document.core.nodesWidget.selectNode(asset)
                         document.core.nodesWidget.compileAndUpdatePreview(asset)
                         document.core.nodesWidget.update()
+                         */
                         document.core.contentChanged.send()
                         updateView.toggle()
                     }
@@ -355,18 +364,20 @@ struct ContentView: View {
             }
             Section(header: Text("Edit Node")) {
                 Button("Rename", action: {
+                    /*
                     if let node = document.core.nodesWidget.currentNode {
                         assetName = node.name
                         showAssetNamePopover = true
                         document.core.contentChanged.send()
-                    }
+                    }*/
                 })
                 Button("Delete", action: {
+                    /*
                     if document.core.nodesWidget.currentNode != nil {
                         showDeleteAssetAlert = true
                         document.core.nodesWidget.update()
                         document.core.contentChanged.send()
-                    }
+                    }*/
                 })
             }
             Section(header: Text("Show")) {
@@ -397,11 +408,12 @@ struct ContentView: View {
             VStack(alignment: .leading) {
                 Text("Name:")
                 TextField("Name", text: $assetName, onEditingChanged: { (changed) in
+                    /*
                     if let node = document.core.nodesWidget.currentNode {
                         node.name = assetName
                         updateView.toggle()
                         document.core.nodesWidget.update()
-                    }
+                    }*/
                 })
                 .frame(minWidth: 200)
             }.padding()
@@ -409,9 +421,10 @@ struct ContentView: View {
         // Delete an asset
         .alert(isPresented: $showDeleteAssetAlert) {
             Alert(
-                title: Text("Do you want to remove the node '\(document.core.nodesWidget.currentNode!.name)' ?"),
+                title: Text("Do you want to remove the node '\(/*document.core.nodesWidget.currentNode!.name*/"")' ?"),
                 message: Text("This action cannot be undone!"),
                 primaryButton: .destructive(Text("Yes"), action: {
+                    /*
                     if let asset = document.core.nodesWidget.currentNode {
                         document.core.nodesWidget.nodeIsAboutToBeDeleted(asset)
                         document.core.assetFolder.removeAsset(asset)
@@ -421,7 +434,7 @@ struct ContentView: View {
                         }
                         self.updateView.toggle()
                         document.core.nodesWidget.update()
-                    }
+                    }*/
                 }),
                 secondaryButton: .cancel(Text("No"), action: {})
             )
@@ -439,8 +452,9 @@ struct ContentView: View {
                 if selectedFiles.count > 0 {
                     if let asset = document.core.assetFolder.current {
                         asset.name = selectedFiles[0].deletingPathExtension().lastPathComponent
+                        /*
                         document.core.nodesWidget.selectNode(asset)
-                        document.core.nodesWidget.update()
+                        document.core.nodesWidget.update()*/
                         document.core.contentChanged.send()
                         updateView.toggle()
                     }
@@ -584,6 +598,7 @@ struct ContentView: View {
                 let url = try result.get()
                 let core = document.core
                 if let project = core.project {
+                    /*
                     if let asset = core.nodesWidget.currentNode {
                         if let texture = project.render(assetFolder: core.assetFolder, device: core.device, time: 0, frame: 0, viewSize: SIMD2<Int>(Int(core.view.frame.width), Int(core.view.frame.height)), forAsset: asset) {
                             
@@ -598,7 +613,7 @@ struct ContentView: View {
                                 }
                             }
                         }
-                    }
+                    }*/
                 }
             } catch {
                 // Handle failure.

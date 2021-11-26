@@ -9,6 +9,7 @@ import MetalKit
 import AVFoundation
 import Photos
 
+/*
 /// MMRect class
 class MMRect
 {
@@ -136,7 +137,7 @@ class MMRect
     {
         return float2(width, height)
     }
-}
+}*/
 
 func makeCGIImage(texture: MTLTexture, forImage: Bool) -> CGImage?
 {
