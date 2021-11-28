@@ -8,7 +8,7 @@
 
 import MetalKit
 
-class NodeGraph : Codable
+class NodeGraph
 {
     enum DebugMode
     {
@@ -33,6 +33,8 @@ class NodeGraph : Codable
         case Objects, Scenes, Game, ObjectsOverview, ScenesOverview
     }
     
+    let model           : Model
+    
     var navigationMode  : NavigationMode = .Off
     var debugMode       : DebugMode = .None
     var nodes           : [Node] = []
@@ -40,7 +42,6 @@ class NodeGraph : Codable
     var drawNodeState   : MTLRenderPipelineState?
     var drawPatternState: MTLRenderPipelineState?
 
-    var core            : Core? = nil
     var mmView          : MMView!
     //var mmScreen        : MMScreen? = nil
 
@@ -157,8 +158,10 @@ class NodeGraph : Codable
         case previewSize
     }
     
-    required init()
+    required init(model: Model)
     {
+        self.model = model
+        
         let node = Node()
 
         node.name = "New Object"
@@ -188,6 +191,7 @@ class NodeGraph : Codable
         //debugInstance = debugBuilder.build(camera: Camera())
     }
     
+    /*
     required init(from decoder: Decoder) throws
     {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -212,14 +216,12 @@ class NodeGraph : Codable
         try container.encode(currentRootUUID, forKey: .currentRootUUID)
         try container.encode(previewSize, forKey: .previewSize)
         try container.encode(overviewIsOn, forKey: .overviewIsOn)*/
-    }
+    }*/
     
     /// Called when a new instance of the NodeGraph class was created, sets up all necessary dependencies.
-    func setup(_ core: Core)
+    func setup()
     {
-        self.core = core
-        mmView = core.nodeView
-        
+        mmView = model.nodeView        
         
         let child = BehaviorTree()
         //child.name = "Child"
@@ -1341,9 +1343,9 @@ class NodeGraph : Codable
             
             // --- Draw Nodes
 
-            if let rootNode = currentRoot {
+            if let rootNode = model.selectedTree, let toDraw = rootNode.children {//currentRoot {
                 
-                let toDraw = getNodesOfRoot(for: currentRoot!)
+                //let toDraw = getNodesOfRoot(for: currentRoot!)
                 
                 let camera = currentRoot!.camera!
                 func expandBounds(_ node: Node)
@@ -1831,8 +1833,8 @@ class NodeGraph : Codable
     {
         if contentType == .ObjectsOverview || contentType == .ScenesOverview { return }
         
-        previewSize.x = min(previewSize.x, core!.nodeRegion!.rect.width - 40)
-        previewSize.y = min(previewSize.y, core!.nodeRegion!.rect.height - 70)
+        previewSize.x = min(previewSize.x, model.nodeRegion!.rect.width - 40)
+        previewSize.y = min(previewSize.y, model.nodeRegion!.rect.height - 70)
         
         node.rect.width = previewSize.x + 2
         node.rect.height = previewSize.y + 64 + 25
@@ -2175,9 +2177,9 @@ class NodeGraph : Codable
     func nodeAt(_ x: Float, _ y: Float) -> Node?
     {
         var found : Node? = nil
-        if let rootNode = currentRoot {
+        if let rootNode = model.selectedTree, let nodes = rootNode.children { //currentRoot {
             for node in nodes {
-                if rootNode.subset!.contains(node.uuid) || node === rootNode {
+                //if rootNode.subset!.contains(node.uuid) || node === rootNode {
                     if node.rect.contains( x, y ) {
                         // Root always has priority
                         if node === rootNode {
@@ -2191,7 +2193,7 @@ class NodeGraph : Codable
                         }
                         found = node
                     }
-                }
+                //}
             }
         }
         return found
@@ -2437,38 +2439,42 @@ class NodeGraph : Codable
         return color
     }
     
+    
     /// Decode a new nodegraph from JSON
     func decodeJSON(_ json: String) -> NodeGraph?
     {
+        /*
         if let jsonData = json.data(using: .utf8)
         {
             if let graph =  try? JSONDecoder().decode(NodeGraph.self, from: jsonData) {
                 return graph
             }
-        }
+        }*/
         return nil
     }
     
     /// Encode the whole NodeGraph to JSON
     func encodeJSON() -> String
     {
+        /*
         let encodedData = try? JSONEncoder().encode(self)
         if let encodedObjectJsonString = String(data: encodedData!, encoding: .utf8)
         {
             return encodedObjectJsonString
-        }
+        }*/
         return ""
     }
     
     /// Sets the current node
     func setCurrentNode(_ node: Node?=nil)
     {
-        if node == nil {
+        if let node = node {
+            selectedUUID = [node.uuid]
+            currentNode = node
+            model.scriptEditor?.setSession(node)
+        } else {
             selectedUUID = []
             currentNode = nil
-        } else {
-            selectedUUID = [node!.uuid]
-            currentNode = node
         }
     }
     

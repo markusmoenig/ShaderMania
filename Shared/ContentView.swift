@@ -70,12 +70,12 @@ struct ContentView: View {
                 
                 VSplitView {
                     
-                    MetalManiaView(document.core)
+                    MetalManiaView(document.model)
 
                     HSplitView {
                         
 
-                        WebView(document.core, deviceColorScheme).tabItem {
+                        WebView(document.model, deviceColorScheme).tabItem {
                         }
                             .animation(.default)
                             .onChange(of: deviceColorScheme) { newValue in
@@ -228,6 +228,7 @@ struct ContentView: View {
                     }
                 }
             }
+
             //.onReceive(self.document.core.timeChanged) { value in
             //    timeString = String(format: "%.02f", value)
             //}

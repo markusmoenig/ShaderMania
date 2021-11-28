@@ -156,6 +156,7 @@ public class Core       : ObservableObject
     
     public func setupNodesView(_ view: MMView)
     {
+        /*
         view.startup()
         view.platformInit()
 
@@ -167,7 +168,7 @@ public class Core       : ObservableObject
         nodeRegion = EditorRegion(view, core: self )
         
         view.editorRegion = nodeRegion
-        
+        */
         //view.core = self
         //nodesWidget = NodesWidget(self)
     }

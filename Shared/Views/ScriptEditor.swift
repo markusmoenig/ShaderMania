@@ -23,22 +23,23 @@ import Combine
 class ScriptEditor
 {
     var webView         : WKWebView
-    var core            : Core
+    var model           : Model
     var sessions        : Int = 0
     var colorScheme     : ColorScheme
     
     var helpText        : String = ""
     
-    init(_ view: WKWebView, _ core: Core,_ colorScheme: ColorScheme)
+    init(_ view: WKWebView, _ model: Model,_ colorScheme: ColorScheme)
     {
         self.webView = view
-        self.core = core
+        self.model = model
         self.colorScheme = colorScheme
         
+        /*
         if let asset = core.assetFolder.current {
             createSession(asset)
             setTheme(colorScheme)
-        }
+        }*/
         
         createHelpSession()
     }
@@ -63,7 +64,7 @@ class ScriptEditor
     
     func activateHelpSession()
     {
-        core.showingHelp = true
+        //model.showingHelp = true
         webView.evaluateJavaScript(
             """
             helpSession.setValue(`\(helpText)`)
@@ -121,6 +122,26 @@ class ScriptEditor
         }
     }
     
+    /// Creates an editor session for the given node
+    func createSession(_ node: Node,_ cb: (()->())? = nil)
+    {
+        if node.scriptSessionId.isEmpty {
+            node.scriptSessionId = "session" + String(sessions)
+            sessions += 1
+        }
+
+        webView.evaluateJavaScript(
+            """
+            var \(node.scriptSessionId) = ace.createEditSession(`\(node.getCode())`)
+            editor.setSession(\(node.scriptSessionId))
+            editor.session.setMode("ace/mode/c_cpp");
+            """, completionHandler: { (value, error ) in
+                if let cb = cb {
+                    cb()
+                }
+         })
+    }
+    
     func setReadOnly(_ readOnly: Bool = false)
     {
         webView.evaluateJavaScript(
@@ -138,6 +159,18 @@ class ScriptEditor
                 cursorStyle: \(silent ? "'wide'" : "'ace'") // "ace"|"slim"|"smooth"|"wide"
             });
             """, completionHandler: { (value, error) in
+         })
+    }
+    
+    func getNodeValue(_ node: Node,_ cb: @escaping (String)->() )
+    {
+        webView.evaluateJavaScript(
+            """
+            \(node.scriptSessionId).getValue()
+            """, completionHandler: { (value, error) in
+                if let value = value as? String {
+                    cb(value)
+                }
          })
     }
     
@@ -164,7 +197,7 @@ class ScriptEditor
     
     func setAssetSession(_ asset: Asset)
     {
-        core.showingHelp = false
+        //core.showingHelp = false
         func setSession()
         {
             let cmd = """
@@ -181,7 +214,27 @@ class ScriptEditor
         } else {
             setSession()
         }
-
+    }
+    
+    /// Sets a session for the given node
+    func setSession(_ node: Node)
+    {
+        func setNodeSession()
+        {
+            let cmd = """
+            editor.setSession(\(node.scriptSessionId))
+            """
+            webView.evaluateJavaScript(cmd, completionHandler: { (value, error ) in
+            })
+        }
+        
+        if node.scriptSessionId.isEmpty == true {
+            createSession(node, { () in
+                setNodeSession()
+            })
+        } else {
+            setNodeSession()
+        }
     }
     
     func setError(_ error: CompileError, scrollToError: Bool = false)
@@ -295,12 +348,12 @@ class ScriptEditor
     
     func updated()
     {
-        /*
-        if let asset = core.nodesWidget.currentNode {
-            getAssetValue(asset, { (value) in
-                self.core.nodesWidget.nodeChanged(value)
+        if let node = model.nodeGraph?.currentNode {
+            getNodeValue(node, { (value) in
+                //node.nodeChanged(value)
+                node.setCode(value)
             })
-        }*/
+        }
     }
 }
 
@@ -314,8 +367,8 @@ class WebViewModel: ObservableObject {
 #if os(OSX)
 struct SwiftUIWebView: NSViewRepresentable {
     public typealias NSViewType = WKWebView
-    var core        : Core!
-    var colorScheme : ColorScheme
+    var model                   : Model!
+    var colorScheme             : ColorScheme
 
     private let webView: WKWebView = WKWebView()
     public func makeNSView(context: NSViewRepresentableContext<SwiftUIWebView>) -> WKWebView {
@@ -336,22 +389,22 @@ struct SwiftUIWebView: NSViewRepresentable {
     public func updateNSView(_ nsView: WKWebView, context: NSViewRepresentableContext<SwiftUIWebView>) { }
 
     public func makeCoordinator() -> Coordinator {
-        return Coordinator(core, colorScheme)
+        return Coordinator(model, colorScheme)
     }
     
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         
-        private var core        : Core
-        private var colorScheme : ColorScheme
+        private var model           : Model
+        private var colorScheme     : ColorScheme
 
-        init(_ core: Core,_ colorScheme: ColorScheme) {
-            self.core = core
+        init(_ model: Model,_ colorScheme: ColorScheme) {
+            self.model = model
             self.colorScheme = colorScheme
         }
         
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if message.name == "jsHandler" {
-                if let scriptEditor = core.scriptEditor {
+                if let scriptEditor = model.scriptEditor {
                     scriptEditor.updated()
                 }
             }
@@ -363,7 +416,7 @@ struct SwiftUIWebView: NSViewRepresentable {
 
         //After the webpage is loaded, assign the data in WebViewModel class
         public func webView(_ web: WKWebView, didFinish: WKNavigation!) {
-            core.scriptEditor = ScriptEditor(web, core, colorScheme)
+            model.scriptEditor = ScriptEditor(web, model, colorScheme)
             web.isHidden = false
         }
 
@@ -441,16 +494,16 @@ struct SwiftUIWebView: UIViewRepresentable {
 #endif
 
 struct WebView  : View {
-    var core        : Core
-    var colorScheme : ColorScheme
+    var model           : Model
+    var colorScheme     : ColorScheme
 
-    init(_ core: Core,_ colorScheme: ColorScheme) {
-        self.core = core
+    init(_ model: Model,_ colorScheme: ColorScheme) {
+        self.model = model
         self.colorScheme = colorScheme
     }
     
     var body: some View {
-        SwiftUIWebView(core: core, colorScheme: colorScheme)
+        SwiftUIWebView(model: model, colorScheme: colorScheme)
     }
 }
 

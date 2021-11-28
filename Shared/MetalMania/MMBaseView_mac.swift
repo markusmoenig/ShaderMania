@@ -149,9 +149,7 @@ public class MMBaseView : MTKView
                 
         //mousePos.x = event.x
         //mousePos.y = event.y
-        
-        print(mousePos.x, mousePos.y)
-        
+                
 //        if hoverWidget != nil {
 //            hoverWidget!.removeState(.Hover)
 //            hoverWidget!.mouseLeave(event)

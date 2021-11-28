@@ -16,9 +16,11 @@ extension UTType {
 }
 
 struct ShaderManiaDocument: FileDocument {
-    
-    var core    = Core()
-    var updated = false
+
+    var model                = Model()
+
+    var core                 = Core()
+    var updated              = false
     
     let exportImage          = PassthroughSubject<Void, Never>()
     let help                 = PassthroughSubject<Void, Never>()
@@ -40,11 +42,13 @@ struct ShaderManiaDocument: FileDocument {
     }*/
     
     init(configuration: ReadConfiguration) throws {
-        guard let data = configuration.file.regularFileContents,
-                let folder = try? JSONDecoder().decode(AssetFolder.self, from: data)
-        else {
+                
+        guard let data = configuration.file.regularFileContents else {
             throw CocoaError(.fileReadCorruptFile)
         }
+        
+        let folder = try? JSONDecoder().decode(AssetFolder.self, from: data)
+
         if data.isEmpty == false {
             core.assetFolder = folder
             core.assetFolder.core = core

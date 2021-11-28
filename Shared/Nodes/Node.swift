@@ -58,6 +58,11 @@ class Node : Codable, Equatable
     var data            : NODE_DATA = NODE_DATA()
     var buffer          : MTLBuffer? = nil
     
+    var codeData        = Data("".utf8)
+    
+    /// The session id for the script editor
+    var scriptSessionId = ""
+    
     var previewTexture  : MTLTexture?
     
     var terminals       : [Terminal] = []
@@ -100,9 +105,9 @@ class Node : Codable, Equatable
         case xPos
         case yPos
         case terminals
-        case subset
         case uiConnections
         case camera
+        case children
     }
     
     init()
@@ -121,9 +126,9 @@ class Node : Codable, Equatable
         xPos = try container.decode(Float.self, forKey: .xPos)
         yPos = try container.decode(Float.self, forKey: .yPos)
         terminals = try container.decode([Terminal].self, forKey: .terminals)
-        subset = try container.decode([UUID]?.self, forKey: .subset)
         uiConnections = try container.decode([UINodeConnection].self, forKey: .uiConnections)
         camera = try container.decodeIfPresent(Camera.self, forKey: .camera)
+        children = try container.decode([Node]?.self, forKey: .children)
 
         for terminal in terminals {
             terminal.node = self
@@ -142,13 +147,24 @@ class Node : Codable, Equatable
         try container.encode(xPos, forKey: .xPos)
         try container.encode(yPos, forKey: .yPos)
         try container.encode(terminals, forKey: .terminals)
-        try container.encode(subset, forKey: .subset)
         try container.encode(uiConnections, forKey: .uiConnections)
         try container.encode(camera, forKey: .camera)
+        try container.encode(children, forKey: .camera)
     }
     
-    static func ==(lhs:Node, rhs:Node) -> Bool { // Implement Equatable
+    /// Equatable
+    static func ==(lhs:Node, rhs:Node) -> Bool {
         return lhs.uuid == rhs.uuid
+    }
+    
+    /// Sets the code of the node
+    func setCode(_ c: String) {
+        codeData = Data(c.utf8)
+    }
+    
+    /// Retrieves the code of the node
+    func getCode() -> String {
+        return String(decoding: codeData, as: UTF8.self)
     }
     
     func onConnect(myTerminal: Terminal, toTerminal: Terminal)
@@ -158,7 +174,6 @@ class Node : Codable, Equatable
     func onDisconnect(myTerminal: Terminal, toTerminal: Terminal)
     {
     }
-    
     
     /// Executes a node inside a behaviour tree
     func execute(nodeGraph: NodeGraph, root: BehaviorTreeRoot, parent: Node) -> Result

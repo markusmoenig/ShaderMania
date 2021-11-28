@@ -117,7 +117,7 @@ struct BrowserView: View {
                     GridItem(.adaptive(minimum: 90))
                 ]
                 
-                ScrollView(.horizontal) {
+                //ScrollView(.horizontal) {
                     LazyVGrid(columns: columns, alignment: .center) {
                         ForEach(shaders, id: \.self) { shader in
                             
@@ -243,11 +243,11 @@ struct BrowserView: View {
                     .padding()
                 .padding(.top, 0)
             }
-                
+
             //.onReceive(document.model.searchResultsChanged) { results in
             //    searchResults = results
             //}
-        }
+        //}
         }
         //.animation(.default)
     }

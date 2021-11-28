@@ -11,10 +11,10 @@ import MetalKit
 #if os(OSX)
 struct MetalManiaView: NSViewRepresentable {
     
-    var core                    : Core!
+    var model                   : Model
 
-    init(_ core: Core) {
-        self.core = core
+    init(_ model: Model) {
+        self.model = model
     }
     
     func makeCoordinator() -> Coordinator {
@@ -23,7 +23,7 @@ struct MetalManiaView: NSViewRepresentable {
     
     func makeNSView(context: NSViewRepresentableContext<MetalManiaView>) -> MTKView {
         let view = MMView()
-        core.setupNodesView(view)
+        model.setupNodeView(view)
         
         return view
     }

@@ -10,23 +10,23 @@ import Foundation
 class EditorRegion: MMRegion
 {
     var widget                  : EditorWidget!
-    var core                    : Core
+    var model                   : Model
         
-    init( _ view: MMView, core: Core)
+    init( _ view: MMView, model: Model)
     {
-        self.core = core
+        self.model = model
         super.init(view, type: .Editor)
         
-        widget = EditorWidget(view, editorRegion: self, core: core)
+        widget = EditorWidget(view, editorRegion: self, model: model)
         registerWidgets( widgets: widget! )
     }
     
     override func build()
     {
-        if core.nodeGraph.maximizedNode == nil {
-            core.nodeGraph.drawRegion(self)
+        if model.nodeGraph.maximizedNode == nil {
+            model.nodeGraph.drawRegion(self)
         } else {
-            core.nodeGraph.maximizedNode?.maxDelegate?.drawRegion(self)
+            model.nodeGraph.maximizedNode?.maxDelegate?.drawRegion(self)
         }
         
         widget.rect.copy(rect)
@@ -36,7 +36,7 @@ class EditorRegion: MMRegion
 class EditorWidget      : MMWidget
 {
     var region          : EditorRegion
-    var core            : Core
+    var model           : Model
 
     var scrolledMode    : Int? = nil
     
@@ -45,9 +45,9 @@ class EditorWidget      : MMWidget
     var zoomBuffer      : Float = 0
     var scaleBuffer     : Float = 0
 
-    init(_ view: MMView, editorRegion: EditorRegion, core: Core)
+    init(_ view: MMView, editorRegion: EditorRegion, model: Model)
     {
-        self.core = core
+        self.model = model
         region = editorRegion
         
         super.init(view)
@@ -72,49 +72,49 @@ class EditorWidget      : MMWidget
 
     override func keyDown(_ event: MMKeyEvent)
     {
-        if core.nodeGraph.maximizedNode == nil {
-            core.nodeGraph.keyDown(event)
+        if model.nodeGraph.maximizedNode == nil {
+            model.nodeGraph.keyDown(event)
         } else {
-            core.nodeGraph.maximizedNode!.maxDelegate!.keyDown(event)
+            model.nodeGraph.maximizedNode!.maxDelegate!.keyDown(event)
         }
     }
     
     override func keyUp(_ event: MMKeyEvent)
     {
-        if core.nodeGraph.maximizedNode == nil {
-            core.nodeGraph.keyUp(event)
+        if model.nodeGraph.maximizedNode == nil {
+            model.nodeGraph.keyUp(event)
         } else {
-            core.nodeGraph.maximizedNode!.maxDelegate!.keyUp(event)
+            model.nodeGraph.maximizedNode!.maxDelegate!.keyUp(event)
         }
     }
     
     override func mouseDown(_ event: MMMouseEvent)
     {
         scrolledMode = nil
-        if core.nodeGraph.maximizedNode == nil {
-            core.nodeGraph.mouseDown(event)
+        if model.nodeGraph.maximizedNode == nil {
+            model.nodeGraph.mouseDown(event)
         } else {
-            core.nodeGraph.maximizedNode!.maxDelegate!.mouseDown(event)
+            model.nodeGraph.maximizedNode!.maxDelegate!.mouseDown(event)
         }
     }
     
     override func mouseUp(_ event: MMMouseEvent)
     {
-        if core.nodeGraph.maximizedNode == nil {
-            core.nodeGraph.mouseUp(event)
+        if model.nodeGraph.maximizedNode == nil {
+            model.nodeGraph.mouseUp(event)
         } else {
-            core.nodeGraph.maximizedNode!.maxDelegate!.mouseUp(event)
+            model.nodeGraph.maximizedNode!.maxDelegate!.mouseUp(event)
         }
     }
     
     override func pinchGesture(_ scale: Float,_ firstTouch: Bool)
     {
-        if core.nodeGraph.maximizedNode == nil {
-            if core.nodeGraph.hoverNode != nil && core.nodeGraph.nodeHoverMode == .Preview {
+        if model.nodeGraph.maximizedNode == nil {
+            if model.nodeGraph.hoverNode != nil && model.nodeGraph.nodeHoverMode == .Preview {
                 
-                var node = core.nodeGraph.hoverNode!
-                if node === core.nodeGraph.currentRoot! {
-                    node = core.nodeGraph.previewNode!
+                var node = model.nodeGraph.hoverNode!
+                if node === model.nodeGraph.currentRoot! {
+                    node = model.nodeGraph.previewNode!
                 }
                 
                 if firstTouch == true {
@@ -123,12 +123,12 @@ class EditorWidget      : MMWidget
                 }
                 
                 node.properties["prevScale"] = max(0.2, zoomBuffer * scale)
-                node.updatePreview(nodeGraph: core.nodeGraph)
+                node.updatePreview(nodeGraph: model.nodeGraph)
                 mmView.update()
             } else
-            if core.nodeGraph.nodeHoverMode == .None && core.nodeGraph.currentRoot != nil
+            if model.nodeGraph.nodeHoverMode == .None && model.nodeGraph.currentRoot != nil
             {
-                if let camera = core.nodeGraph.currentRoot!.camera {
+                if let camera = model.nodeGraph.currentRoot!.camera {
                     
                     if firstTouch == true {
                         zoomBuffer = camera.zoom
@@ -142,12 +142,10 @@ class EditorWidget      : MMWidget
                     
                     // Move nodes relative to the mouse position
                     if firstTouch == false && camera.zoom > 0.2 && camera.zoom < 1.5 {
-                        let targetPoint = SIMD2<Float>( core.mmView.pinchCenter.x - core.editorRegion!.rect.x, core.mmView.pinchCenter.y - core.editorRegion!.rect.y)
+                        let targetPoint = SIMD2<Float>( model.mmView.pinchCenter.x - model.editorRegion!.rect.x, model.mmView.pinchCenter.y - model.editorRegion!.rect.y)
                         
-                        print("this", targetPoint)
-
-                        if let currentRoot = core.nodeGraph.currentRoot {
-                            let toMove = core.nodeGraph.getNodesOfMaster(for: currentRoot)
+                        if let currentRoot = model.nodeGraph.currentRoot {
+                            let toMove = model.nodeGraph.getNodesOfMaster(for: currentRoot)
                             
                             let percent : Float = (scaleBuffer - scale)
                             scaleBuffer = scale
@@ -165,14 +163,14 @@ class EditorWidget      : MMWidget
                 }
             }
         } else {
-            core.nodeGraph.maximizedNode!.maxDelegate!.pinchGesture(scale, firstTouch)
+            model.nodeGraph.maximizedNode!.maxDelegate!.pinchGesture(scale, firstTouch)
         }
     }
     
     override func mouseScrolled(_ event: MMMouseEvent)
     {
-        if core.nodeGraph.maximizedNode == nil {
-            if core.nodeGraph.hoverNode != nil && core.nodeGraph.nodeHoverMode == .Preview && core.nodeGraph.overviewIsOn == false {
+        if model.nodeGraph.maximizedNode == nil {
+            if model.nodeGraph.hoverNode != nil && model.nodeGraph.nodeHoverMode == .Preview && model.nodeGraph.overviewIsOn == false {
                 
                 #if os(iOS)
                 // Prevent scrolling over several areas
@@ -186,14 +184,14 @@ class EditorWidget      : MMWidget
                 #endif
                 
                 // Node preview translation
-                var node = core.nodeGraph.hoverNode!
-                if node === core.nodeGraph.currentRoot! {
-                    node = core.nodeGraph.previewNode!
+                var node = model.nodeGraph.hoverNode!
+                if node === model.nodeGraph.currentRoot! {
+                    node = model.nodeGraph.previewNode!
                 }
                 
                 /*
-                if core.nodeGraph.refList.isActive && core.nodeGraph.refList.rect.contains(event.x, event.y) {
-                    core.nodeGraph.refList.mouseScrolled(event)
+                if model.nodeGraph.refList.isActive && model.nodeGraph.refList.rect.contains(event.x, event.y) {
+                    model.nodeGraph.refList.mouseScrolled(event)
                     return
                 }*/
                 
@@ -217,9 +215,9 @@ class EditorWidget      : MMWidget
                 node.properties["prevOffX"] = prevOffX
                 node.properties["prevOffY"] = prevOffY
                 node.properties["prevScale"] = prevScale
-                node.updatePreview(nodeGraph: core.nodeGraph)
+                node.updatePreview(nodeGraph: model.nodeGraph)
             } else
-            if core.nodeGraph.nodeHoverMode == .None && core.nodeGraph.currentRoot != nil
+            if model.nodeGraph.nodeHoverMode == .None && model.nodeGraph.currentRoot != nil
             {
                 // NodeGraph translation
                 
@@ -234,7 +232,7 @@ class EditorWidget      : MMWidget
                 }
                 #endif
 
-                if let camera = core.nodeGraph.currentRoot!.camera {
+                if let camera = model.nodeGraph.currentRoot!.camera {
                     #if os(OSX)
                     if mmView.commandIsDown && event.deltaY! != 0 {
                         camera.zoom += event.deltaY! * 0.003
@@ -244,10 +242,10 @@ class EditorWidget      : MMWidget
                         // Move nodes relative to the mouse position
                         
                         if camera.zoom > 0.2 && camera.zoom < 1.5 {
-                            let targetPoint = SIMD2<Float>(event.x - core.nodeRegion!.rect.x, event.y - core.nodeRegion!.rect.y)
+                            let targetPoint = SIMD2<Float>(event.x - model.nodeRegion!.rect.x, event.y - model.nodeRegion!.rect.y)
 
-                            if let currentRoot = core.nodeGraph.currentRoot {
-                                let toMove = core.nodeGraph.getNodesOfRoot(for: currentRoot)
+                            if let currentRoot = model.nodeGraph.currentRoot {
+                                let toMove = model.nodeGraph.getNodesOfRoot(for: currentRoot)
                                 
                                 for mNode in toMove {
                                     
@@ -280,24 +278,24 @@ class EditorWidget      : MMWidget
                 mmView.lockFramerate()
             }
         } else {
-            core.nodeGraph.maximizedNode!.maxDelegate!.mouseScrolled(event)
+            model.nodeGraph.maximizedNode!.maxDelegate!.mouseScrolled(event)
         }
     }
     
     override func mouseMoved(_ event: MMMouseEvent)
     {
-        if core.nodeGraph.maximizedNode == nil {
-            core.nodeGraph.mouseMoved(event)
+        if model.nodeGraph.maximizedNode == nil {
+            model.nodeGraph.mouseMoved(event)
         } else {
-            core.nodeGraph.maximizedNode!.maxDelegate!.mouseMoved(event)
+            model.nodeGraph.maximizedNode!.maxDelegate!.mouseMoved(event)
         }
     }
     
     /*
     override func dragTerminated() {
-        core.nodeGraph.refList.dragSource = nil
+        model.nodeGraph.refList.dragSource = nil
         mmView.unlockFramerate()
-        core.nodeGraph.refList.mouseIsDown = false
+        model.nodeGraph.refList.mouseIsDown = false
     }*/
     
     /*
@@ -308,7 +306,7 @@ class EditorWidget      : MMWidget
             // Object Editor, shape drag to editor
             let drag = dragSource as! ShapeSelectorDrag
         
-            let currentObject = core.nodeGraph.maximizedNode as? Object
+            let currentObject = model.nodeGraph.maximizedNode as? Object
             let delegate = currentObject!.maxDelegate as! ObjectMaxDelegate
             let selObject = delegate.selObject!
             
