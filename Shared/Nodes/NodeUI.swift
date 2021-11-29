@@ -148,7 +148,7 @@ class NodeUISeparator : NodeUI
         self.mmView = mmView
         
         if titleLabel == nil {
-            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.currentRoot!.camera!.zoom : 1
+            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.model.selectedTree!.camera!.zoom : 1
             titleLabel = MMTextLabel(mmView, font: mmView.openSans, text: "", scale: NodeUI.titleFontScale * scale, color: NodeUI.titleTextColor)
         }
         
@@ -237,7 +237,7 @@ class NodeUISelector : NodeUI
         self.mmView = mmView
         
         if titleLabel == nil {
-            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.currentRoot!.camera!.zoom : 1
+            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.model.selectedTree!.camera!.zoom : 1
             titleLabel = MMTextLabel(mmView, font: mmView.openSans, text: title, scale: NodeUI.titleFontScale * scale, color: NodeUI.titleTextColor)
             contentLabel = MMTextLabel(mmView, font: mmView.openSans, text: "", scale: NodeUI.fontScale * scale, color: NodeUI.contentTextColor)
         }
@@ -569,7 +569,7 @@ class NodeUIDropTarget : NodeUI
         self.mmView = mmView
         
         if titleLabel == nil {
-            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.currentRoot!.camera!.zoom : 1
+            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.model.selectedTree!.camera!.zoom : 1
             titleLabel = MMTextLabel(mmView, font: mmView.openSans, text: title, scale: NodeUI.titleFontScale * scale, color: NodeUI.titleTextColor)
         }
         
@@ -830,7 +830,7 @@ class NodeUIKeyDown : NodeUI
         self.mmView = mmView
         
         if titleLabel == nil {
-            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.currentRoot!.camera!.zoom : 1
+            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.model.selectedTree!.camera!.zoom : 1
             titleLabel = MMTextLabel(mmView, font: mmView.openSans, text: title, scale: NodeUI.titleFontScale * scale, color: NodeUI.titleTextColor)
             contentLabel = MMTextLabel(mmView, font: mmView.openSans, text: "", scale: NodeUI.fontScale * scale)
         }
@@ -920,7 +920,7 @@ class NodeUINumber : NodeUI
         self.mmView = mmView
         
         if titleLabel == nil {
-            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.currentRoot!.camera!.zoom : 1
+            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.model.selectedTree!.camera!.zoom : 1
             titleLabel = MMTextLabel(mmView, font: mmView.openSans, text: title, scale: NodeUI.titleFontScale * scale, color: NodeUI.titleTextColor)
             contentLabel = MMTextLabel(mmView, font: mmView.openSans, text: "", scale: NodeUI.fontScale * scale, color: NodeUI.contentTextColor)
         }
@@ -1093,7 +1093,7 @@ class NodeUIAngle : NodeUI
         self.mmView = mmView
         
         if titleLabel == nil {
-            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.currentRoot!.camera!.zoom : 1
+            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.model.selectedTree!.camera!.zoom : 1
             titleLabel = MMTextLabel(mmView, font: mmView.openSans, text: title, scale: NodeUI.titleFontScale * scale, color: NodeUI.titleTextColor)
         }
         
@@ -1205,7 +1205,7 @@ class NodeUIText : NodeUI
         self.mmView = mmView
         
         if titleLabel == nil {
-            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.currentRoot!.camera!.zoom : 1
+            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.model.selectedTree!.camera!.zoom : 1
             titleLabel = MMTextLabel(mmView, font: mmView.openSans, text: title, scale: NodeUI.titleFontScale * scale, color: NodeUI.titleTextColor)
         }
         
@@ -1299,7 +1299,7 @@ class NodeUIColor : NodeUI
         self.mmView = mmView
         
         if titleLabel == nil {
-            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.currentRoot!.camera!.zoom : 1
+            let scale : Float = node.nodeGraph != nil ? node.nodeGraph!.model.selectedTree!.camera!.zoom : 1
             titleLabel = MMTextLabel(mmView, font: mmView.openSans, text: title, scale: NodeUI.titleFontScale * scale, color: NodeUI.titleTextColor)
         }
         

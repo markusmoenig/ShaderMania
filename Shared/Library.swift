@@ -270,6 +270,7 @@ class Library
                                 current = folder.assets[0]
                             }
                                 
+                            /*
                             if let current = current {
                                 self.project.compileAssets(assetFolder: folder, forAsset: current, compiler: self.core.shaderCompiler, finished: { () in
                                     if let texture = self.project.render(assetFolder: folder, device: self.core.device, time: 0, frame: 0, viewSize: SIMD2<Int>(120, 80), forAsset: current) {
@@ -287,7 +288,7 @@ class Library
                                         }
                                     }
                                 })
-                            }
+                            }*/
                         
                         }
                     }

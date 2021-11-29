@@ -31,14 +31,14 @@ class Camera : Codable
 class Node : Codable, Equatable
 {
     enum Brand {
-        case Property, Behavior, Function, Arithmetic
+        case Shader, Property, Behavior, Function, Arithmetic
     }
 
     enum Result {
         case Success, Failure, Running, Unused
     }
     
-    var brand           : Brand = .Behavior
+    var brand           : Brand = .Shader
     var type            : String = ""
     var properties      : [String: Float]
 
@@ -59,6 +59,16 @@ class Node : Codable, Equatable
     var buffer          : MTLBuffer? = nil
     
     var codeData        = Data("".utf8)
+    var codeDataChanged = false
+    
+    /// The compiled shader if this is a shader node
+    var shader          : Shader? = nil
+    
+    var texture         : MTLTexture? = nil
+    
+    var shaderData      : [float4] = [float4(), float4(), float4(), float4(), float4(), float4(), float4(), float4(), float4(),float4()]
+    var shaderDataNames  : [String] = [String(), String(), String(), String(), String(), String(), String(), String(), String(),String()]
+    var errors          : [CompileError] = []
     
     /// The session id for the script editor
     var scriptSessionId = ""
@@ -160,6 +170,7 @@ class Node : Codable, Equatable
     /// Sets the code of the node
     func setCode(_ c: String) {
         codeData = Data(c.utf8)
+        codeDataChanged = true
     }
     
     /// Retrieves the code of the node

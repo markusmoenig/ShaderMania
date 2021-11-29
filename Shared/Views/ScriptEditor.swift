@@ -7,7 +7,7 @@
 
 struct CompileError
 {
-    var asset           : Asset? = nil
+    var node            : Node? = nil
     var line            : Int32? = nil
     var column          : Int32? = 0
     var error           : String? = nil

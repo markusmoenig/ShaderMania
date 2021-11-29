@@ -62,209 +62,206 @@ struct ContentView: View {
     
     var body: some View {
         
-        //HStack() {
-            NavigationView() {
+        NavigationView() {
 
-                ParameterListView(document: document, updateView: $updateView)
-                    .frame(minWidth: leftPanelWidth, idealWidth: leftPanelWidth, maxWidth: leftPanelWidth)
+            ParameterListView(document: document, updateView: $updateView)
+                .frame(minWidth: leftPanelWidth, idealWidth: leftPanelWidth, maxWidth: leftPanelWidth)
+            
+            VSplitView {
                 
-                VSplitView {
+                MetalManiaView(document.model)
+
+                HSplitView {
                     
-                    MetalManiaView(document.model)
 
-                    HSplitView {
-                        
-
-                        WebView(document.model, deviceColorScheme).tabItem {
-                        }
-                            .animation(.default)
-                            .onChange(of: deviceColorScheme) { newValue in
-                                document.core.scriptEditor?.setTheme(newValue)
-                            }
-                        
-                        BrowserView(document: $document)
-                        
-                        //VSplitView {
-                            
-                            //MetalView(document.core, .Main)
-                                /*
-                                .frame(minWidth: 0,
-                                       maxWidth: geometry.size.width / document.core.previewFactor,
-                                       minHeight: 0,
-                                       maxHeight: geometry.size.height / document.core.previewFactor,
-                                       alignment: .topTrailing)
-                                 
-                                .opacity(helpIsVisible ? 0 : (document.core.state == .Running ? 1 : document.core.previewOpacity))
-                                 */
-                                //.animation(.default)
-                                //.allowsHitTesting(false)
-                            
-                            /*
-                            MetalView(document.core, .Nodes)
-                                //.animation(.default)
-                                .allowsHitTesting(true)
-                                //.frame(maxHeight: editingState == .Both ? geometry.size.height / 2.5 : geometry.size.height)
-                             */
-                        //}
+                    WebView(document.model, deviceColorScheme).tabItem {
                     }
+                        .animation(.default)
+                        .onChange(of: deviceColorScheme) { newValue in
+                            document.core.scriptEditor?.setTheme(newValue)
+                        }
                     
-                    /*
-                    ZStack(alignment: .topTrailing) {
+                    BrowserView(document: $document)
+                }
+                
+                /*
+                ZStack(alignment: .topTrailing) {
 
-                        VStack(spacing: 2) {
-                            
-                            if editingState == .Source || editingState == .Both {
-                                GeometryReader { geometry in
-                                    ScrollView {
+                    VStack(spacing: 2) {
+                        
+                        if editingState == .Source || editingState == .Both {
+                            GeometryReader { geometry in
+                                ScrollView {
 
-                                        if document.core.assetFolder.assets.isEmpty == false {
-                                            WebView(document.core, deviceColorScheme).tabItem {
-                                            }
-                                                .animation(.default)
-                                            
-                                                .frame(height: geometry.size.height)
-                                                .tag(1)
-                                                .onChange(of: deviceColorScheme) { newValue in
-                                                    document.core.scriptEditor?.setTheme(newValue)
-                                                }
+                                    if document.core.assetFolder.assets.isEmpty == false {
+                                        WebView(document.core, deviceColorScheme).tabItem {
                                         }
-                                    }
-                                    .zIndex(0)
-                                    .frame(maxWidth: .infinity)
-                                    .layoutPriority(2)
-                                    .animation(.default)
-
-                                    .onReceive(self.document.core.contentChanged) { state in
-                                        document.updated.toggle()
+                                            .animation(.default)
+                                        
+                                            .frame(height: geometry.size.height)
+                                            .tag(1)
+                                            .onChange(of: deviceColorScheme) { newValue in
+                                                document.core.scriptEditor?.setTheme(newValue)
+                                            }
                                     }
                                 }
-                            }
-                                                    
-                            if editingState == .Nodes || editingState == .Both {
-                                MetalView(document.core, .Nodes)
-                                    .zIndex(0)
-                                    .animation(.default)
-                                    .allowsHitTesting(true)
-                                    .frame(maxHeight: editingState == .Both ? geometry.size.height / 2.5 : geometry.size.height)
+                                .zIndex(0)
+                                .frame(maxWidth: .infinity)
+                                .layoutPriority(2)
+                                .animation(.default)
+
+                                .onReceive(self.document.core.contentChanged) { state in
+                                    document.updated.toggle()
+                                }
                             }
                         }
-                        
-                        MetalView(document.core, .Main)
-                            .zIndex(2)
-                            .frame(minWidth: 0,
-                                   maxWidth: geometry.size.width / document.core.previewFactor,
-                                   minHeight: 0,
-                                   maxHeight: geometry.size.height / document.core.previewFactor,
-                                   alignment: .topTrailing)
-                            .opacity(helpIsVisible ? 0 : (document.core.state == .Running ? 1 : document.core.previewOpacity))
-                            .animation(.default)
-                            .allowsHitTesting(false)
-                    }
-                     */
-                    
-                    //if showBrowser {
-                        //BrowserView(document: $document)
-                        //    .frame(maxHeight: 140)
-                    //}
-                }
-            }
-            
-            .toolbar {
-                ToolbarItemGroup(placement: .automatic) {
-                    
-                    toolNodeMenu
-                    
-                    Divider()
-                        .padding(.horizontal, 2)
-                        .opacity(0)
-                    
-                    toolPreviewMenu
-                    
-                    Divider()
-                        .padding(.horizontal, 2)
-                        .opacity(0)
-                    
-                    // Core Controls
-                    Button(action: {
-                        document.core.stop()
-                        document.core.start()
-                        helpIsVisible = false
-                        updateView.toggle()
-                    })
-                    {
-                        Label("Run", systemImage: "play.fill")
-                    }
-                    .keyboardShortcut("r")
-                    
-                    Button(action: {
-                        document.core.stop()
-                        if let asset = document.core.assetFolder.current {
-                            document.core.createPreview(asset)
+                                                
+                        if editingState == .Nodes || editingState == .Both {
+                            MetalView(document.core, .Nodes)
+                                .zIndex(0)
+                                .animation(.default)
+                                .allowsHitTesting(true)
+                                .frame(maxHeight: editingState == .Both ? geometry.size.height / 2.5 : geometry.size.height)
                         }
-                        updateView.toggle()
-                    }) {
-                        Label("Stop", systemImage: "stop.fill")
-                    }.keyboardShortcut(".")
-                    .disabled(document.core.state == .Idle)
-                    
-                    //Divider()
-                        //.padding(.horizontal, 2)
-                        //.opacity(0)
-
-                    toolShareMenu
-                    toolGiftMenu
-                    
-                    Button(action: {
-                        document.help.send()
-                    }) {
-                        Label("Help", systemImage: "questionmark")
                     }
-                    .keyboardShortcut("h")
                     
-                    Button(action: {
-                        showLibrary.toggle()
-                    }) {
-                        Label("Library", systemImage: "sidebar.right")
-                    }
+                    MetalView(document.core, .Main)
+                        .zIndex(2)
+                        .frame(minWidth: 0,
+                               maxWidth: geometry.size.width / document.core.previewFactor,
+                               minHeight: 0,
+                               maxHeight: geometry.size.height / document.core.previewFactor,
+                               alignment: .topTrailing)
+                        .opacity(helpIsVisible ? 0 : (document.core.state == .Running ? 1 : document.core.previewOpacity))
+                        .animation(.default)
+                        .allowsHitTesting(false)
                 }
-            }
-
-            //.onReceive(self.document.core.timeChanged) { value in
-            //    timeString = String(format: "%.02f", value)
-            //}
-            
-            .onReceive(self.document.core.createPreview) { value in
-                if let asset = document.core.assetFolder.current {
-                    document.core.createPreview(asset)
-                }
-            }
-            
-            .onReceive(self.document.help) { value in
-                if self.helpIsVisible == false {
-                    self.document.core.scriptEditor!.activateHelpSession()
-                } else {
-                    if let asset = document.core.assetFolder.current {
-                        self.document.core.assetFolder.select(asset.id)
-                    }
-                }
-                self.helpIsVisible.toggle()
-            }
-            
-            .onReceive(self.document.exportImage) { value in
-                exportingImage = true
-            }
-            
-            .onReceive(self.document.core.updateUI) { value in
-                updateView.toggle()
-            }
+                 */
                 
-            /*
-            if showLibrary == true {
-                LibraryView(document: document, updateView: $updateView)
-                    .frame(minWidth: 220, idealWidth: 220, maxWidth: 220)
-                    .animation(.easeInOut)
-            }*/
+                //if showBrowser {
+                    //BrowserView(document: $document)
+                    //    .frame(maxHeight: 140)
+                //}
+            }
+        }
+        
+        .toolbar {
+            
+            ToolbarItemGroup(placement: .automatic) {
+
+                /*
+                Button(action: {
+                    //showBrowser.toggle()
+                })
+                {
+                    Image(systemName: "dock.rectangle")
+                        .imageScale(.large)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .keyboardShortcut("t")
+                 */
+                
+                Button("Build") {
+                    document.model.build()
+                }
+                .keyboardShortcut("b")
+            }
+
+            ToolbarItemGroup(placement: .automatic) {
+                
+                //toolNodeMenu
+                
+                //Divider()
+                //    .padding(.horizontal, 2)
+                //    .opacity(0)
+                
+                //toolPreviewMenu
+                
+                //Divider()
+                //    .padding(.horizontal, 2)
+                //    .opacity(0)
+                
+                // Core Controls
+                Button(action: {
+                    /*
+                    document.core.stop()
+                    document.core.start()
+                    helpIsVisible = false
+                    updateView.toggle()*/
+                    
+                    if let tree = document.model.selectedTree {
+                        //document.model.project.drawShader(tree, false, document.model.device)
+                        document.model.project.render(tree: tree, device: document.model.device, time: 0, frame: 0, viewSize: SIMD2<Int>(document.model.nodeGraph.previewSize))
+                    }
+                })
+                {
+                    Label("Run", systemImage: "play.fill")
+                }
+                .keyboardShortcut("r")
+                
+                Button(action: {
+                    document.core.stop()
+                    if let asset = document.core.assetFolder.current {
+                        document.core.createPreview(asset)
+                    }
+                    updateView.toggle()
+                }) {
+                    Label("Stop", systemImage: "stop.fill")
+                }.keyboardShortcut(".")
+                .disabled(document.core.state == .Idle)
+                
+                //Divider()
+                    //.padding(.horizontal, 2)
+                    //.opacity(0)
+
+                toolShareMenu
+                toolGiftMenu
+                
+                Button(action: {
+                    document.help.send()
+                }) {
+                    Label("Help", systemImage: "questionmark")
+                }
+                .keyboardShortcut("h")
+                
+                Button(action: {
+                    showLibrary.toggle()
+                }) {
+                    Label("Library", systemImage: "sidebar.right")
+                }
+            }
+        }
+
+        //.onReceive(self.document.core.timeChanged) { value in
+        //    timeString = String(format: "%.02f", value)
         //}
+        
+        .onReceive(self.document.core.createPreview) { value in
+            if let asset = document.core.assetFolder.current {
+                document.core.createPreview(asset)
+            }
+        }
+        
+        .onReceive(self.document.help) { value in
+            if self.helpIsVisible == false {
+                self.document.core.scriptEditor!.activateHelpSession()
+            } else {
+                if let asset = document.core.assetFolder.current {
+                    self.document.core.assetFolder.select(asset.id)
+                }
+            }
+            self.helpIsVisible.toggle()
+        }
+        
+        .onReceive(self.document.exportImage) { value in
+            exportingImage = true
+        }
+        
+        .onReceive(self.document.core.updateUI) { value in
+            updateView.toggle()
+        }
+            
+
         // For Mac Screenshots, 1440x900
         //.frame(minWidth: 1440, minHeight: 806)
         //.frame(maxWidth: 1440, maxHeight: 806)

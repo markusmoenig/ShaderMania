@@ -24,7 +24,8 @@ class Project : Codable, Equatable
     var time            = Float(0)
     var frame           = UInt32(0)
 
-    var assetFolder     : AssetFolder? = nil
+    //var assetFolder     : AssetFolder? = nil
+    var renderTree      : Node? = nil
     
     var textureLoader   : MTKTextureLoader? = nil
     
@@ -82,8 +83,10 @@ class Project : Codable, Equatable
         if black != nil { black!.setPurgeableState(.volatile); black = nil }
     }
     
-    func collectShadersFor(assetFolder: AssetFolder, asset: Asset,_ collected: inout [Asset])
+    /// Collects all shaders in the given tree
+    func collectShadersForTree(tree: Node, collection: inout [Node])
     {
+        /*
         for (_, connectedToId) in asset.slots {
             
             if let conAsset = assetFolder.getAssetById(connectedToId) {
@@ -92,49 +95,40 @@ class Project : Codable, Equatable
                     collected.append(conAsset)
                 }
             }
+        }*/
+        for node in tree.children! {
+            collection.append(node)
         }
-        collected.append(asset)
     }
     
-    func compileAssets(assetFolder: AssetFolder, forAsset: Asset, compiler: ShaderCompiler, finished: @escaping () -> ())
+    func compileTree(tree: Node, compiler: ShaderCompiler, finished: @escaping () -> ())
     {
-        var collected : [Asset] = []
-        collectShadersFor(assetFolder: assetFolder, asset: forAsset, &collected)
+        var collected : [Node] = []
+        collectShadersForTree(tree: tree, collection: &collected)
         
-        var toCompile = 0
+        var toCompile = collected.count
         
-        for asset in collected {
-            if asset.shader == nil && asset.type == .Shader {
-                toCompile += 1
-            }
-        }
-        
-        for asset in collected {
-            if asset.shader == nil && asset.type == .Shader {
-                compiler.compile(asset: asset, cb: { (shader, errors) in
+        for node in collected {
+            compiler.compile(node: node, cb: { (shader, errors) in
                     
-                    asset.shader = shader
-                    asset.errors = errors
-                    toCompile -= 1
+                node.shader = shader
+                node.errors = errors
+                    
+                toCompile -= 1
 
-                    if toCompile == 0 {
-                        DispatchQueue.main.async {
-                            finished()
-                        }
+                if toCompile == 0 {
+                    DispatchQueue.main.async {
+                        finished()
                     }
-                })
-            }
+                }
+            })
         }
     }
     
-    @discardableResult func render(assetFolder: AssetFolder, device: MTLDevice, time: Float, frame: UInt32, viewSize: SIMD2<Int>, forAsset: Asset, preview: Bool = false) -> MTLTexture?
+    @discardableResult func render(tree: Node, device: MTLDevice, time: Float, frame: UInt32, viewSize: SIMD2<Int>, preview: Bool = false) -> MTLTexture?
     {
-        self.assetFolder = assetFolder
+        self.renderTree = tree
         self.time = time
-
-        //if forAsset.type == .Image {
-            //return forAsset.texture
-        //}
         
         startDrawing(device)
 
@@ -143,14 +137,14 @@ class Project : Codable, Equatable
             clear(black!)
         }
         
-        var collected : [Asset] = []
-        collectShadersFor(assetFolder: assetFolder, asset: forAsset, &collected)
+        var collected : [Node] = []
+        collectShadersForTree(tree: tree, collection: &collected)
 
         size = viewSize
         
-        if let customSize = assetFolder.customSize {
-            size = customSize
-        }
+        //if let customSize = assetFolder.customSize {
+        //    size = customSize
+        //}
         
         if preview == false {
             if size != lastSize {
@@ -160,19 +154,20 @@ class Project : Codable, Equatable
 
         checkTextures(collected: collected, preview: preview, device: device)
             
-        for asset in collected {
-            if asset.type == .Shader {
-                drawShader(asset, preview, device)
+        for node in collected {
+            if node.brand == .Shader {
+                drawShader(node, preview, device)
             }
         }
         
+        /*
         if preview {
             for asset in assetFolder.assets {
                 if asset.type == .Shader && asset.previewTexture != nil && collected.contains(asset) == false {
                     clear(asset.previewTexture!, float4(0,0,0,0))
                 }
             }
-        }
+        }*/
         
         if preview == false {
             lastSize = size
@@ -181,19 +176,20 @@ class Project : Codable, Equatable
         if collected.count == 0 {
             return nil
         } else {
+            tree.texture = collected.last!.texture
             return collected.last!.texture
         }
     }
     
-    func drawShader(_ asset: Asset,_ preview: Bool, _ device: MTLDevice)
+    func drawShader(_ node: Node,_ preview: Bool, _ device: MTLDevice)
     {
-        if asset.shader == nil {
-            print("no shader for \(asset.name)")
+        if node.shader == nil {
+            print("no shader for \(node.name)")
             return
         }
         let rect = MMRect( 0, 0, Float(size.x), Float(size.y))
         
-        let texture = preview == false ? asset.texture! : asset.previewTexture!
+        let texture = preview == false ? node.texture! : node.previewTexture!
         
         let vertexData = createVertexData(texture: texture, rect: rect)
         
@@ -217,6 +213,7 @@ class Project : Codable, Equatable
         for index in 1..<5 {
             var hasBeenSet = false
             
+            /*
             if let nodeId = asset.slots[index - 1] {
                 if let node = assetFolder?.getAssetById(nodeId) {
                     let texture = preview == false ? node.texture : node.previewTexture
@@ -226,7 +223,7 @@ class Project : Codable, Equatable
                         hasBeenSet = true
                     }
                 }
-            }
+            }*/
             
             if hasBeenSet == false {
                 renderEncoder.setFragmentTexture(black, index: index)
@@ -234,64 +231,64 @@ class Project : Codable, Equatable
         }
 
         /// Update the parameter data for the shader
-        if let shader = asset.shader {
+        if let shader = node.shader {
             
             if shader.paramDataBuffer == nil {
-                shader.paramDataBuffer = device.makeBuffer(bytes: asset.shaderData, length: asset.shaderData.count * MemoryLayout<SIMD4<Float>>.stride, options: [])!
+                shader.paramDataBuffer = device.makeBuffer(bytes: node.shaderData, length: node.shaderData.count * MemoryLayout<SIMD4<Float>>.stride, options: [])!
             } else {
-                shader.paramDataBuffer!.contents().copyMemory(from: asset.shaderData, byteCount: asset.shaderData.count * MemoryLayout<SIMD4<Float>>.stride)
+                shader.paramDataBuffer!.contents().copyMemory(from: node.shaderData, byteCount: node.shaderData.count * MemoryLayout<SIMD4<Float>>.stride)
             }
             
             renderEncoder.setFragmentBuffer(shader.paramDataBuffer, offset: 0, index: 5)
         }
 
-        renderEncoder.setRenderPipelineState(asset.shader!.pipelineState)
+        renderEncoder.setRenderPipelineState(node.shader!.pipelineState)
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         renderEncoder.endEncoding()
     }
     
     /// Checks if all textures are loaded and makes sure they have the right size
-    func checkTextures(collected: [Asset], preview: Bool = true, device: MTLDevice)
+    func checkTextures(collected: [Node], preview: Bool = true, device: MTLDevice)
     {
-        for asset in collected {
+        for node in collected {
             
-            if asset.type == .Shader {
+            if node.brand == .Shader {
                 if preview == false {
-                    if asset.texture == nil || asset.texture!.width != size.x || asset.texture!.height != size.y {
-                        if asset.texture != nil {
-                            asset.texture!.setPurgeableState(.volatile)
-                            asset.texture = nil
+                    if node.texture == nil || node.texture!.width != size.x || node.texture!.height != size.y {
+                        if node.texture != nil {
+                            node.texture!.setPurgeableState(.volatile)
+                            node.texture = nil
                         }
-                        asset.texture = allocateTexture(device, width: size.x, height: size.y)
-                        clear(asset.texture!)
+                        node.texture = allocateTexture(device, width: size.x, height: size.y)
+                        clear(node.texture!)
                     }
                 } else {
-                    if asset.previewTexture == nil {
-                        asset.previewTexture = allocateTexture(device, width: size.x, height: size.y)
-                        clear(asset.previewTexture!, float4(0,0,0,0))
+                    if node.previewTexture == nil {
+                        node.previewTexture = allocateTexture(device, width: size.x, height: size.y)
+                        clear(node.previewTexture!, float4(0,0,0,0))
                     }
                 }
-            } else
-            if asset.type == .Image {
+            } /*else
+            if node.type == .Image {
                 // Image Texture
                 
                 if textureLoader == nil {
                     textureLoader = MTKTextureLoader(device: device)
                 }
                 
-                if preview == false && asset.texture == nil {
+                if preview == false && node.texture == nil {
                     let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
-                    if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
-                        asset.texture = texture
+                    if let texture  = try? textureLoader?.newTexture(data: node.data[0], options: texOptions) {
+                        node.texture = texture
                     }
                 } else
                 if preview == true && asset.previewTexture == nil {
                     let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]
-                    if let texture  = try? textureLoader?.newTexture(data: asset.data[0], options: texOptions) {
-                        asset.previewTexture = texture
+                    if let texture  = try? textureLoader?.newTexture(data: node.data[0], options: texOptions) {
+                        node.previewTexture = texture
                     }
                 }
-            }
+            }*/
         }
     }
     

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Metal
 
 class Model {
     
@@ -17,18 +18,29 @@ class Model {
     var nodeGraph                           : NodeGraph!
     var nodeRegion                          : MMRegion!
     
+    var device                              : MTLDevice!
+    
     /// The currently selected shader tree
     var selectedTree                        : Node? = nil
     
     /// The script editor
     var scriptEditor                        : ScriptEditor? = nil
     
+    var compiler                            : ShaderCompiler!
+    
     init() {
         project = Project()
-        
         selectedTree = project.trees[0]
+
+        compiler = ShaderCompiler(self)
     }
     
+    /// Loaded from document
+    func setProject(_ project: Project) {
+        self.project = project
+    }
+    
+    /// Sets up the NodeGraph from the MetalManiaView
     func setupNodeView(_ view: MMView)
     {
         view.startup()
@@ -38,12 +50,24 @@ class Model {
         
         nodeGraph = NodeGraph(model: self)
         nodeGraph.setup()
+        nodeGraph.setcurrentRoot(node: selectedTree)
         
         nodeRegion = EditorRegion(view, model: self)
         
         view.editorRegion = nodeRegion
+        device = view.device
+    }
+    
+    /// Build the project, that means:
+    /// 1.Compiling all uncompiled or changed shaders in the project
+    func build() {
         
-        //view.core = self
-        //nodesWidget = NodesWidget(self)
+        if let shaderTree = selectedTree {
+            project.compileTree(tree: shaderTree, compiler: compiler, finished: { () in
+        
+                print("finished compiling")
+                
+            })
+        }
     }
 }

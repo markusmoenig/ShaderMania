@@ -111,7 +111,7 @@ public class Core       : ObservableObject
         
         assetFolder.setup(self)
 
-        shaderCompiler = ShaderCompiler(self)
+        //shaderCompiler = ShaderCompiler(self)
         
         #if os(iOS)
         do {

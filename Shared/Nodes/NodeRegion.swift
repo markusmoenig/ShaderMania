@@ -113,7 +113,7 @@ class EditorWidget      : MMWidget
             if model.nodeGraph.hoverNode != nil && model.nodeGraph.nodeHoverMode == .Preview {
                 
                 var node = model.nodeGraph.hoverNode!
-                if node === model.nodeGraph.currentRoot! {
+                if node === model.nodeGraph.model.selectedTree! {
                     node = model.nodeGraph.previewNode!
                 }
                 
@@ -126,9 +126,9 @@ class EditorWidget      : MMWidget
                 node.updatePreview(nodeGraph: model.nodeGraph)
                 mmView.update()
             } else
-            if model.nodeGraph.nodeHoverMode == .None && model.nodeGraph.currentRoot != nil
+            if model.nodeGraph.nodeHoverMode == .None && model.selectedTree != nil
             {
-                if let camera = model.nodeGraph.currentRoot!.camera {
+                if let camera = model.selectedTree!.camera {
                     
                     if firstTouch == true {
                         zoomBuffer = camera.zoom
@@ -185,7 +185,7 @@ class EditorWidget      : MMWidget
                 
                 // Node preview translation
                 var node = model.nodeGraph.hoverNode!
-                if node === model.nodeGraph.currentRoot! {
+                if node === model.selectedTree! {
                     node = model.nodeGraph.previewNode!
                 }
                 
@@ -217,7 +217,7 @@ class EditorWidget      : MMWidget
                 node.properties["prevScale"] = prevScale
                 node.updatePreview(nodeGraph: model.nodeGraph)
             } else
-            if model.nodeGraph.nodeHoverMode == .None && model.nodeGraph.currentRoot != nil
+            if model.nodeGraph.nodeHoverMode == .None && model.selectedTree != nil
             {
                 // NodeGraph translation
                 
@@ -232,7 +232,7 @@ class EditorWidget      : MMWidget
                 }
                 #endif
 
-                if let camera = model.nodeGraph.currentRoot!.camera {
+                if let camera = model.selectedTree!.camera {
                     #if os(OSX)
                     if mmView.commandIsDown && event.deltaY! != 0 {
                         camera.zoom += event.deltaY! * 0.003
@@ -244,7 +244,7 @@ class EditorWidget      : MMWidget
                         if camera.zoom > 0.2 && camera.zoom < 1.5 {
                             let targetPoint = SIMD2<Float>(event.x - model.nodeRegion!.rect.x, event.y - model.nodeRegion!.rect.y)
 
-                            if let currentRoot = model.nodeGraph.currentRoot {
+                            if let currentRoot = model.selectedTree {
                                 let toMove = model.nodeGraph.getNodesOfRoot(for: currentRoot)
                                 
                                 for mNode in toMove {

@@ -54,8 +54,8 @@ class NodeGraph
     var playToExecute   : [Node] = []
     var playBindings    : [Terminal] = []
 
-    var currentRoot     : Node? = nil
-    var currentRootUUID : UUID? = nil
+    //var currentRoot     : Node? = nil
+    //var currentRootUUID : UUID? = nil
     
     var currentObjectUUID: UUID? = nil
     var currentSceneUUID: UUID? = nil
@@ -116,7 +116,8 @@ class NodeGraph
     var previewInfoMenu : MMMenuWidget!
 
     var previewSize     : SIMD2<Float> = SIMD2<Float>(375, 200)
-    
+    var previewMinSize  : SIMD2<Float> = SIMD2<Float>(375, 80)
+
     var previewRect     : MMRect = MMRect()
     var navRect         : MMRect = MMRect()
     var navLabel        : MMTextLabel!
@@ -161,7 +162,7 @@ class NodeGraph
     required init(model: Model)
     {
         self.model = model
-        
+        /*
         let node = Node()
 
         node.name = "New Object"
@@ -169,7 +170,7 @@ class NodeGraph
         //node.currentSequence = object.sequences[0]
         node.setupTerminals()
         node.subset = []
-        nodes.append(node)
+        nodes.append(node)*/
         
         /*
         let layer = Layer()
@@ -185,7 +186,7 @@ class NodeGraph
         //game.name = "Game"
         //nodes.append(game)
 
-        setcurrentRoot(node: node)
+        //setcurrentRoot(node: node)
         
         //debugBuilder = DebugBuilder(self)
         //debugInstance = debugBuilder.build(camera: Camera())
@@ -223,6 +224,12 @@ class NodeGraph
     {
         mmView = model.nodeView        
         
+        mmView.registerIcon("navigation")
+        
+        mmView.registerIcon("zoom_minus")
+        mmView.registerIcon("zoom_plus")
+
+        /*
         let child = BehaviorTree()
         //child.name = "Child"
         //node.sequences.append( MMTlSequence() )
@@ -231,6 +238,7 @@ class NodeGraph
         child.setupUI(mmView: mmView)
         nodes.append(child)
         currentRoot!.subset?.append(child.uuid)
+         */
         
         timeline = MMTimeline(mmView)
         //builder = Builder(self)
@@ -405,7 +413,7 @@ class NodeGraph
             self.nodeList!.switchTo(.Game)
             adjustVisibleButtons()
         }
-        
+        */
         var smallButtonSkin = MMSkinButton()
         smallButtonSkin.height = mmView.skin.Button.height
         smallButtonSkin.round = mmView.skin.Button.round
@@ -417,26 +425,27 @@ class NodeGraph
         iconButtonSkin.round = mmView.skin.Button.round
         iconButtonSkin.fontScale = mmView.skin.Button.fontScale
         
-        navButton = MMButtonWidget(app.mmView, skinToUse: iconButtonSkin, iconName: "navigation")
+        navButton = MMButtonWidget(mmView, skinToUse: iconButtonSkin, iconName: "navigation")
         navButton.iconZoom = 2
         navButton.clicked = { (event) -> Void in
             self.setNavigationState(on: self.navigationMode == .Off)
         }
 
-        editButton = MMButtonWidget(app.mmView, skinToUse: smallButtonSkin, text: "Shape..." )
+        editButton = MMButtonWidget(mmView, skinToUse: smallButtonSkin, text: "Shape..." )
         editButton.clicked = { (event) -> Void in
+            /*
             self.stopPreview()
 
             self.editButton.removeState(.Checked)
             
             self.maximizedNode = self.currentRoot!
             self.deactivate()
-            self.maximizedNode!.maxDelegate!.activate(self.app!)
+            self.maximizedNode!.maxDelegate!.activate(self.app!)*/
         }
 
-        playButton = MMButtonWidget( app.mmView, skinToUse: smallButtonSkin, text: "Run Behavior" )
+        playButton = MMButtonWidget(mmView, skinToUse: smallButtonSkin, text: "Run Behavior" )
         playButton.clicked = { (event) -> Void in
-            
+            /*
             if self.playNode == nil {
                 
                 // --- Start Playing
@@ -496,21 +505,34 @@ class NodeGraph
                     }
                 }
                 
-                self.playButton.addState(.Checked)
-                app.mmView.lockFramerate(true)
+                //self.playButton.addState(.Checked)
+                //self.mmView.lockFramerate(true)
+             
             } else {
-                self.stopPreview()
-            }
+                //self.stopPreview()
+            }*/
         }
         
-        nodeList = NodeList(app.mmView, app:app)
-        sideSliderButton = MMSideSliderWidget(app.mmView)
+        //nodeList = NodeList(app.mmView, app:app)
+        sideSliderButton = MMSideSliderWidget(mmView)
         
         navSliderWidget = MMSliderWidget(mmView, range: SIMD2<Float>(0.2, 1.5), value: 1)
         navSliderWidget.changed = { (value) in
-            self.currentRoot!.camera!.zoom = value
+            if let camera = self.model.selectedTree?.camera {
+                camera.zoom = value
+            }
         }
+
+        previewInfoMenu = MMMenuWidget(mmView, type: .LabelMenu)
+
+        activate()
         
+        navLabel = MMTextLabel(mmView, font: mmView.openSans, text: "100%", scale: 0.34, color: SIMD4<Float>(0.573, 0.573, 0.573, 1))
+        
+        zoomInTexture = mmView.icons["zoom_plus"]
+        zoomOutTexture = mmView.icons["zoom_minus"]
+        
+        /*
         // --- Register icons at first time start
 //        if app.mmView.icons["execute"] == nil {
 //            executeIcon = app.mmView.registerIcon("execute")
@@ -604,6 +626,20 @@ class NodeGraph
     ///
     func activate()
     {
+        if !overviewIsOn {
+            mmView.widgets.insert(navButton, at: 0)
+            mmView.widgets.insert(editButton, at: 0)
+            mmView.widgets.insert(playButton, at: 0)
+            //mmView.widgets.insert(behaviorMenu, at: 0)
+            
+            if navigationMode == .On {
+                mmView.widgets.insert(navSliderWidget, at: 0)
+            } else {
+                //mmView.widgets.insert(previewInfoMenu, at: 0)
+            }
+        }
+        nodeHoverMode = .None
+
         /*
         mmView.registerWidgets(widgets: nodeList!, contentScrollButton, objectsButton, scenesButton, gameButton)
         if !overviewIsOn {
@@ -895,7 +931,7 @@ class NodeGraph
 //            let offX = selectedNode.rect.x - event.x
             let offY = selectedNode.rect.y - event.y
             
-            if offY < 26 && selectedNode !== currentRoot {
+            if offY < 26 && selectedNode !== model.selectedTree {
                 dragStartPos.x = event.x
                 dragStartPos.y = event.y
                 nodeHoverMode = .Dragging
@@ -1003,13 +1039,15 @@ class NodeGraph
             return
         }*/
         
+        let selectedTree = model.selectedTree
+        
         // Navigation Drag
         if navigationMode == .On && nodeHoverMode == .NavigationDrag {
             
             let factor : Float = max(boundingRect.width / previewRect.width, boundingRect.height / previewRect.height)
             
-            currentRoot!.camera!.xPos -= (event.x - dragStartPos.x) * factor * currentRoot!.camera!.zoom
-            currentRoot!.camera!.yPos -= (event.y - dragStartPos.y) * factor * currentRoot!.camera!.zoom
+            selectedTree!.camera!.xPos -= (event.x - dragStartPos.x) * factor * selectedTree!.camera!.zoom
+            model.selectedTree!.camera!.yPos -= (event.y - dragStartPos.y) * factor * selectedTree!.camera!.zoom
             dragStartPos.x = event.x
             dragStartPos.y = event.y
             mmView.update()
@@ -1028,8 +1066,8 @@ class NodeGraph
             sideSliderButton.removeState(.Hover)
         }*/
         
-        if currentRoot == nil { return }
-        var scale : Float = currentRoot!.camera!.zoom
+        if model.selectedTree == nil { return }
+        var scale : Float = model.selectedTree!.camera!.zoom
         
         /*
         if let screen = mmScreen {
@@ -1101,7 +1139,7 @@ class NodeGraph
             previewSize.y = max(previewSize.y, 80)
 
             DispatchQueue.main.async {
-                self.currentRoot!.updatePreview(nodeGraph: self)
+                selectedTree!.updatePreview(nodeGraph: self)
             }
             mmView.update()
             return
@@ -1110,7 +1148,7 @@ class NodeGraph
         hoverNode = nodeAt(event.x, event.y)
         
         // Resizing the root node ?
-        if currentRoot != nil && hoverNode === currentRoot {
+        if selectedTree != nil && hoverNode === selectedTree {
             if event.x > hoverNode!.rect.x + 5 && event.x < hoverNode!.rect.x + 35 && event.y < hoverNode!.rect.y + hoverNode!.rect.height - 5 && event.y > hoverNode!.rect.y + hoverNode!.rect.height - 35 {
                 nodeHoverMode = .RootDrag
                 mmView.update()
@@ -1194,7 +1232,7 @@ class NodeGraph
                 mmView.update()
             }
             
-            if hoverNode !== currentRoot {
+            if hoverNode !== selectedTree {
                 // --- Look for NodeUI item under the mouse, root has no UI
                 let uiItemX = hoverNode!.rect.x + 35 * scale
                 var uiItemY = hoverNode!.rect.y + NodeGraph.bodyY * scale
@@ -1255,7 +1293,7 @@ class NodeGraph
             if overviewIsOn == false && contentType != .Game {
                 
                 let rect = MMRect()
-                if hoverNode !== currentRoot {
+                if hoverNode !== selectedTree {
                     
                     rect.x = hoverNode!.rect.x + (hoverNode!.rect.width - 200*scale) / 2
                     rect.y = hoverNode!.rect.y + NodeGraph.bodyY * scale + hoverNode!.uiArea.height * scale
@@ -1343,11 +1381,8 @@ class NodeGraph
             
             // --- Draw Nodes
 
-            if let rootNode = model.selectedTree, let toDraw = rootNode.children {//currentRoot {
-                
-                //let toDraw = getNodesOfRoot(for: currentRoot!)
-                
-                let camera = currentRoot!.camera!
+            if let rootNode = model.selectedTree, let toDraw = rootNode.children, let camera = rootNode.camera {
+                                
                 func expandBounds(_ node: Node)
                 {
                     let nodeX : Float = node.xPos
@@ -1395,7 +1430,7 @@ class NodeGraph
                 
                 // --- Ongoing Node connection attempt ?
                 if nodeHoverMode == .TerminalConnection {
-                    let scale : Float = currentRoot!.camera!.zoom
+                    let scale : Float = model.selectedTree!.camera!.zoom
 
                     let color = prevTerminalConnected ? SIMD3<Float>(0.278, 0.482, 0.675) : getColorForTerminal(hoverTerminal!.0)
                     mmView.drawLine.draw( sx: hoverTerminal!.2, sy: hoverTerminal!.3, ex: mousePos.x, ey: mousePos.y, radius: 2 * scale, fillColor : SIMD4<Float>(color.x, color.y, color.z, 1) )
@@ -1459,10 +1494,10 @@ class NodeGraph
     /// Draw an overview node
     func drawOverviewNode(_ node: Node, region: MMRegion)
     {
-        let scale : Float = currentRoot!.camera!.zoom
+        let scale : Float = model.selectedTree!.camera!.zoom
         
-        node.rect.x = region.rect.x + node.xPos * scale + currentRoot!.camera!.xPos
-        node.rect.y = region.rect.y + node.yPos * scale + currentRoot!.camera!.yPos
+        node.rect.x = region.rect.x + node.xPos * scale + model.selectedTree!.camera!.xPos
+        node.rect.y = region.rect.y + node.yPos * scale + model.selectedTree!.camera!.yPos
         
         node.rect.width = 266 * scale
         node.rect.height = 116 * scale
@@ -1579,10 +1614,10 @@ class NodeGraph
         let renderer = mmView.renderer!
         let renderEncoder = renderer.renderEncoder!
         let scaleFactor : Float = mmView.scaleFactor
-        var scale : Float = currentRoot!.camera!.zoom
+        var scale : Float = model.selectedTree!.camera!.zoom
 
-        node.rect.x = region.rect.x + node.xPos * scale + currentRoot!.camera!.xPos
-        node.rect.y = region.rect.y + node.yPos * scale + currentRoot!.camera!.yPos
+        node.rect.x = region.rect.x + node.xPos * scale + model.selectedTree!.camera!.xPos
+        node.rect.y = region.rect.y + node.yPos * scale + model.selectedTree!.camera!.yPos
         
         if let behaviorTree = node.behaviorTree {
             let treeScale = behaviorTree.properties["treeScale"]!
@@ -1836,6 +1871,9 @@ class NodeGraph
         previewSize.x = min(previewSize.x, model.nodeRegion!.rect.width - 40)
         previewSize.y = min(previewSize.y, model.nodeRegion!.rect.height - 70)
         
+        previewSize.x = max(previewSize.x, previewMinSize.x)
+        previewSize.y = max(previewSize.y, previewMinSize.y)
+        
         node.rect.width = previewSize.x + 2
         node.rect.height = previewSize.y + 64 + 25
         
@@ -1854,12 +1892,11 @@ class NodeGraph
         previewRect.width = previewSize.x - 23
         previewRect.height = previewSize.y
         
-        /*
         if navigationMode == .Off {
             var textures : [MTLTexture] = []
             
             
-            if refList.isActive == false {
+            //if refList.isActive == false {
                 // --- Preview
                 
                 func printBehaviorOnlyText()
@@ -1869,7 +1906,14 @@ class NodeGraph
                 
                 // Preview Border
                 mmView.drawBoxPattern.draw( x: x, y: y, width: previewSize.x - 23, height: previewSize.y, round: 26, borderSize: 0, fillColor: SIMD4<Float>(0.306, 0.310, 0.314, 1.000), borderColor: SIMD4<Float>(0.216, 0.220, 0.224, 1.000) )
-                
+            
+            if let tree = model.selectedTree {
+                if let texture = tree.texture {
+                    textures.append(texture)
+                }
+            }
+            
+                /*
                 if let game = previewNode as? Game {
                     if let _ = game.currentScene {
                         if let texture = sceneRenderer.fragment.texture {
@@ -1893,21 +1937,22 @@ class NodeGraph
                             textures.append(texture)
                         }
                     }
-                }
+                }*/
                 
                 for texture in textures {
-                    app!.mmView.drawTexture.draw(texture, x: x - 23, y: y, zoom: 1, round: 26, roundingRect: SIMD4<Float>(23, 0, previewSize.x - 23, previewSize.y))
+                    mmView.drawTexture.draw(texture, x: x - 23, y: y, zoom: 1, round: 26, roundingRect: SIMD4<Float>(23, 0, previewSize.x - 23, previewSize.y))
                 }
                 
                 // Draw Debug
                 
+                /*
                 if debugMode != .None {
                     let camera = createNodeCamera(playNode != nil ? playNode! : node)
                     
                     debugBuilder.render(width: previewSize.x, height: previewSize.y, instance: debugInstance, camera: camera)
                     app!.mmView.drawTexture.draw(debugInstance.texture!, x: x - 23, y: y, zoom: 1, round: 26, roundingRect: SIMD4<Float>(23, 0, previewSize.x - 23, previewSize.y))
-                }
-            } else {
+                }*/
+            /*} else {
                 // Visible reference list
                 
                 refList.rect.x = x
@@ -1916,16 +1961,17 @@ class NodeGraph
                 refList.rect.height = previewSize.y
                 
                 refList.draw()
-            }
+            }*/
             
             // If previewing fill in the screen dimensions
             
+            /*
             if let screen = mmScreen {
                 screen.rect.x = x
                 screen.rect.y = y
                 screen.rect.width = previewSize.x
                 screen.rect.height = previewSize.y
-            }
+            }*/
         } else {
             // Navigation
             
@@ -1972,18 +2018,18 @@ class NodeGraph
             
             navRect.x = x + (-camera.xPos / scale - boundingRect.x) * aWidth + (navWidth - (boundingRect.width * aWidth)) / 2
             navRect.y = y + (-camera.yPos / scale - boundingRect.y) * aHeight + (navHeight - (boundingRect.height * aHeight)) / 2
-            navRect.width = app!.editorRegion!.rect.width * aWidth / scale
-            navRect.height = app!.editorRegion!.rect.height * aHeight / scale
+            navRect.width = model.nodeRegion!.rect.width * aWidth / scale
+            navRect.height = model.nodeRegion!.rect.height * aHeight / scale
             
-            app!.mmView.drawBox.draw(x: navRect.x, y: navRect.y, width: navRect.width, height: navRect.height, round: 8, borderSize: 2, fillColor: SIMD4<Float>(0,0,0,0), borderColor: SIMD4<Float>(0.596, 0.125, 0.141, 1.000))
+            mmView.drawBox.draw(x: navRect.x, y: navRect.y, width: navRect.width, height: navRect.height, round: 8, borderSize: 2, fillColor: SIMD4<Float>(0,0,0,0), borderColor: SIMD4<Float>(0.596, 0.125, 0.141, 1.000))
             
-            app!.mmView.renderer.setClipRect()
+            mmView.renderer.setClipRect()
             
             navLabel.rect.x = node.rect.x + 30
             navLabel.rect.y = node.rect.y + node.rect.height - 22
-            if navLabelZoom != currentRoot!.camera!.zoom {
-                navLabel.setText(String(format: "%.00f", currentRoot!.camera!.zoom * 100) + "%")
-                navLabelZoom = currentRoot!.camera!.zoom
+            if navLabelZoom != model.selectedTree!.camera!.zoom {
+                navLabel.setText(String(format: "%.00f", model.selectedTree!.camera!.zoom * 100) + "%")
+                navLabelZoom = model.selectedTree!.camera!.zoom
             }
             navLabel.draw()
             
@@ -1996,9 +2042,7 @@ class NodeGraph
             navSliderWidget.rect.height = 20
             navSliderWidget.draw()
         }
-         */
         
-        /*
         // --- Buttons
         
         navButton.rect.x = node.rect.x + 10
@@ -2013,11 +2057,12 @@ class NodeGraph
         playButton.rect.y = editButton.rect.y
         playButton.draw()
         
+        /*
         behaviorMenu.rect.x = node.rect.x + node.rect.width - 64
         behaviorMenu.rect.y = node.rect.y + 26
         behaviorMenu.rect.width = 30
         behaviorMenu.rect.height = 28
-        behaviorMenu.draw()
+        behaviorMenu.draw()*/
         
         // --- Node Drag Handles
         
@@ -2027,16 +2072,17 @@ class NodeGraph
         // --- Preview Info Label
         
         if navigationMode == .Off {
+            /*
             previewInfoMenu.rect.x = node.rect.x + node.rect.width - previewInfoMenu.rect.width - 36
             previewInfoMenu.rect.y = node.rect.y + node.rect.height - 24
-            previewInfoMenu.draw()
-        }*/
+            previewInfoMenu.draw()*/
+        }
     }
     
     /// Draws the given connection
     func drawConnection(_ conn: Connection)
     {
-        var scale : Float = currentRoot!.camera!.zoom
+        var scale : Float = model.selectedTree!.camera!.zoom
         let terminal = conn.terminal!
         let node = terminal.node!
         
@@ -2178,6 +2224,7 @@ class NodeGraph
     {
         var found : Node? = nil
         if let rootNode = model.selectedTree, let nodes = rootNode.children { //currentRoot {
+            if rootNode.rect.contains(x, y) { return rootNode }
             for node in nodes {
                 //if rootNode.subset!.contains(node.uuid) || node === rootNode {
                     if node.rect.contains( x, y ) {
@@ -2202,7 +2249,7 @@ class NodeGraph
     /// Returns the terminal and the terminal connector at the given mouse position for the given node (if any)
     func terminalAt(_ node: Node, _ x: Float, _ y: Float) -> (Terminal, Terminal.Connector, Float, Float)?
     {
-        var scale : Float = currentRoot!.camera!.zoom
+        var scale : Float = model.selectedTree!.camera!.zoom
 
         if let behaviorTree = node.behaviorTree {
             let treeScale = behaviorTree.properties["treeScale"]!
@@ -2585,7 +2632,7 @@ class NodeGraph
             if currentContent.count > 0 {
                 setcurrentRoot(node: currentContent[0])
             } else {
-                currentRoot = nil
+                model.selectedTree = nil
             }
         }
         contentScrollButton.setItems(items, fixedWidth: 220)
@@ -2595,12 +2642,12 @@ class NodeGraph
     /// Sets the current root node
     func setcurrentRoot(node: Node?=nil, uuid: UUID?=nil)
     {
-        currentRoot = nil
-        currentRootUUID = nil
-        
+        //currentRoot = nil
+        //currentRootUUID = nil
+        /*
         func setcurrentRootUUID(_ uuid: UUID)
         {
-            currentRootUUID = uuid
+            //currentRootUUID = uuid
             if contentType == .Objects {
                 currentObjectUUID = uuid
             } else
@@ -2623,13 +2670,14 @@ class NodeGraph
                 }
             }
         }
+         */
         
         
         // Update the nodes for the new root
-        if let currentRoot = currentRoot {
-            updateRootNodes(currentRoot)
-            if currentRoot.camera == nil {
-                currentRoot.camera = Camera()
+        if let tree = model.selectedTree {
+            updateRootNodes(tree)
+            if tree.camera == nil {
+                tree.camera = Camera()
             }
             
             /*
@@ -2752,7 +2800,7 @@ class NodeGraph
     func setOverviewRoot()
     {
         overviewRoot.subset = []
-        setCurrentNode(currentRoot != nil ? currentRoot : nil)
+        setCurrentNode(model.selectedTree != nil ? model.selectedTree : nil)
             
         /*
         if contentType == .ObjectsOverview {
@@ -3509,7 +3557,7 @@ class NodeGraph
             }
         }
         // Remove node from root subset
-        if let root = currentRoot {
+        if let root = model.selectedTree {
             if let index = root.subset!.firstIndex(where: { $0 == node.uuid }) {
                 root.subset!.remove(at: index)
             }
@@ -3644,7 +3692,7 @@ class NodeGraph
                 node.name = name
                 node.label = nil
                 if !self.overviewIsOn {
-                    self.updateRootNodes(self.currentRoot!)
+                    self.updateRootNodes(self.model.selectedTree!)
                 } else {
                     if self.contentType == .ObjectsOverview {
                         self.updateContent(.Objects)
@@ -3785,23 +3833,23 @@ class NodeGraph
                     self.nodes.append(node)
                     root.subset!.append(node.uuid)
                     self.setCurrentNode()
-                    self.updateRootNodes(self.currentRoot!)
+                    self.updateRootNodes(self.model.selectedTree!)
                     //self.refList.update()
                 }
                 nodeStatusChanged(node, root)
             }
         }
         
-        if currentRoot != nil {
-            nodeStatusChanged(node, currentRoot!)
+        if model.selectedTree != nil {
+            nodeStatusChanged(node, model.selectedTree!)
             
             node.setupTerminals()
             
             nodes.append(node)
-            currentRoot?.subset!.append(node.uuid)
+            model.selectedTree?.subset!.append(node.uuid)
             setCurrentNode(node)
             updateNode(node)
-            updateRootNodes(currentRoot!)
+            updateRootNodes(model.selectedTree!)
             //refList.update()
         }
     }

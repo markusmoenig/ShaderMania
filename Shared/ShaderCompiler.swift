@@ -203,24 +203,25 @@ class Shader                : NSObject
 
 class ShaderCompiler
 {
-    let core            : Core
+    let model               : Model
     
-    init(_ core: Core)
+    init(_ model: Model)
     {
-        self.core = core
+        self.model = model
     }
     
-    func compile(asset: Asset, cb: @escaping (Shader?, [CompileError]) -> ())
+    func compile(node: Node, cb: @escaping (Shader?, [CompileError]) -> ())
     {
-        var code = getHeaderCode(noOp: asset.type == .Common)
+        var code = getHeaderCode(noOp: false)//asset.type == .Common)
         
+        /*
         if asset.type != .Common {
             for asset in core.assetFolder.assets {
                 if asset.type == .Common {
                     code += asset.value
                 }
             }
-        }
+        }*/
         
         var ns = code as NSString
         var lineNumbers  : Int32 = 0
@@ -234,7 +235,7 @@ class ShaderCompiler
 
         func createError(_ errorText: String = "Syntax Error", line: Int32) {
             var error = CompileError()
-            error.asset = asset
+            error.node = node
             error.line = line - lineNumbers
             error.column = 0
             error.error = errorText
@@ -242,7 +243,7 @@ class ShaderCompiler
             parseErrors.append(error)
         }
         
-        ns = (code + asset.value) as NSString
+        ns = (code + node.getCode()) as NSString
         var lineNr : Int32 = 0
                 
         var parsedCode = ""
@@ -299,9 +300,9 @@ class ShaderCompiler
                                 
                             let parameter = ShaderParameter(type, pairs)
                             let paramText = parameter.createShaderText(shader.parameters.count)
-                            if asset.shaderDataNames[shader.parameters.count] != parameter.name {
-                                asset.shaderData[shader.parameters.count] = parameter.defaultValue
-                                asset.shaderDataNames[shader.parameters.count] = parameter.name
+                            if node.shaderDataNames[shader.parameters.count] != parameter.name {
+                                node.shaderData[shader.parameters.count] = parameter.defaultValue
+                                node.shaderDataNames[shader.parameters.count] = parameter.name
                             }
                             shader.parameters.append(parameter)
                             
@@ -344,7 +345,7 @@ class ShaderCompiler
                         }
                         if arr.count >= 4 {
                             var er = CompileError()
-                            er.asset = asset
+                            er.node = node
                             er.line = Int32(arr[0])! - lineNumbers - 1
                             er.column = Int32(arr[1])
                             er.type = arr[2].trimmingCharacters(in: .whitespaces)
@@ -377,19 +378,21 @@ class ShaderCompiler
                 shader.pipelineStateDesc.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
                 
                 do {
-                    shader.pipelineState = try self.core.device.makeRenderPipelineState(descriptor: shader.pipelineStateDesc)
+                    shader.pipelineState = try self.model.device.makeRenderPipelineState(descriptor: shader.pipelineStateDesc)
                     shader.isValid = true
                 } catch {
                     shader.isValid = false
                 }
 
                 if shader.isValid == true {
+                    node.codeDataChanged = false
+                    node.shader = shader
                     cb(shader, errors)
                 }
             }
         }
         
-        core.device.makeLibrary(source: parsedCode, options: nil, completionHandler: compiledCB)
+        model.device.makeLibrary(source: parsedCode, options: nil, completionHandler: compiledCB)
     }
     
     /// Splits the parameters into key and value pairs
