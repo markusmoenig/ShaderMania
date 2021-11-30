@@ -13,6 +13,8 @@ class Model {
     /// The project itself
     var project                             : Project
     
+    var metalStates                         : MetalStates!
+    
     // MetalMania based Node system
     var nodeView                            : MMView!
     var nodeGraph                           : NodeGraph!
@@ -30,6 +32,8 @@ class Model {
     
     init() {
         project = Project()
+        project.model = self
+        
         selectedTree = project.trees[0]
 
         compiler = ShaderCompiler(self)
@@ -38,6 +42,7 @@ class Model {
     /// Loaded from document
     func setProject(_ project: Project) {
         self.project = project
+        self.project.model = self
     }
     
     /// Sets up the NodeGraph from the MetalManiaView
@@ -55,7 +60,9 @@ class Model {
         nodeRegion = EditorRegion(view, model: self)
         
         view.editorRegion = nodeRegion
-        device = view.device
+        device = view.device!
+        
+        metalStates = MetalStates(self)
     }
     
     /// Build the project, that means:
@@ -65,6 +72,7 @@ class Model {
         if let shaderTree = selectedTree {
             project.compileTree(tree: shaderTree, compiler: compiler, finished: { () in
         
+                self.nodeView.update()
                 print("finished compiling")
                 
             })

@@ -9,6 +9,14 @@ import MetalKit
 
 class Project : Codable, Equatable
 {
+    enum State {
+        case Idle, Playing, Paused
+    }
+    
+    var state           : State = .Idle
+    
+    var model           : Model!
+    
     var uuid            : UUID = UUID()
     
     var trees           : [Node] = []
@@ -21,8 +29,10 @@ class Project : Codable, Equatable
     
     var size            = SIMD2<Int>(0,0)
     var lastSize        = SIMD2<Int>(0,0)
+    
     var time            = Float(0)
     var frame           = UInt32(0)
+    var targetFPS       = Float(60)
 
     //var assetFolder     : AssetFolder? = nil
     var renderTree      : Node? = nil
@@ -37,7 +47,6 @@ class Project : Codable, Equatable
     }
 
     init() {
-        
         let tree = Node()
         tree.children = []
 
@@ -75,60 +84,43 @@ class Project : Codable, Equatable
         try container.encode(trees, forKey: .trees)
     }
     
-    static func ==(lhs:Project, rhs:Project) -> Bool {
-        return lhs.uuid == rhs.uuid
+    /// Start playback
+    func play() {
+        
+        if state == .Idle {
+            model.nodeView.lockFramerate(true)
+        }
+        
+        state = .Playing
+        time = 0
+        frame = 0
     }
     
-    func clear() {
-        if black != nil { black!.setPurgeableState(.volatile); black = nil }
+    /// Stop playback
+    func stop() {
+        state = .Idle
+        model.nodeView.unlockFramerate(true)
     }
     
-    /// Collects all shaders in the given tree
-    func collectShadersForTree(tree: Node, collection: inout [Node])
-    {
-        /*
-        for (_, connectedToId) in asset.slots {
-            
-            if let conAsset = assetFolder.getAssetById(connectedToId) {
-                collectShadersFor(assetFolder: assetFolder, asset: conAsset, &collected)
-                if collected.contains(conAsset) == false {
-                    collected.append(conAsset)
-                }
-            }
-        }*/
-        for node in tree.children! {
-            collection.append(node)
+    /// The main update function for rendering
+    func update() {
+                
+        if let tree = model.selectedTree {
+            render(tree: tree, viewSize: SIMD2<Int>(model.nodeGraph.previewSize))
+        }
+        
+        if state == .Playing {
+            time += 1 / targetFPS
+            frame += 1
         }
     }
     
-    func compileTree(tree: Node, compiler: ShaderCompiler, finished: @escaping () -> ())
-    {
-        var collected : [Node] = []
-        collectShadersForTree(tree: tree, collection: &collected)
-        
-        var toCompile = collected.count
-        
-        for node in collected {
-            compiler.compile(node: node, cb: { (shader, errors) in
-                    
-                node.shader = shader
-                node.errors = errors
-                    
-                toCompile -= 1
-
-                if toCompile == 0 {
-                    DispatchQueue.main.async {
-                        finished()
-                    }
-                }
-            })
-        }
-    }
-    
-    @discardableResult func render(tree: Node, device: MTLDevice, time: Float, frame: UInt32, viewSize: SIMD2<Int>, preview: Bool = false) -> MTLTexture?
+    /// Render the given tree
+    @discardableResult func render(tree: Node, viewSize: SIMD2<Int>, preview: Bool = false) -> MTLTexture?
     {
         self.renderTree = tree
-        self.time = time
+        
+        let device = model.device!
         
         startDrawing(device)
 
@@ -172,6 +164,8 @@ class Project : Codable, Equatable
         if preview == false {
             lastSize = size
         }
+        
+        stopDrawing()
         
         if collected.count == 0 {
             return nil
@@ -247,6 +241,57 @@ class Project : Codable, Equatable
         renderEncoder.endEncoding()
     }
     
+    
+    func clear() {
+        if black != nil { black!.setPurgeableState(.volatile); black = nil }
+    }
+    
+    /// Collects all shaders in the given tree
+    func collectShadersForTree(tree: Node, collection: inout [Node])
+    {
+        /*
+        for (_, connectedToId) in asset.slots {
+            
+            if let conAsset = assetFolder.getAssetById(connectedToId) {
+                collectShadersFor(assetFolder: assetFolder, asset: conAsset, &collected)
+                if collected.contains(conAsset) == false {
+                    collected.append(conAsset)
+                }
+            }
+        }*/
+        for node in tree.children! {
+            collection.append(node)
+        }
+    }
+    
+    /// Compiles the given shader tree
+    func compileTree(tree: Node, compiler: ShaderCompiler, finished: @escaping () -> ())
+    {
+        var collected : [Node] = []
+        collectShadersForTree(tree: tree, collection: &collected)
+        
+        var toCompile = collected.count
+        
+        for node in collected {
+            compiler.compile(node: node, cb: { (shader, errors) in
+                    
+                node.shader = shader
+                node.errors = errors
+                    
+                toCompile -= 1
+
+                if toCompile == 0 {
+                    DispatchQueue.main.async {
+                        for node in collected {
+                            node.setupUI(mmView: self.model.nodeView)
+                        }
+                        finished()
+                    }
+                }
+            })
+        }
+    }
+    
     /// Checks if all textures are loaded and makes sure they have the right size
     func checkTextures(collected: [Node], preview: Bool = true, device: MTLDevice)
     {
@@ -256,7 +301,7 @@ class Project : Codable, Equatable
                 if preview == false {
                     if node.texture == nil || node.texture!.width != size.x || node.texture!.height != size.y {
                         if node.texture != nil {
-                            node.texture!.setPurgeableState(.volatile)
+                            //node.texture!.setPurgeableState(.volatile)
                             node.texture = nil
                         }
                         node.texture = allocateTexture(device, width: size.x, height: size.y)
@@ -457,5 +502,9 @@ class Project : Codable, Equatable
                 finished(executionDuration)
             }
         } */
+    }
+    
+    static func ==(lhs:Project, rhs:Project) -> Bool {
+        return lhs.uuid == rhs.uuid
     }
 }

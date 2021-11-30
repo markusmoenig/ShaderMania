@@ -52,6 +52,8 @@ struct ContentView: View {
     @State private var importingImage       : Bool = false
     @State private var exportingImage       : Bool = false
 
+    @State private var isPlaying            : Bool = false
+
     @Environment(\.colorScheme) var deviceColorScheme: ColorScheme
 
     #if os(macOS)
@@ -64,8 +66,9 @@ struct ContentView: View {
         
         NavigationView() {
 
-            ParameterListView(document: document, updateView: $updateView)
-                .frame(minWidth: leftPanelWidth, idealWidth: leftPanelWidth, maxWidth: leftPanelWidth)
+            ProjectView(document.model)
+            //ParameterListView(document: document, updateView: $updateView)
+            //    .frame(minWidth: leftPanelWidth, idealWidth: leftPanelWidth, maxWidth: leftPanelWidth)
             
             VSplitView {
                 
@@ -165,6 +168,7 @@ struct ContentView: View {
                     document.model.build()
                 }
                 .keyboardShortcut("b")
+                .disabled(isPlaying == true)
             }
 
             ToolbarItemGroup(placement: .automatic) {
@@ -183,16 +187,8 @@ struct ContentView: View {
                 
                 // Core Controls
                 Button(action: {
-                    /*
-                    document.core.stop()
-                    document.core.start()
-                    helpIsVisible = false
-                    updateView.toggle()*/
-                    
-                    if let tree = document.model.selectedTree {
-                        //document.model.project.drawShader(tree, false, document.model.device)
-                        document.model.project.render(tree: tree, device: document.model.device, time: 0, frame: 0, viewSize: SIMD2<Int>(document.model.nodeGraph.previewSize))
-                    }
+                    document.model.project.play()
+                    isPlaying = true
                 })
                 {
                     Label("Run", systemImage: "play.fill")
@@ -200,15 +196,12 @@ struct ContentView: View {
                 .keyboardShortcut("r")
                 
                 Button(action: {
-                    document.core.stop()
-                    if let asset = document.core.assetFolder.current {
-                        document.core.createPreview(asset)
-                    }
-                    updateView.toggle()
+                    document.model.project.stop()
+                    isPlaying = false
                 }) {
                     Label("Stop", systemImage: "stop.fill")
                 }.keyboardShortcut(".")
-                .disabled(document.core.state == .Idle)
+                .disabled(isPlaying == false)
                 
                 //Divider()
                     //.padding(.horizontal, 2)
@@ -594,25 +587,23 @@ struct ContentView: View {
         ) { result in
             do {
                 let url = try result.get()
-                let core = document.core
-                if let project = core.project {
-                    /*
-                    if let asset = core.nodesWidget.currentNode {
-                        if let texture = project.render(assetFolder: core.assetFolder, device: core.device, time: 0, frame: 0, viewSize: SIMD2<Int>(Int(core.view.frame.width), Int(core.view.frame.height)), forAsset: asset) {
-                            
-                            project.stopDrawing(syncTexture: texture, waitUntilCompleted: true)
-                            
-                            if let cgiTexture = project.makeCGIImage(core.device, core.metalStates.getComputeState(state: .MakeCGIImage), texture) {
-                                if let image = makeCGIImage(texture: cgiTexture, forImage: true) {
-                                    if let imageDestination = CGImageDestinationCreateWithURL(url as CFURL, kUTTypePNG, 1, nil) {
-                                        CGImageDestinationAddImage(imageDestination, image, nil)
-                                        CGImageDestinationFinalize(imageDestination)
-                                    }
+
+                let model = document.model
+                let project = model.project
+                    
+                if let tree = document.model.selectedTree {
+                    if let texture = tree.texture {
+                        if let cgiTexture = project.makeCGIImage(model.device, model.metalStates.getComputeState(state: .MakeCGIImage), texture) {
+                            if let image = makeCGIImage(texture: cgiTexture, forImage: true) {
+                                if let imageDestination = CGImageDestinationCreateWithURL(url as CFURL, kUTTypePNG, 1, nil) {
+                                    CGImageDestinationAddImage(imageDestination, image, nil)
+                                    CGImageDestinationFinalize(imageDestination)
                                 }
                             }
                         }
-                    }*/
+                    }
                 }
+                
             } catch {
                 // Handle failure.
             }

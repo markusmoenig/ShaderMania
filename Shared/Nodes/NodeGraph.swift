@@ -1453,7 +1453,7 @@ class NodeGraph
                 }
                 
                 // --- Draw the root
-                drawRootNode( rootNode, region: region, navNodes: toDraw)
+                drawTreeNode( rootNode, region: region, navNodes: toDraw)
             }
             
             // SideSlider
@@ -1864,7 +1864,7 @@ class NodeGraph
     }
     
     /// Draw the root node
-    func drawRootNode(_ node: Node, region: MMRegion, navNodes: [Node])
+    func drawTreeNode(_ node: Node, region: MMRegion, navNodes: [Node])
     {
         if contentType == .ObjectsOverview || contentType == .ScenesOverview { return }
         
@@ -1908,6 +1908,7 @@ class NodeGraph
                 mmView.drawBoxPattern.draw( x: x, y: y, width: previewSize.x - 23, height: previewSize.y, round: 26, borderSize: 0, fillColor: SIMD4<Float>(0.306, 0.310, 0.314, 1.000), borderColor: SIMD4<Float>(0.216, 0.220, 0.224, 1.000) )
             
             if let tree = model.selectedTree {
+                model.project.update()
                 if let texture = tree.texture {
                     textures.append(texture)
                 }
@@ -1938,7 +1939,7 @@ class NodeGraph
                         }
                     }
                 }*/
-                
+            
                 for texture in textures {
                     mmView.drawTexture.draw(texture, x: x - 23, y: y, zoom: 1, round: 26, roundingRect: SIMD4<Float>(23, 0, previewSize.x - 23, previewSize.y))
                 }
@@ -2226,21 +2227,15 @@ class NodeGraph
         if let rootNode = model.selectedTree, let nodes = rootNode.children { //currentRoot {
             if rootNode.rect.contains(x, y) { return rootNode }
             for node in nodes {
-                //if rootNode.subset!.contains(node.uuid) || node === rootNode {
-                    if node.rect.contains( x, y ) {
-                        // Root always has priority
-                        if node === rootNode {
-                            return node
+                if node.rect.contains( x, y ) {
+                    // --- If the node is inside its root tree due to scaling skip it
+                    if let behaviorTree = node.behaviorTree {
+                        if behaviorTree.rect.contains(x, y) {
+                            continue
                         }
-                        // --- If the node is inside its root tree due to scaling skip it
-                        if let behaviorTree = node.behaviorTree {
-                            if behaviorTree.rect.contains(x, y) {
-                                continue
-                            }
-                        }
-                        found = node
                     }
-                //}
+                    found = node
+                }
             }
         }
         return found

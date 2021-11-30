@@ -166,6 +166,8 @@
 		2BC6A3FA2754627C00F8A500 /* union_off.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 2BC6A3DF2754627C00F8A500 /* union_off.tiff */; };
 		2BC6A3FB2754627C00F8A500 /* foreground.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 2BC6A3E02754627C00F8A500 /* foreground.tiff */; };
 		2BC6A3FC2754627C00F8A500 /* foreground.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 2BC6A3E02754627C00F8A500 /* foreground.tiff */; };
+		2BC6A3FE2754C46500F8A500 /* ProjectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3FD2754C46400F8A500 /* ProjectView.swift */; };
+		2BC6A3FF2754C46500F8A500 /* ProjectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3FD2754C46400F8A500 /* ProjectView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -268,6 +270,7 @@
 		2BC6A3DE2754627C00F8A500 /* sz_ui_blue.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = sz_ui_blue.tiff; sourceTree = "<group>"; };
 		2BC6A3DF2754627C00F8A500 /* union_off.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = union_off.tiff; sourceTree = "<group>"; };
 		2BC6A3E02754627C00F8A500 /* foreground.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = foreground.tiff; sourceTree = "<group>"; };
+		2BC6A3FD2754C46400F8A500 /* ProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -394,6 +397,7 @@
 		2B995CD1274C6FD1009E976C /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				2BC6A3FD2754C46400F8A500 /* ProjectView.swift */,
 				2B995CDD274CB90E009E976C /* BrowserView.swift */,
 				2BC6A3A1274F21FF00F8A500 /* MetalManiaView.swift */,
 				2B0EEA7E2565DF7800C84C6C /* ScriptEditor.swift */,
@@ -667,6 +671,7 @@
 				2B0EEA622565DF3A00C84C6C /* ShaderManiaApp.swift in Sources */,
 				2BC6A3D02752F79E00F8A500 /* Model.swift in Sources */,
 				2B995D2A274E1C7C009E976C /* MMInfoArea.swift in Sources */,
+				2BC6A3FE2754C46500F8A500 /* ProjectView.swift in Sources */,
 				2BC6A3BD274F342A00F8A500 /* NodeUI.swift in Sources */,
 				2B0EEA8B2565DF7800C84C6C /* Core.swift in Sources */,
 				2B995CDE274CB90E009E976C /* BrowserView.swift in Sources */,
@@ -733,6 +738,7 @@
 				2B0EEA632565DF3A00C84C6C /* ShaderManiaApp.swift in Sources */,
 				2BC6A3D12752F79E00F8A500 /* Model.swift in Sources */,
 				2B995D2B274E1C7C009E976C /* MMInfoArea.swift in Sources */,
+				2BC6A3FF2754C46500F8A500 /* ProjectView.swift in Sources */,
 				2BC6A3BE274F342A00F8A500 /* NodeUI.swift in Sources */,
 				2B0EEA8C2565DF7800C84C6C /* Core.swift in Sources */,
 				2B995CDF274CB90E009E976C /* BrowserView.swift in Sources */,

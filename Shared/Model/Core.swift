@@ -139,7 +139,7 @@ public class Core       : ObservableObject
         }
         view.core = self
         
-        metalStates = MetalStates(self)
+        //metalStates = MetalStates(self)
         textureLoader = MTKTextureLoader(device: device)
         
         /*

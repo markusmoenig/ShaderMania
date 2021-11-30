@@ -24,12 +24,13 @@ class MetalStates {
     var states                  : [Int:MTLRenderPipelineState] = [:]
     var computeStates           : [Int:MTLComputePipelineState] = [:]
 
-    var core                    : Core
+    var model                   : Model
     
-    init(_ core: Core)
+    init(_ model: Model)
     {
-        self.core = core
+        self.model = model
         
+        /*
         if let frameworkId = core.frameworkId {
             for b in Bundle.allFrameworks {
                 if b.bundleIdentifier == frameworkId {
@@ -37,9 +38,9 @@ class MetalStates {
                     break
                 }
             }
-        } else {
-            defaultLibrary = core.device.makeDefaultLibrary()
-        }
+        } else {*/
+            defaultLibrary = model.device.makeDefaultLibrary()
+        //}
         
         let vertexFunction = defaultLibrary!.makeFunction( name: "m4mQuadVertexShader" )
 
@@ -84,7 +85,7 @@ class MetalStates {
         do {
             //renderPipelineState = try device.makeComputePipelineState( function: function! )
             pipelineStateDescriptor.fragmentFunction = function
-            renderPipelineState = try core.device.makeRenderPipelineState( descriptor: pipelineStateDescriptor )
+            renderPipelineState = try model.device.makeRenderPipelineState( descriptor: pipelineStateDescriptor )
         } catch {
             print( "computePipelineState failed" )
             return nil
@@ -111,7 +112,7 @@ class MetalStates {
         }
         
         do {
-            computePipelineState = try core.device.makeComputePipelineState( function: function! )
+            computePipelineState = try model.device.makeComputePipelineState( function: function! )
         } catch {
             print( "computePipelineState failed" )
             return nil

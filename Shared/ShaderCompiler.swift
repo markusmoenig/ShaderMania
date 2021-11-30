@@ -64,7 +64,7 @@ class ShaderParameter
     
     var url                 : URL? = nil
     
-    init(_ paramType: String, _ parameters: [String: String])
+    init(_ node: Node,_ paramType: String, _ parameters: [String: String])
     {
         if let name = parameters["name"] {
             self.name = name
@@ -126,12 +126,12 @@ class ShaderParameter
                     self.uiType = .Slider
                 }
             }
-            
+            /*
             if let uiType = parameters["ui"] {
                 if uiType.lowercased() == "slider" {
                     self.uiType = .Slider
                 }
-            }
+            }*/
             if let defaultValue = parameters["default"] {
                 if let v = Float(defaultValue) {
                     self.defaultValue.x = v
@@ -155,6 +155,9 @@ class ShaderParameter
                     self.step = v
                 }
             }
+            
+            let uiItem = NodeUINumber(node, variable: name, title: name, range: SIMD2<Float>(min, max), value: defaultValue.x)
+            node.uiItems.append(uiItem)
         }
     }
     
@@ -212,7 +215,9 @@ class ShaderCompiler
     
     func compile(node: Node, cb: @escaping (Shader?, [CompileError]) -> ())
     {
-        var code = getHeaderCode(noOp: false)//asset.type == .Common)
+        let code = getHeaderCode(noOp: false)//asset.type == .Common)
+        
+        node.uiItems = []
         
         /*
         if asset.type != .Common {
@@ -298,7 +303,7 @@ class ShaderCompiler
                             index += 1
                             let pairs = self.splitParameters(params)
                                 
-                            let parameter = ShaderParameter(type, pairs)
+                            let parameter = ShaderParameter(node, type, pairs)
                             let paramText = parameter.createShaderText(shader.parameters.count)
                             if node.shaderDataNames[shader.parameters.count] != parameter.name {
                                 node.shaderData[shader.parameters.count] = parameter.defaultValue
