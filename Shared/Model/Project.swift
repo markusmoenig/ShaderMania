@@ -227,6 +227,14 @@ class Project : Codable, Equatable
         /// Update the parameter data for the shader
         if let shader = node.shader {
             
+            for (index, uiItem) in node.uiItems.enumerated() {
+                if uiItem.brand == .Number {
+                    if let number = uiItem as? NodeUINumber {
+                        node.shaderData[index].x = number.value
+                    }
+                }
+            }
+            
             if shader.paramDataBuffer == nil {
                 shader.paramDataBuffer = device.makeBuffer(bytes: node.shaderData, length: node.shaderData.count * MemoryLayout<SIMD4<Float>>.stride, options: [])!
             } else {

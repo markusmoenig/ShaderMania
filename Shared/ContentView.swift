@@ -56,6 +56,8 @@ struct ContentView: View {
 
     @Environment(\.colorScheme) var deviceColorScheme: ColorScheme
 
+    @State private var browserIsMaximized   = false
+
     #if os(macOS)
     let leftPanelWidth                      : CGFloat = 200
     #else
@@ -73,19 +75,9 @@ struct ContentView: View {
             VSplitView {
                 
                 MetalManiaView(document.model)
-
-                HSplitView {
+                    .frame(maxHeight: browserIsMaximized ? 0 : .infinity)
                     
-
-                    WebView(document.model, deviceColorScheme).tabItem {
-                    }
-                        .animation(.default)
-                        .onChange(of: deviceColorScheme) { newValue in
-                            document.core.scriptEditor?.setTheme(newValue)
-                        }
-                    
-                    BrowserView(document: $document)
-                }
+                BrowserView(document: $document)
                 
                 /*
                 ZStack(alignment: .topTrailing) {
@@ -225,9 +217,9 @@ struct ContentView: View {
             }
         }
 
-        //.onReceive(self.document.core.timeChanged) { value in
-        //    timeString = String(format: "%.02f", value)
-        //}
+        .onReceive(self.document.model.browserIsMaximized) { value in
+            browserIsMaximized = value
+        }
         
         .onReceive(self.document.core.createPreview) { value in
             if let asset = document.core.assetFolder.current {

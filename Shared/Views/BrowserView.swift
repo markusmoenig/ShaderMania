@@ -10,9 +10,10 @@ import SwiftUI
 struct BrowserView: View {
     
     enum Mode {
-        case shaderBrowser
+        case editor, browser, timeline
     }
-    
+
+    @Environment(\.colorScheme) var deviceColorScheme: ColorScheme
     @Environment(\.managedObjectContext) var managedObjectContext
 
     @FetchRequest(
@@ -24,7 +25,7 @@ struct BrowserView: View {
     
     @Binding var document               : ShaderManiaDocument
 
-    @State private var mode             : Mode = .shaderBrowser
+    @State private var mode             : Mode = .editor
     
     @State private var IconSize         : CGFloat = 80
         
@@ -38,48 +39,46 @@ struct BrowserView: View {
     @State private var selectedName     : String = ""
 
     @State private var showAssetNamePopover = false
+    
+    @State private var browserIsMaximized   = false
 
     var body: some View {
             
         VStack(alignment: .center, spacing: 0) {
 
             HStack(alignment: .center, spacing: 8) {
-                                    
-                Button(action: {
-                    importing = true
-                })
-                {
-                    Image(systemName: "plus.app")
-                        .imageScale(.large)
-                }
-                .buttonStyle(.borderless)
-                .padding(.leading, 8)
-                          
-                Divider()
-                                
-                //Spacer()
                 
                 Button(action: {
-                    mode = .shaderBrowser
+                    mode = .editor
+                    /*
+                    if let node = document.model.nodeGraph.currentNode {
+                        document.model.scriptEditor?.setSession(node)
+                    }*/
                 })
                 {
-                    Image(systemName: mode == .shaderBrowser ? "b.square.fill" : "b.square")
+                    Image(systemName: mode == .editor ? "e.square.fill" : "e.square")
                         .imageScale(.large)
                 }
                 .buttonStyle(.borderless)
+                .padding(.leading, 12)
 
                 Button(action: {
-                    //mode = .log
+                    mode = .browser
                 })
                 {
-                    Image(systemName: mode == .shaderBrowser ? "l.square.fill" : "l.square")
+                    Image(systemName: mode == .browser ? "b.square.fill" : "b.square")
                         .imageScale(.large)
                 }
                 .buttonStyle(.borderless)
-                //.padding(.leading, 4)
-                    
-                //Divider()
-                //    .frame(maxHeight: 16)
+                
+                Button(action: {
+                    mode = .timeline
+                })
+                {
+                    Image(systemName: mode == .timeline ? "t.square.fill" : "t.square")
+                        .imageScale(.large)
+                }
+                .buttonStyle(.borderless)
                         
                 Divider()
 
@@ -87,8 +86,20 @@ struct BrowserView: View {
                     .frame(height: 20, alignment: .leading)
                 
                 Spacer()
+                
+                Button(action: {
+                    browserIsMaximized.toggle()
+                    document.model.browserIsMaximized.send(browserIsMaximized)                    
+                })
+                {
+                    Image(systemName: browserIsMaximized == false ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+                        .imageScale(.large)
+                }
+                .buttonStyle(.borderless)
+                .padding(.trailing, 8)
             }
-            //.frame(height: 30)
+            .frame(height: 25)
+            
             // Edit Asset name
             .popover(isPresented: self.$showAssetNamePopover,
                      arrowEdge: .bottom
@@ -109,16 +120,22 @@ struct BrowserView: View {
                 
             Divider()
             
-            if mode == .shaderBrowser {
+            ZStack(alignment: .topLeading) {
                 
-                let rows: [GridItem] = Array(repeating: .init(.fixed(70)), count: 1)
+                WebView(document.model, deviceColorScheme)
+                    //.animation(.default)
+                    .onChange(of: deviceColorScheme) { newValue in
+                        document.core.scriptEditor?.setTheme(newValue)
+                    }
+                    .opacity(mode == .editor ? 1 : 0)
+
                 
                 let columns = [
                     GridItem(.adaptive(minimum: 90))
                 ]
                 
-                //ScrollView(.horizontal) {
-                    LazyVGrid(columns: columns, alignment: .center) {
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 0) {
                         ForEach(shaders, id: \.self) { shader in
                             
                             //if searchResults.contains(object.name!) {
@@ -241,7 +258,9 @@ struct BrowserView: View {
                         }
                     }
                     .padding()
-                .padding(.top, 0)
+                    .padding(.top, 0)
+                }
+                .opacity(mode == .browser ? 1 : 0)
             }
 
             //.onReceive(document.model.searchResultsChanged) { results in

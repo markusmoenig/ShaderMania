@@ -5,8 +5,8 @@
 //  Created by Markus Moenig on 28/11/21.
 //
 
-import Foundation
 import Metal
+import Combine
 
 class Model {
     
@@ -30,6 +30,8 @@ class Model {
     
     var compiler                            : ShaderCompiler!
     
+    let browserIsMaximized                  = PassthroughSubject<Bool, Never>()
+    
     init() {
         project = Project()
         project.model = self
@@ -43,6 +45,8 @@ class Model {
     func setProject(_ project: Project) {
         self.project = project
         self.project.model = self
+        
+        selectedTree = project.trees[0]
     }
     
     /// Sets up the NodeGraph from the MetalManiaView

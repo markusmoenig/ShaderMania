@@ -118,6 +118,7 @@ class Node : Codable, Equatable
         case uiConnections
         case camera
         case children
+        case codeData
     }
     
     init()
@@ -139,6 +140,7 @@ class Node : Codable, Equatable
         uiConnections = try container.decode([UINodeConnection].self, forKey: .uiConnections)
         camera = try container.decodeIfPresent(Camera.self, forKey: .camera)
         children = try container.decode([Node]?.self, forKey: .children)
+        codeData = try container.decode(Data.self, forKey: .codeData)
 
         for terminal in terminals {
             terminal.node = self
@@ -159,7 +161,8 @@ class Node : Codable, Equatable
         try container.encode(terminals, forKey: .terminals)
         try container.encode(uiConnections, forKey: .uiConnections)
         try container.encode(camera, forKey: .camera)
-        try container.encode(children, forKey: .camera)
+        try container.encode(children, forKey: .children)
+        try container.encode(codeData, forKey: .codeData)
     }
     
     /// Equatable

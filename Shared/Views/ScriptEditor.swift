@@ -227,7 +227,7 @@ class ScriptEditor
             webView.evaluateJavaScript(cmd, completionHandler: { (value, error ) in
             })
         }
-        
+                
         if node.scriptSessionId.isEmpty == true {
             createSession(node, { () in
                 setNodeSession()
@@ -479,7 +479,9 @@ struct SwiftUIWebView: UIViewRepresentable {
 
         //After the webpage is loaded, assign the data in WebViewModel class
         public func webView(_ web: WKWebView, didFinish: WKNavigation!) {
-            core.scriptEditor = ScriptEditor(web, core, colorScheme)
+            if model.scriptEditor == nil {
+                core.scriptEditor = ScriptEditor(web, core, colorScheme)
+            }
         }
 
         public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) { }
