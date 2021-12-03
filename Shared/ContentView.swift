@@ -57,6 +57,7 @@ struct ContentView: View {
     @Environment(\.colorScheme) var deviceColorScheme: ColorScheme
 
     @State private var browserIsMaximized   = false
+    @State private var browserSize          = SIMD2<Int>(400, 200)
 
     #if os(macOS)
     let leftPanelWidth                      : CGFloat = 200
@@ -72,12 +73,13 @@ struct ContentView: View {
             //ParameterListView(document: document, updateView: $updateView)
             //    .frame(minWidth: leftPanelWidth, idealWidth: leftPanelWidth, maxWidth: leftPanelWidth)
             
-            VSplitView {
+            ZStack(alignment: .bottomLeading) {
                 
                 MetalManiaView(document.model)
                     .frame(maxHeight: browserIsMaximized ? 0 : .infinity)
                     
-                BrowserView(document: $document)
+                BrowserView(document, size: $browserSize)
+                    .frame(maxWidth: browserIsMaximized ? .infinity : CGFloat(browserSize.x), maxHeight: browserIsMaximized ? .infinity : CGFloat(browserSize.y))
                 
                 /*
                 ZStack(alignment: .topTrailing) {

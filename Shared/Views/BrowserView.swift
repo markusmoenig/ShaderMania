@@ -23,7 +23,10 @@ struct BrowserView: View {
       ]
     ) var shaders: FetchedResults<ShaderEntity>
     
-    @Binding var document               : ShaderManiaDocument
+    var document                        : ShaderManiaDocument
+    var size                            : Binding<SIMD2<Int>>
+
+    @State var sizeBuffer               : SIMD2<Int>
 
     @State private var mode             : Mode = .editor
     
@@ -42,6 +45,12 @@ struct BrowserView: View {
     
     @State private var browserIsMaximized   = false
 
+    init(_ document: ShaderManiaDocument, size: Binding<SIMD2<Int>>) {
+        self.document = document
+        self.size = size
+        _sizeBuffer = State(initialValue: SIMD2<Int>(self.size.wrappedValue.x, self.size.wrappedValue.y))
+    }
+    
     var body: some View {
             
         VStack(alignment: .center, spacing: 0) {
@@ -59,8 +68,9 @@ struct BrowserView: View {
                     Image(systemName: mode == .editor ? "e.square.fill" : "e.square")
                         .imageScale(.large)
                 }
-                .buttonStyle(.borderless)
+                .buttonStyle(.plain)
                 .padding(.leading, 12)
+                .keyboardShortcut("1")
 
                 Button(action: {
                     mode = .browser
@@ -69,8 +79,9 @@ struct BrowserView: View {
                     Image(systemName: mode == .browser ? "b.square.fill" : "b.square")
                         .imageScale(.large)
                 }
-                .buttonStyle(.borderless)
-                
+                .buttonStyle(.plain)
+                .keyboardShortcut("2")
+
                 Button(action: {
                     mode = .timeline
                 })
@@ -78,8 +89,9 @@ struct BrowserView: View {
                     Image(systemName: mode == .timeline ? "t.square.fill" : "t.square")
                         .imageScale(.large)
                 }
-                .buttonStyle(.borderless)
-                        
+                .buttonStyle(.plain)
+                .keyboardShortcut("3")
+
                 Divider()
 
                 Text(selectedName)
@@ -89,16 +101,46 @@ struct BrowserView: View {
                 
                 Button(action: {
                     browserIsMaximized.toggle()
-                    document.model.browserIsMaximized.send(browserIsMaximized)                    
+                    document.model.browserIsMaximized.send(browserIsMaximized)
                 })
                 {
                     Image(systemName: browserIsMaximized == false ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
                         .imageScale(.large)
                 }
-                .buttonStyle(.borderless)
+                .buttonStyle(.plain)
+                
+                Divider()
+
+                Button(action: {
+                })
+                {
+                    Image(systemName: "arrow.up.and.down.and.arrow.left.and.right")
+                        .imageScale(.large)
+                }
+                .buttonStyle(.plain)
                 .padding(.trailing, 8)
+                .disabled(browserIsMaximized)
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged({ info in
+                            let deltaX = Int(info.location.x - info.startLocation.x)
+                            let deltaY = Int(info.startLocation.y - info.location.y)
+                            
+                            if self.size.wrappedValue.x + deltaX > 200 {
+                                self.size.wrappedValue.x += deltaX
+                            }
+                            
+                            if self.size.wrappedValue.y + deltaY > 100 {
+                                self.size.wrappedValue.y += deltaY
+                            }
+                        })
+                        .onEnded({ info in
+                            sizeBuffer = SIMD2<Int>(self.size.wrappedValue.x, self.size.wrappedValue.y)
+                        })
+                )
             }
             .frame(height: 25)
+            .background(Color.accentColor)
             
             // Edit Asset name
             .popover(isPresented: self.$showAssetNamePopover,
