@@ -57,7 +57,7 @@ struct ContentView: View {
     @Environment(\.colorScheme) var deviceColorScheme: ColorScheme
 
     @State private var browserIsMaximized   = false
-    @State private var browserSize          = SIMD2<Int>(400, 200)
+    @State private var browserSize          = SIMD2<Int>(700, 300)
 
     #if os(macOS)
     let leftPanelWidth                      : CGFloat = 200
@@ -77,6 +77,10 @@ struct ContentView: View {
                 
                 MetalManiaView(document.model)
                     .frame(maxHeight: browserIsMaximized ? 0 : .infinity)
+                    .onDrop(
+                        of: ["public.url"],
+                        delegate: URLDropDelegate(model: document.model)
+                    )
                     
                 BrowserView(document, size: $browserSize)
                     .frame(maxWidth: browserIsMaximized ? .infinity : CGFloat(browserSize.x), maxHeight: browserIsMaximized ? .infinity : CGFloat(browserSize.y))
@@ -141,6 +145,7 @@ struct ContentView: View {
                 //}
             }
         }
+        .frame(minWidth: 1280, minHeight: 800)
         
         .toolbar {
             
@@ -255,6 +260,17 @@ struct ContentView: View {
         // For Mac App Previews 1920x1080
         //.frame(minWidth: 1920, minHeight: 978)
         //.frame(maxWidth: 1920, maxHeight: 978)
+    }
+    
+    private func handleDrop(at index: Int, _ items: [NSItemProvider]) {
+        print("here")
+        for item in items {
+            _ = item.loadObject(ofClass: URL.self) { url, _ in
+                //DispatchQueue.main.async {
+                    //url.map { self.urlItems.insert(URLItem(link: $0), at: index) }
+                //}
+            }
+        }
     }
     
     // tool bar menus

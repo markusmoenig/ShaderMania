@@ -231,6 +231,12 @@ class Project : Codable, Equatable
                 if uiItem.brand == .Number {
                     if let number = uiItem as? NodeUINumber {
                         node.shaderData[index].x = number.value
+                    } else
+                    if let color = uiItem as? NodeUIColor {
+                        node.shaderData[index].x = color.value.x
+                        node.shaderData[index].y = color.value.y
+                        node.shaderData[index].z = color.value.y
+                        node.shaderData[index].w = 1
                     }
                 }
             }

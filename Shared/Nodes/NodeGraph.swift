@@ -628,8 +628,8 @@ class NodeGraph
     {
         if !overviewIsOn {
             mmView.widgets.insert(navButton, at: 0)
-            mmView.widgets.insert(editButton, at: 0)
-            mmView.widgets.insert(playButton, at: 0)
+            //mmView.widgets.insert(editButton, at: 0)
+            //mmView.widgets.insert(playButton, at: 0)
             //mmView.widgets.insert(behaviorMenu, at: 0)
             
             if navigationMode == .On {
@@ -2050,13 +2050,14 @@ class NodeGraph
         navButton.rect.y = node.rect.y + 25
         navButton.draw()
         
+        /*
         editButton.rect.x = navButton.rect.x + navButton.rect.width + 10
         editButton.rect.y = node.rect.y + 25
         editButton.draw()
         
         playButton.rect.x = editButton.rect.x + editButton.rect.width + 10
         playButton.rect.y = editButton.rect.y
-        playButton.draw()
+        playButton.draw()*/
         
         /*
         behaviorMenu.rect.x = node.rect.x + node.rect.width - 64

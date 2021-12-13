@@ -117,6 +117,9 @@ class ShaderParameter
                     self.defaultValue.x = v3.x
                     self.defaultValue.y = v3.y
                     self.defaultValue.z = v3.z
+                    
+                    let uiItem = NodeUIColor(node, variable: name, title: name, value: v3)
+                    node.uiItems.append(uiItem)
                 }
             }
         } else
@@ -348,7 +351,7 @@ class ShaderCompiler
                         if errorArr.count > 0 {
                             errorText = String(errorArr[0])
                         }
-                        if arr.count >= 4 {
+                        if arr.count >= 4 && Int32(arr[0]) != nil && Int32(arr[1]) != nil {
                             var er = CompileError()
                             er.node = node
                             er.line = Int32(arr[0])! - lineNumbers - 1
