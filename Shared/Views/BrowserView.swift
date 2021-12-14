@@ -71,6 +71,8 @@ struct BrowserView: View {
     @State private var showNodeNamePopover  = false
     
     @State private var browserIsMaximized   = false
+    
+    @State private var selectedNode     : Node? = nil
 
     init(_ document: ShaderManiaDocument, size: Binding<SIMD2<Int>>) {
         self.document = document
@@ -208,17 +210,15 @@ struct BrowserView: View {
                         document.core.scriptEditor?.setTheme(newValue)
                     }
                     .opacity(mode == .editor ? 1 : 0)
-
+                    .disabled(selectedNode != nil && selectedNode!.brand == .Shader ? false : true)
                 
                 NodeBrowserView(model: document.model)
                     .opacity(mode == .browser ? 1 : 0)
-
-            //.onReceive(document.model.searchResultsChanged) { results in
-            //    searchResults = results
-            //}
             }
         }
-        //.animation(.default)
+        .onReceive(document.model.selectedNodeChanged) { node in
+            selectedNode = node
+        }
     }
     
     func assetEntityToImage(_ entity: ShaderEntity) -> Image? {

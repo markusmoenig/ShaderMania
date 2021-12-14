@@ -50,7 +50,7 @@ class Project : Codable, Equatable
         let object = Node(brand: .Tree)
         object.children = []
 
-        object.name = "New Tree"
+        object.name = "New Object"
         //tree.sequences.append( MMTlSequence() )
         //tree.currentSequence = object.sequences[0]
         object.setupTerminals()

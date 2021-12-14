@@ -16,20 +16,20 @@ struct ProjectView: View {
     @State private var showProjectNamePopover   : Bool = false
     @State private var projectName              : String = ""
     
-    @State private var selected                 : UUID? = nil
+    @State private var selected                 : Node? = nil
 
     @State var updateView                       : Bool = false
     
     #if os(macOS)
-    let TopRowPadding                       : CGFloat = 2
+    let TopRowPadding                           : CGFloat = 2
     #else
-    let TopRowPadding                       : CGFloat = 5
+    let TopRowPadding                           : CGFloat = 5
     #endif
 
     init(_ model: Model)
     {
         self.model = model
-        //_selected = State(initialValue: model.project.main.id)
+        _selected = State(initialValue: model.selectedTree)
     }
     
     var body: some View {
@@ -39,7 +39,7 @@ struct ProjectView: View {
             List {
                 Section(header: Text("Objects")) {
                     
-                    ForEach(model.project.objects, id: \.uuid) { tree in
+                    ForEach(model.project.objects, id: \.uuid) { object in
 
                         Button(action: {
                             /*
@@ -52,12 +52,17 @@ struct ProjectView: View {
                                 model.selectionChanged.send()
                             }
                              */
+                            selected = object
                         })
                         {
-                            Label(tree.name, systemImage: selected == nil ? "s.square.fill" :  "s.square")
+                            Label(object.name, systemImage: selected === object ? "s.square.fill" :  "s.square")
                                 .foregroundColor(selected == nil ? .accentColor : .primary)
                         }
                         .contextMenu {
+                            Button("Rename", action: {
+                                projectName = object.name
+                                showProjectNamePopover = true
+                            })
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
@@ -72,12 +77,10 @@ struct ProjectView: View {
                     Text("Name:")
                     TextField("Name", text: $projectName, onEditingChanged: { (changed) in
                         if let selected = selected {
-                            /*
-                            if let o = self.model.project.getObject(from: selected) {
-                                o.name = projectName
-                                self.selected = nil
-                                self.selected = o.id
-                            }*/
+                            let select = selected
+                            self.selected = nil
+                            self.selected = select
+                            self.selected!.name = projectName
                         }
                     })
                     .frame(minWidth: 200)

@@ -1658,13 +1658,13 @@ class NodeGraph
         node.data.borderRound = 24
         
         if !overviewIsOn {
-            if node.brand == .Behavior {
+            if node.brand == .Tree {
                 node.data.brandColor = mmView.skin.Node.behaviorColor
             } else
-            if node.brand == .Property {
+            if node.brand == .Script {
                 node.data.brandColor = mmView.skin.Node.propertyColor
             } else
-            if node.brand == .Function {
+            if node.brand == .Shader {
                 node.data.brandColor = mmView.skin.Node.functionColor
             } else
             if node.brand == .Arithmetic {
@@ -2512,9 +2512,11 @@ class NodeGraph
             selectedUUID = [node.uuid]
             currentNode = node
             model.scriptEditor?.setSession(node)
+            model.selectedNodeChanged.send(currentNode)
         } else {
             selectedUUID = []
             currentNode = nil
+            model.selectedNodeChanged.send(currentNode)
         }
     }
     

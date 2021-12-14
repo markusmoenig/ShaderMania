@@ -24,6 +24,9 @@ class Model {
     
     /// The currently selected shader tree
     var selectedTree                        : Node? = nil
+
+    let selectedObjectChanged               = PassthroughSubject<Node?, Never>()
+    let selectedNodeChanged                 = PassthroughSubject<Node?, Never>()
     
     /// The script editor
     var scriptEditor                        : ScriptEditor? = nil
