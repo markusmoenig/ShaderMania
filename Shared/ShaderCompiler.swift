@@ -231,6 +231,8 @@ class ShaderCompiler
             }
         }*/
         
+        print("comp", node.name)
+        
         var ns = code as NSString
         var lineNumbers  : Int32 = 0
         

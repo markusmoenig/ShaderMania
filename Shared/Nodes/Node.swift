@@ -30,8 +30,8 @@ class Camera : Codable
 
 class Node : Codable, Equatable
 {
-    enum Brand {
-        case Shader, Property, Behavior, Function, Arithmetic
+    enum Brand : Int, Codable {
+        case Shader, Script, Tree, Property, Behavior, Function, Arithmetic
     }
 
     enum Result {
@@ -95,8 +95,8 @@ class Node : Codable, Equatable
     var behaviorTrees   : [BehaviorTree]? = nil
     var behaviorRoot    : BehaviorTreeRoot? = nil
     
-    // Set for behavior nodes to allow for tree scaling
-    var behaviorTree    : BehaviorTree? = nil
+    // Set for nodes connected to a ShaderTree (for node scaling)
+    var shaderTree      : Node? = nil
 
     var playResult      : Result? = nil
     var helpUrl         : String? = nil
@@ -109,6 +109,7 @@ class Node : Codable, Equatable
 
     private enum CodingKeys: String, CodingKey {
         case name
+        case brand
         case type
         case properties
         case uuid
@@ -128,6 +129,15 @@ class Node : Codable, Equatable
         setup()
     }
     
+    init(brand: Brand = .Shader)
+    {
+        self.brand = brand
+        
+        properties = [:]
+        minimumSize = Node.NodeMinimumSize
+        setup()
+    }
+    
     required init(from decoder: Decoder) throws
     {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -141,6 +151,12 @@ class Node : Codable, Equatable
         camera = try container.decodeIfPresent(Camera.self, forKey: .camera)
         children = try container.decode([Node]?.self, forKey: .children)
         codeData = try container.decode(Data.self, forKey: .codeData)
+        
+        if let brand = try container.decodeIfPresent(Brand.self, forKey: .brand) {
+            self.brand = brand
+        } else {
+            brand = .Shader
+        }
 
         for terminal in terminals {
             terminal.node = self
@@ -163,6 +179,7 @@ class Node : Codable, Equatable
         try container.encode(camera, forKey: .camera)
         try container.encode(children, forKey: .children)
         try container.encode(codeData, forKey: .codeData)
+        try container.encode(brand, forKey: .brand)
     }
     
     /// Equatable
@@ -212,6 +229,12 @@ class Node : Codable, Equatable
     /// Setup the UI of the node
     func setupUI(mmView: MMView)
     {
+        if brand == .Tree {
+            uiItems = [
+                NodeUISelector(self, variable: "status", title: "Execute", items: ["Always", "On Startup", "On Demand"], index: 0),
+                NodeUINumber(self, variable: "treeScale", title: "Scale", range: SIMD2<Float>(0, 1), value: 1)
+            ]
+        }
         computeUIArea(mmView: mmView)
     }
     
@@ -248,6 +271,19 @@ class Node : Codable, Equatable
     /// Setup
     func setup()
     {
+        if terminals.isEmpty == true {
+            if brand == .Tree {
+                terminals = [
+                    Terminal(name: "Behavior", connector: .Bottom, brand: .Behavior, node: self)
+                ]
+            } else
+            if brand == .Shader {
+                terminals = [
+                    Terminal(name: "Behavior", connector: .Top, brand: .Behavior, node: self),
+                    Terminal(name: "Behavior", connector: .Bottom, brand: .Behavior, node: self)
+                ]
+            }
+        }
     }
     
     /// Recomputes the UI area of the node
@@ -280,17 +316,22 @@ class Node : Codable, Equatable
     /// A UI Variable changed
     func variableChanged(variable: String, oldValue: Float, newValue: Float, continuous: Bool = false, noUndo: Bool = false)
     {
-        /*
+        
+        if brand == .Tree && variable == "treeScale" {
+            properties[variable] = newValue
+            uiItems[0].mmView.update()
+        }
+        
         func applyProperties(_ uuid: UUID, _ variable: String,_ old: Float,_ new: Float)
         {
             nodeGraph!.mmView.undoManager!.registerUndo(withTarget: self) { target in
-                if let node = globalApp!.nodeGraph.getNodeForUUID(uuid) {
+                if let node = self.nodeGraph?.model.nodeGraph.getNodeForUUID(uuid) {
                     node.properties[variable] = new
                     
                     applyProperties(uuid, variable, new, old)
                     node.updateUI(mmView: node.nodeGraph!.mmView)
                     node.variableChanged(variable: variable, oldValue: old, newValue: new, continuous: false, noUndo: true)
-                    globalApp!.nodeGraph.mmView.update()
+                    self.nodeGraph?.mmView.update()
                 }
             }
             nodeGraph!.mmView.undoManager!.setActionName("Node Property Changed")
@@ -300,16 +341,15 @@ class Node : Codable, Equatable
         if continuous == false {
             applyProperties(self.uuid, variable, newValue, oldValue)
         }
-        self.updateUIState(mmView: self.nodeGraph!.mmView)*/
+        self.updateUIState(mmView: self.nodeGraph!.mmView)
     }
     
     func variableChanged(variable: String, oldValue: SIMD3<Float>, newValue: SIMD3<Float>, continuous: Bool = false, noUndo: Bool = false)
     {
-        /*
         func applyProperties(_ uuid: UUID, _ variable: String,_ old: SIMD3<Float>,_ new: SIMD3<Float>)
         {
             nodeGraph!.mmView.undoManager!.registerUndo(withTarget: self) { target in
-                if let node = globalApp!.nodeGraph.getNodeForUUID(uuid) {
+                if let node = self.nodeGraph?.getNodeForUUID(uuid) {
                     node.properties[variable + "_x"] = new.x
                     node.properties[variable + "_y"] = new.y
                     node.properties[variable + "_z"] = new.z
@@ -317,7 +357,7 @@ class Node : Codable, Equatable
                     applyProperties(uuid, variable, new, old)
                     node.updateUI(mmView: node.nodeGraph!.mmView)
                     node.variableChanged(variable: variable, oldValue: old, newValue: new, continuous: false, noUndo: true)
-                    globalApp!.nodeGraph.mmView.update()
+                    self.nodeGraph?.mmView.update()
                 }
             }
             nodeGraph!.mmView.undoManager!.setActionName("Node Property Changed")
@@ -326,7 +366,7 @@ class Node : Codable, Equatable
         if continuous == false {
             applyProperties(self.uuid, variable, newValue, oldValue)
         }
-        self.updateUIState(mmView: self.nodeGraph!.mmView)*/
+        self.updateUIState(mmView: self.nodeGraph!.mmView)
     }
     
     /// Executes the connected properties

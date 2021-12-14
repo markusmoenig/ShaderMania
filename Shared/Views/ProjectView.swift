@@ -37,9 +37,9 @@ struct ProjectView: View {
         ZStack(alignment: .bottomLeading) {
 
             List {
-                Section(header: Text("ShaderTrees")) {
+                Section(header: Text("Objects")) {
                     
-                    ForEach(model.project.trees, id: \.uuid) { tree in
+                    ForEach(model.project.objects, id: \.uuid) { tree in
 
                         Button(action: {
                             /*

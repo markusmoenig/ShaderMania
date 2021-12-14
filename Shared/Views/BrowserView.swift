@@ -23,10 +23,9 @@ struct URLDropDelegate: DropDelegate {
         for item in items {
             _ = item.loadObject(ofClass: URL.self) { url, _ in
                 if let url = url {
-                    print(url)
-                    //DispatchQueue.main.async {
-                     //   self.urlItems.insert(URLItem(link: url), at: 0)
-                    //}
+                    var text = url.absoluteString
+                    text = text.replacingOccurrences(of: "node://", with: "")
+                    model.addNodeByName(text)
                 }
             }
         }
@@ -69,7 +68,7 @@ struct BrowserView: View {
     
     @State private var selectedName     : String = ""
 
-    @State private var showAssetNamePopover = false
+    @State private var showNodeNamePopover  = false
     
     @State private var browserIsMaximized   = false
 
@@ -182,7 +181,7 @@ struct BrowserView: View {
             .background(Color.accentColor)
             
             // Edit Asset name
-            .popover(isPresented: self.$showAssetNamePopover,
+            .popover(isPresented: self.$showNodeNamePopover,
                      arrowEdge: .bottom
             ) {
                 VStack(alignment: .leading) {

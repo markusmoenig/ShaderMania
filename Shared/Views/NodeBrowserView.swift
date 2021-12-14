@@ -10,6 +10,7 @@ import SwiftUI
 struct NodeBrowserView: View {
     
     @Environment(\.managedObjectContext) var managedObjectContext
+    @Environment(\.colorScheme) var deviceColorScheme: ColorScheme
 
     @FetchRequest(
       entity: ShaderEntity.entity(),
@@ -41,19 +42,20 @@ struct NodeBrowserView: View {
         if folderType == .root {
 
             let rootFolders = ["Core", "Shaders", "Scripts"]
-            
+            let rootNodes = ["Tree"]
+
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 0) {
                     ForEach(rootFolders, id: \.self) { folder in
                         
-                        VStack(alignment: .center) {
+                        VStack(alignment: .center, spacing: 0) {
                             
                             Image(systemName: selectedName == folder ? "folder.fill" : "folder")
                                 .resizable()
                                 .scaledToFit()
                                 .padding()
                                 .padding(.bottom, 0)
-                                //.frame(width: IconSize * 0.8, height: IconSize * 0.8)
+                                .frame(width: IconSize, height: IconSize)
                                 //.padding(.bottom, 15)
                                 .onTapGesture(count: 2, perform: {
                                     folderType = .inbuilt
@@ -61,11 +63,6 @@ struct NodeBrowserView: View {
                                 .onTapGesture(perform: {
                                     selectedName = folder
                                 })
-                                .onDrag {
-                                    selectedName = folder
-                                    return NSItemProvider(object: URL(string: "folder://" + selectedName)! as NSURL)
-                                }
-
                             
                             Text(folder)
                                 .onTapGesture(perform: {
@@ -73,9 +70,40 @@ struct NodeBrowserView: View {
                                 })
                         }
                     }
+                    
+                    ForEach(rootNodes, id: \.self) { node in
+                        
+                        VStack(alignment: .center, spacing: 0) {
+                            
+                            Image(systemName: selectedName == node ? "cylinder.fill" : "cylinder")
+                                .resizable()
+                                .scaledToFit()
+                                .padding()
+                                .padding(.bottom, 0)
+                                .frame(width: IconSize, height: IconSize)
+                                //.padding(.bottom, 15)
+                                .onTapGesture(count: 2, perform: {
+                                    folderType = .inbuilt
+                                })
+                                .onTapGesture(perform: {
+                                    selectedName = node
+                                })
+                                .onDrag {
+                                    selectedName = node
+                                    return NSItemProvider(object: URL(string: "node://" + selectedName)! as NSURL)
+                                }
+
+                            
+                            Text(node)
+                                .onTapGesture(perform: {
+                                    selectedName = node
+                                })
+                        }
+                    }
                 }
             }
-            
+            .background(deviceColorScheme == .light ? Color.gray : Color.black)
+
         } else {
             
             ScrollView {

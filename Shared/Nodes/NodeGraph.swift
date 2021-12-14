@@ -620,7 +620,7 @@ class NodeGraph
         
         zoomInTexture = mmView.icons["zoom_plus"]
         zoomOutTexture = mmView.icons["zoom_minus"]
-         */
+         */        
     }
 
     ///
@@ -1113,8 +1113,8 @@ class NodeGraph
         }
         
         // Adjust scale
-        if hoverNode != nil && hoverNode!.behaviorTree != nil {
-            scale *= hoverNode!.behaviorTree!.properties["treeScale"]!
+        if hoverNode != nil && hoverNode!.shaderTree != nil {
+            scale *= hoverNode!.shaderTree!.properties["treeScale"]!
         }
         
         // Drag Node
@@ -1353,7 +1353,7 @@ class NodeGraph
             renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
             
             // --- Run nodes when playing
-            
+            /*
             if playNode != nil {
                 
                 for node in nodes {
@@ -1377,7 +1377,7 @@ class NodeGraph
                 }
                 
                 playNode?.updatePreview(nodeGraph: self)
-            }
+            }*/
             
             // --- Draw Nodes
 
@@ -1619,16 +1619,16 @@ class NodeGraph
         node.rect.x = region.rect.x + node.xPos * scale + model.selectedTree!.camera!.xPos
         node.rect.y = region.rect.y + node.yPos * scale + model.selectedTree!.camera!.yPos
         
-        if let behaviorTree = node.behaviorTree {
-            let treeScale = behaviorTree.properties["treeScale"]!
+        if let shaderTree = node.shaderTree {
+            let treeScale = shaderTree.properties["treeScale"]!
             scale *= treeScale
-            node.rect.x += (behaviorTree.rect.x + behaviorTree.rect.width / 2 - node.rect.x) * (1.0 - treeScale)
-            node.rect.y += (behaviorTree.rect.y + behaviorTree.rect.height / 2 - node.rect.y) * (1.0 - treeScale)
+            node.rect.x += (shaderTree.rect.x + shaderTree.rect.width / 2 - node.rect.x) * (1.0 - treeScale)
+            node.rect.y += (shaderTree.rect.y + shaderTree.rect.height / 2 - node.rect.y) * (1.0 - treeScale)
             
             node.rect.width = max(node.minimumSize.x, node.uiArea.width + 30) * scale
             node.rect.height = (node.minimumSize.y + max(node.uiArea.height, 20)) * scale
             
-            if behaviorTree.rect.contains(node.rect.x, node.rect.y) {
+            if shaderTree.rect.contains(node.rect.x, node.rect.y) {
                 return
             }
         } else {
@@ -2088,12 +2088,12 @@ class NodeGraph
         let terminal = conn.terminal!
         let node = terminal.node!
         
-        if let behaviorTree = node.behaviorTree {
-            let treeScale = behaviorTree.properties["treeScale"]!
+        if let shaderTree = node.shaderTree {
+            let treeScale = shaderTree.properties["treeScale"]!
             scale *= treeScale
         } else
-        if let behaviorTree = node as? BehaviorTree {
-            let treeScale = behaviorTree.properties["treeScale"]!
+        if node.brand == .Tree {
+            let treeScale = node.properties["treeScale"]!
             scale *= treeScale
         }
 
@@ -2141,8 +2141,8 @@ class NodeGraph
                 }
             }
             
-            if let behaviorRoot = node.behaviorTree {
-                if behaviorRoot.rect.contains(node.rect.x + x, node.rect.y + y) {
+            if let shaderTree = node.shaderTree {
+                if shaderTree.rect.contains(node.rect.x + x, node.rect.y + y) {
                     return nil
                 }
             }
@@ -2230,8 +2230,8 @@ class NodeGraph
             for node in nodes {
                 if node.rect.contains( x, y ) {
                     // --- If the node is inside its root tree due to scaling skip it
-                    if let behaviorTree = node.behaviorTree {
-                        if behaviorTree.rect.contains(x, y) {
+                    if let shaderTree = node.shaderTree {
+                        if shaderTree.rect.contains(x, y) {
                             continue
                         }
                     }
@@ -2247,8 +2247,8 @@ class NodeGraph
     {
         var scale : Float = model.selectedTree!.camera!.zoom
 
-        if let behaviorTree = node.behaviorTree {
-            let treeScale = behaviorTree.properties["treeScale"]!
+        if let shaderTree = node.shaderTree {
+            let treeScale = shaderTree.properties["treeScale"]!
             scale *= treeScale
         }
         
@@ -2311,12 +2311,12 @@ class NodeGraph
     /// Connects two terminals
     func connectTerminals(_ terminal1: Terminal,_ terminal2: Terminal)
     {
-        /*
+        
         func applyUndo(_ terminal1_: UUID,_ terminal2_: UUID, connect: Bool)
         {
             mmView.undoManager!.registerUndo(withTarget: self) { target in
-                let terminal1 = globalApp!.nodeGraph.getTerminalOfUUID(terminal1_)
-                let terminal2 = globalApp!.nodeGraph.getTerminalOfUUID(terminal2_)
+                let terminal1 = self.model.nodeGraph.getTerminalOfUUID(terminal1_)
+                let terminal2 = self.model.nodeGraph.getTerminalOfUUID(terminal2_)
 
                 if terminal1 != nil && terminal2 != nil {
                     
@@ -2347,9 +2347,9 @@ class NodeGraph
                     
                     applyUndo(terminal1_, terminal2_, connect: !connect)
                     
-                    globalApp!.nodeGraph.updateNode(node1)
-                    globalApp!.nodeGraph.updateNode(node2)
-                    globalApp!.nodeGraph.mmView.update()
+                    self.model.nodeGraph.updateNode(node1)
+                    self.model.nodeGraph.updateNode(node2)
+                    self.model.nodeGraph.mmView.update()
                 }
             }
             mmView.undoManager!.setActionName("Connect Terminals")
@@ -2368,18 +2368,16 @@ class NodeGraph
         
         terminal1.node!.onConnect(myTerminal: terminal1, toTerminal: terminal2)
         terminal2.node!.onConnect(myTerminal: terminal2, toTerminal: terminal1)
-         */
     }
     
     /// Disconnects the connection
     func disconnectConnection(_ conn: Connection, undo: Bool = true)
     {
-        /*
         func applyUndo(_ terminal1_: UUID,_ terminal2_: UUID, connect: Bool)
         {
             mmView.undoManager!.registerUndo(withTarget: self) { target in
-                let terminal1 = globalApp!.nodeGraph.getTerminalOfUUID(terminal1_)
-                let terminal2 = globalApp!.nodeGraph.getTerminalOfUUID(terminal2_)
+                let terminal1 = self.model.nodeGraph.getTerminalOfUUID(terminal1_)
+                let terminal2 = self.model.nodeGraph.getTerminalOfUUID(terminal2_)
                 
                 if terminal1 != nil && terminal2 != nil {
                     
@@ -2410,9 +2408,9 @@ class NodeGraph
                     
                     applyUndo(terminal1_, terminal2_, connect: !connect)
                     
-                    globalApp!.nodeGraph.updateNode(node1)
-                    globalApp!.nodeGraph.updateNode(node2)
-                    globalApp!.nodeGraph.mmView.update()
+                    self.model.nodeGraph.updateNode(node1)
+                    self.model.nodeGraph.updateNode(node2)
+                    self.model.nodeGraph.mmView.update()
                 }
             }
             mmView.undoManager!.setActionName("Disconnect Terminals")
@@ -2433,7 +2431,6 @@ class NodeGraph
         
         updateNode(terminal.node!)
         updateNode(toTerminal.node!)
-         */
     }
     
     /// Returns the color for the given terminal
@@ -2626,7 +2623,7 @@ class NodeGraph
          */
         if currentFound == false {
             if currentContent.count > 0 {
-                setcurrentRoot(node: currentContent[0])
+                setCurrentTree(node: currentContent[0])
             } else {
                 model.selectedTree = nil
             }
@@ -2636,7 +2633,7 @@ class NodeGraph
     }
     
     /// Sets the current root node
-    func setcurrentRoot(node: Node?=nil, uuid: UUID?=nil)
+    func setCurrentTree(node: Node?=nil, uuid: UUID?=nil)
     {
         //currentRoot = nil
         //currentRootUUID = nil
@@ -2856,8 +2853,7 @@ class NodeGraph
                 if terminal.connector == .Top && terminal.connections.count > 0 {
                     if let destTerminal = terminal.connections[0].toTerminal {
                         rc = destTerminal.node!
-                        let behaviorTree = rc as? BehaviorTree
-                        if behaviorTree == nil {
+                        if rc?.brand != .Tree {
                             rc = getRootNode(destTerminal.node!)
                         }
                     }
@@ -2867,9 +2863,8 @@ class NodeGraph
             return rc
         }
         
-        /*
         node.nodeGraph = self
-        node.behaviorTree = nil
+        node.shaderTree = nil
         for terminal in node.terminals {
             for conn in terminal.connections {
                 conn.toTerminal = getTerminalOfUUID(conn.toTerminalUUID)
@@ -2877,9 +2872,10 @@ class NodeGraph
             
             // Go up the tree to see if it is connected to a behavior tree and if yes link it
             if terminal.connector == .Top {
-                let rootNode = getRootNode(node)
-                if let behaviorTree = rootNode as? BehaviorTree {
-                    node.behaviorTree = behaviorTree
+                if let rootNode = getRootNode(node) {
+                    if rootNode.brand == .Tree {
+                        node.shaderTree = rootNode
+                    }
                 }
             }
         }
@@ -2904,7 +2900,7 @@ class NodeGraph
                 conn.targets = []
             }
         }
-        
+        /*
         for item in node.uiItems {
             
             // .ObjectInstanceTarget Drop Target
@@ -3432,8 +3428,12 @@ class NodeGraph
     /// Hard updates all nodes
     func updateNodes()
     {
-        for node in nodes {
-            updateNode(node)
+        //if let rootNode = model.selectedTree, let toDraw = rootNode.children, let camera = rootNode.camera {
+
+        for tree in model.project.objects {
+            for node in tree.children! {
+                updateNode(node)
+            }
         }
         maximizedNode = nil
     }
@@ -3482,9 +3482,11 @@ class NodeGraph
     /// Get the node for the given uuid
     func getNodeForUUID(_ uuid: UUID) -> Node?
     {
-        for node in nodes {
-            if node.uuid == uuid {
-                return node
+        for tree in model.project.objects {
+            for node in tree.children! {
+                if node.uuid == uuid {
+                    return node
+                }
             }
         }
         
@@ -3494,10 +3496,12 @@ class NodeGraph
     /// Returns the terminal of the given UUID
     func getTerminalOfUUID(_ uuid: UUID) -> Terminal?
     {
-        for node in nodes {
-            for terminal in node.terminals {
-                if terminal.uuid == uuid {
-                    return terminal
+        for tree in model.project.objects {
+            for node in tree.children! {
+                for terminal in node.terminals {
+                    if terminal.uuid == uuid {
+                        return terminal
+                    }
                 }
             }
         }

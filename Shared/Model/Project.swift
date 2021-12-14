@@ -19,7 +19,7 @@ class Project : Codable, Equatable
     
     var uuid            : UUID = UUID()
     
-    var trees           : [Node] = []
+    var objects         : [Node] = []
     
     var black           : MTLTexture? = nil
     var temp            : MTLTexture? = nil
@@ -43,26 +43,26 @@ class Project : Codable, Equatable
     
     private enum CodingKeys: String, CodingKey {
         case uuid
-        case trees
+        case objects
     }
 
     init() {
-        let tree = Node()
-        tree.children = []
+        let object = Node(brand: .Tree)
+        object.children = []
 
-        tree.name = "New Tree"
+        object.name = "New Tree"
         //tree.sequences.append( MMTlSequence() )
         //tree.currentSequence = object.sequences[0]
-        tree.setupTerminals()
-        trees.append(tree)
+        object.setupTerminals()
+        objects.append(object)
         
-        let node = Node()
+        let node = Node(brand: .Shader)
 
         node.name = "Shader"
         //node.sequences.append( MMTlSequence() )
         //node.currentSequence = object.sequences[0]
         node.setupTerminals()
-        tree.children!.append(node)
+        object.children!.append(node)
     }
     
     deinit
@@ -74,14 +74,14 @@ class Project : Codable, Equatable
     {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         uuid = try container.decode(UUID.self, forKey: .uuid)
-        trees = try container.decode([Node].self, forKey: .trees)
+        objects = try container.decode([Node].self, forKey: .objects)
     }
 
     func encode(to encoder: Encoder) throws
     {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(uuid, forKey: .uuid)
-        try container.encode(trees, forKey: .trees)
+        try container.encode(objects, forKey: .objects)
     }
     
     /// Start playback
@@ -263,18 +263,25 @@ class Project : Codable, Equatable
     /// Collects all shaders in the given tree
     func collectShadersForTree(tree: Node, collection: inout [Node])
     {
-        /*
-        for (_, connectedToId) in asset.slots {
-            
-            if let conAsset = assetFolder.getAssetById(connectedToId) {
-                collectShadersFor(assetFolder: assetFolder, asset: conAsset, &collected)
-                if collected.contains(conAsset) == false {
-                    collected.append(conAsset)
+        func addConnectedNodes(_ node: Node) {
+            for t in node.terminals {
+                for c in t .connections {
+                    if let connectedNode = c.toTerminal?.node {
+                        if connectedNode.brand == .Shader {
+                            if collection.contains(connectedNode) == false {
+                                collection.append(connectedNode)
+                                addConnectedNodes(connectedNode)
+                            }
+                        }
+                    }
                 }
             }
-        }*/
+        }
+        
         for node in tree.children! {
-            collection.append(node)
+            if node.brand == .Tree {
+                addConnectedNodes(node)
+            }
         }
     }
     

@@ -52,7 +52,7 @@ struct ShaderManiaDocument: FileDocument {
         if let folder = try? JSONDecoder().decode(AssetFolder.self, from: data) {
             /// Backwards compatibility to ShaderMania v1.x            
 
-            model.project.trees[0].children = []
+            model.project.objects[0].children = []
             for asset in folder.assets {
                 // Create a node for the asset
                 if asset.type == .Shader {
@@ -60,7 +60,7 @@ struct ShaderManiaDocument: FileDocument {
                     node.name =  asset.name
                     node.setCode(asset.value)
                     node.setupTerminals()
-                    model.project.trees[0].children?.append(node)
+                    model.project.objects[0].children?.append(node)
                 }
             }
         }

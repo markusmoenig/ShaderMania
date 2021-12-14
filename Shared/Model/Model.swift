@@ -36,7 +36,7 @@ class Model {
         project = Project()
         project.model = self
         
-        selectedTree = project.trees[0]
+        selectedTree = project.objects[0]
 
         compiler = ShaderCompiler(self)
     }
@@ -46,7 +46,8 @@ class Model {
         self.project = project
         self.project.model = self
         
-        selectedTree = project.trees[0]
+        selectedTree = project.objects[0]
+        nodeGraph?.updateNodes()
     }
     
     /// Sets up the NodeGraph from the MetalManiaView
@@ -59,7 +60,8 @@ class Model {
         
         nodeGraph = NodeGraph(model: self)
         nodeGraph.setup()
-        nodeGraph.setcurrentRoot(node: selectedTree)
+        nodeGraph.setCurrentTree(node: selectedTree)
+        nodeGraph.updateNodes()
         
         nodeRegion = EditorRegion(view, model: self)
         
@@ -67,6 +69,10 @@ class Model {
         device = view.device!
         
         metalStates = MetalStates(self)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            view.update()
+        }
     }
     
     /// Build the project, that means:
@@ -80,6 +86,33 @@ class Model {
                 print("finished compiling")
                 
             })
+        }
+    }
+    
+    /// Add the node identified by the node type name, called after DnD
+    func addNodeByName(_ nodeType: String) {
+        
+        var brand : Node.Brand = .Tree
+        var name = ""
+                
+        if nodeType == "Tree" {
+            brand = .Tree
+            name = "New ShaderTree"
+        }
+        
+        let tree = Node(brand: brand)
+        tree.children = []
+
+        tree.name = name
+        //tree.sequences.append( MMTlSequence() )
+        //tree.currentSequence = object.sequences[0]
+        tree.setupTerminals()
+        tree.setupUI(mmView: nodeView)
+        if let selectedTree = selectedTree {
+            selectedTree.children?.append(tree)
+        }
+        DispatchQueue.main.async {
+            self.nodeView.update()
         }
     }
 }

@@ -37,8 +37,6 @@
 		2B0EEAA12565DF9A00C84C6C /* Classes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEA9C2565DF9A00C84C6C /* Classes.swift */; };
 		2B0EEAA72565DFA800C84C6C /* Files in Resources */ = {isa = PBXBuildFile; fileRef = 2B0EEAA62565DFA800C84C6C /* Files */; };
 		2B0EEAA82565DFA800C84C6C /* Files in Resources */ = {isa = PBXBuildFile; fileRef = 2B0EEAA62565DFA800C84C6C /* Files */; };
-		2B0EEABB2566035700C84C6C /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEABA2566035700C84C6C /* Project.swift */; };
-		2B0EEABC2566035700C84C6C /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEABA2566035700C84C6C /* Project.swift */; };
 		2B0EEAC3256619D000C84C6C /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B0EEAC2256619D000C84C6C /* CloudKit.framework */; };
 		2B36F66D25D3C8A0001611BE /* MetalDrawables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */; };
 		2B36F66E25D3C8A0001611BE /* MetalDrawables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */; };
@@ -124,16 +122,12 @@
 		2BC6A3A3274F21FF00F8A500 /* MetalManiaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A1274F21FF00F8A500 /* MetalManiaView.swift */; };
 		2BC6A3B1274F342A00F8A500 /* NodeGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A5274F342A00F8A500 /* NodeGraph.swift */; };
 		2BC6A3B2274F342A00F8A500 /* NodeGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A5274F342A00F8A500 /* NodeGraph.swift */; };
-		2BC6A3B5274F342A00F8A500 /* Behavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A7274F342A00F8A500 /* Behavior.swift */; };
-		2BC6A3B6274F342A00F8A500 /* Behavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A7274F342A00F8A500 /* Behavior.swift */; };
 		2BC6A3B9274F342A00F8A500 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A9274F342A00F8A500 /* Node.swift */; };
 		2BC6A3BA274F342A00F8A500 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A9274F342A00F8A500 /* Node.swift */; };
 		2BC6A3BD274F342A00F8A500 /* NodeUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AB274F342A00F8A500 /* NodeUI.swift */; };
 		2BC6A3BE274F342A00F8A500 /* NodeUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AB274F342A00F8A500 /* NodeUI.swift */; };
 		2BC6A3C3274F342A00F8A500 /* Node.metal in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AE274F342A00F8A500 /* Node.metal */; };
 		2BC6A3C4274F342A00F8A500 /* Node.metal in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AE274F342A00F8A500 /* Node.metal */; };
-		2BC6A3C5274F342A00F8A500 /* Variables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AF274F342A00F8A500 /* Variables.swift */; };
-		2BC6A3C6274F342A00F8A500 /* Variables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AF274F342A00F8A500 /* Variables.swift */; };
 		2BC6A3CA27506B3200F8A500 /* NodeRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3C927506B3200F8A500 /* NodeRegion.swift */; };
 		2BC6A3CB27506B3200F8A500 /* NodeRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3C927506B3200F8A500 /* NodeRegion.swift */; };
 		2BC6A3D02752F79E00F8A500 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3CF2752F79E00F8A500 /* Model.swift */; };
@@ -170,6 +164,14 @@
 		2BC6A3FF2754C46500F8A500 /* ProjectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3FD2754C46400F8A500 /* ProjectView.swift */; };
 		DD17D27127672BCB00F9DE5F /* NodeBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD17D27027672BCB00F9DE5F /* NodeBrowserView.swift */; };
 		DD17D27227672BCB00F9DE5F /* NodeBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD17D27027672BCB00F9DE5F /* NodeBrowserView.swift */; };
+		DD17D2732768264700F9DE5F /* Behavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A7274F342A00F8A500 /* Behavior.swift */; };
+		DD17D2742768264800F9DE5F /* Behavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3A7274F342A00F8A500 /* Behavior.swift */; };
+		DD17D2752768264B00F9DE5F /* Variables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AF274F342A00F8A500 /* Variables.swift */; };
+		DD17D2762768264C00F9DE5F /* Variables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AF274F342A00F8A500 /* Variables.swift */; };
+		DD8127D527686E3E0041C75A /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEABA2566035700C84C6C /* Project.swift */; };
+		DD8127D627686E3F0041C75A /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0EEABA2566035700C84C6C /* Project.swift */; };
+		DD8127D82768723A0041C75A /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8127D72768723A0041C75A /* Project.swift */; };
+		DD8127D92768723A0041C75A /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8127D72768723A0041C75A /* Project.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -273,8 +275,8 @@
 		2BC6A3DF2754627C00F8A500 /* union_off.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = union_off.tiff; sourceTree = "<group>"; };
 		2BC6A3E02754627C00F8A500 /* foreground.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = foreground.tiff; sourceTree = "<group>"; };
 		2BC6A3FD2754C46400F8A500 /* ProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectView.swift; sourceTree = "<group>"; };
-		DD17D26F2767282F00F9DE5F /* ShaderManiaCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ShaderManiaCore; path = ../../ShaderManiaCore; sourceTree = "<group>"; };
 		DD17D27027672BCB00F9DE5F /* NodeBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeBrowserView.swift; sourceTree = "<group>"; };
+		DD8127D72768723A0041C75A /* Project.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -312,7 +314,6 @@
 		2B0EEA4D2565DF3900C84C6C /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				DD17D26F2767282F00F9DE5F /* ShaderManiaCore */,
 				2B0EEA4E2565DF3900C84C6C /* ShaderManiaApp.swift */,
 				2B0EEA4F2565DF3900C84C6C /* ShaderManiaDocument.swift */,
 				2B0EEA772565DF7800C84C6C /* ContentView.swift */,
@@ -418,6 +419,7 @@
 				2B995CD3274CA305009E976C /* AssetFolder.swift */,
 				2B0EEA7C2565DF7800C84C6C /* Core.swift */,
 				2B0EEABA2566035700C84C6C /* Project.swift */,
+				DD8127D72768723A0041C75A /* Project.swift */,
 				2BC6A3CF2752F79E00F8A500 /* Model.swift */,
 				2B995CD9274CB769009E976C /* DataModel.xcdatamodeld */,
 			);
@@ -535,6 +537,8 @@
 			dependencies = (
 			);
 			name = "ShaderMania (macOS)";
+			packageProductDependencies = (
+			);
 			productName = "ShaderMania (macOS)";
 			productReference = 2B0EEA5E2565DF3A00C84C6C /* ShaderMania.app */;
 			productType = "com.apple.product-type.application";
@@ -650,20 +654,19 @@
 				2B0EEA932565DF7800C84C6C /* MetalStates.swift in Sources */,
 				2BC6A3CA27506B3200F8A500 /* NodeRegion.swift in Sources */,
 				2B0EEA8D2565DF7800C84C6C /* MathLibrary.swift in Sources */,
-				2BC6A3B5274F342A00F8A500 /* Behavior.swift in Sources */,
 				2BC6A3B1274F342A00F8A500 /* NodeGraph.swift in Sources */,
 				2B995D12274E1C7C009E976C /* MMUtils.swift in Sources */,
 				2B995D32274E1C7C009E976C /* MMScrollButton.swift in Sources */,
 				2B995D3A274E1C7C009E976C /* MMTimeline.swift in Sources */,
 				2B0EEA852565DF7800C84C6C /* Asset.swift in Sources */,
 				2B0EEA892565DF7800C84C6C /* Utils.swift in Sources */,
+				DD17D2742768264800F9DE5F /* Behavior.swift in Sources */,
 				2B995D00274E1C7C009E976C /* MMColorWidget.swift in Sources */,
 				2B995D16274E1C7C009E976C /* MMSliderWidget.swift in Sources */,
 				2B7C7EEC25DCB5D400727BC0 /* Library.swift in Sources */,
 				2B3D4C7925A68ECA00D2F8EA /* Views.swift in Sources */,
 				2BC6A3B9274F342A00F8A500 /* Node.swift in Sources */,
 				2B995D02274E1C7C009E976C /* MMFile.swift in Sources */,
-				2BC6A3C5274F342A00F8A500 /* Variables.swift in Sources */,
 				2B995D3C274E1C7C009E976C /* MMFont.swift in Sources */,
 				2B0EEA872565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA02565DF9A00C84C6C /* Classes.swift in Sources */,
@@ -681,19 +684,21 @@
 				2BC6A3BD274F342A00F8A500 /* NodeUI.swift in Sources */,
 				2B0EEA8B2565DF7800C84C6C /* Core.swift in Sources */,
 				2B995CDE274CB90E009E976C /* BrowserView.swift in Sources */,
+				DD17D2752768264B00F9DE5F /* Variables.swift in Sources */,
 				2B995D36274E1C7C009E976C /* MMFragment.swift in Sources */,
 				2B995D38274E1C7C009E976C /* MMListWidget.swift in Sources */,
 				2B995CDB274CB769009E976C /* DataModel.xcdatamodeld in Sources */,
 				2B995D1E274E1C7C009E976C /* MMFloatWidget.swift in Sources */,
+				DD8127D527686E3E0041C75A /* Project.swift in Sources */,
 				2B995D30274E1C7C009E976C /* MMTabWidget.swift in Sources */,
 				2B995D20274E1C7C009E976C /* MMSkin.swift in Sources */,
+				DD8127D82768723A0041C75A /* Project.swift in Sources */,
 				2B995D0A274E1C7C009E976C /* MMView.swift in Sources */,
 				2B995D2C274E1C7C009E976C /* MMRegion.swift in Sources */,
 				2B0EEA8F2565DF7800C84C6C /* ScriptEditor.swift in Sources */,
 				2B995D24274E1C7C009E976C /* MMBaseView__ios.swift in Sources */,
 				2B995D1C274E1C7C009E976C /* MMScreen.swift in Sources */,
 				2B995D1A274E1C7C009E976C /* MMScrollArea.swift in Sources */,
-				2B0EEABB2566035700C84C6C /* Project.swift in Sources */,
 				DD17D27127672BCB00F9DE5F /* NodeBrowserView.swift in Sources */,
 				2B995D0E274E1C7C009E976C /* MMAnimate.swift in Sources */,
 			);
@@ -718,20 +723,19 @@
 				2B0EEA942565DF7800C84C6C /* MetalStates.swift in Sources */,
 				2BC6A3CB27506B3200F8A500 /* NodeRegion.swift in Sources */,
 				2B0EEA8E2565DF7800C84C6C /* MathLibrary.swift in Sources */,
-				2BC6A3B6274F342A00F8A500 /* Behavior.swift in Sources */,
 				2BC6A3B2274F342A00F8A500 /* NodeGraph.swift in Sources */,
 				2B995D13274E1C7C009E976C /* MMUtils.swift in Sources */,
 				2B995D33274E1C7C009E976C /* MMScrollButton.swift in Sources */,
 				2B995D3B274E1C7C009E976C /* MMTimeline.swift in Sources */,
 				2B0EEA862565DF7800C84C6C /* Asset.swift in Sources */,
 				2B0EEA8A2565DF7800C84C6C /* Utils.swift in Sources */,
+				DD17D2732768264700F9DE5F /* Behavior.swift in Sources */,
 				2B995D01274E1C7C009E976C /* MMColorWidget.swift in Sources */,
 				2B995D17274E1C7C009E976C /* MMSliderWidget.swift in Sources */,
 				2B7C7EED25DCB5D400727BC0 /* Library.swift in Sources */,
 				2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */,
 				2BC6A3BA274F342A00F8A500 /* Node.swift in Sources */,
 				2B995D03274E1C7C009E976C /* MMFile.swift in Sources */,
-				2BC6A3C6274F342A00F8A500 /* Variables.swift in Sources */,
 				2B995D3D274E1C7C009E976C /* MMFont.swift in Sources */,
 				2B0EEA882565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA12565DF9A00C84C6C /* Classes.swift in Sources */,
@@ -749,19 +753,21 @@
 				2BC6A3BE274F342A00F8A500 /* NodeUI.swift in Sources */,
 				2B0EEA8C2565DF7800C84C6C /* Core.swift in Sources */,
 				2B995CDF274CB90E009E976C /* BrowserView.swift in Sources */,
+				DD17D2762768264C00F9DE5F /* Variables.swift in Sources */,
 				2B995D37274E1C7C009E976C /* MMFragment.swift in Sources */,
 				2B995D39274E1C7C009E976C /* MMListWidget.swift in Sources */,
 				2B995CDC274CB769009E976C /* DataModel.xcdatamodeld in Sources */,
 				2B995D1F274E1C7C009E976C /* MMFloatWidget.swift in Sources */,
+				DD8127D627686E3F0041C75A /* Project.swift in Sources */,
 				2B995D31274E1C7C009E976C /* MMTabWidget.swift in Sources */,
 				2B995D21274E1C7C009E976C /* MMSkin.swift in Sources */,
+				DD8127D92768723A0041C75A /* Project.swift in Sources */,
 				2B995D0B274E1C7C009E976C /* MMView.swift in Sources */,
 				2B995D2D274E1C7C009E976C /* MMRegion.swift in Sources */,
 				2B0EEA902565DF7800C84C6C /* ScriptEditor.swift in Sources */,
 				2B995D1D274E1C7C009E976C /* MMScreen.swift in Sources */,
 				2B995D23274E1C7C009E976C /* MMBaseView_mac.swift in Sources */,
 				2B995D1B274E1C7C009E976C /* MMScrollArea.swift in Sources */,
-				2B0EEABC2566035700C84C6C /* Project.swift in Sources */,
 				DD17D27227672BCB00F9DE5F /* NodeBrowserView.swift in Sources */,
 				2B995D0F274E1C7C009E976C /* MMAnimate.swift in Sources */,
 			);
