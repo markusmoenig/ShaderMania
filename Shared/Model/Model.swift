@@ -31,8 +31,9 @@ class Model {
     /// The script editor
     var scriptEditor                        : ScriptEditor? = nil
     
-    var compiler                            : ShaderCompiler!
-    
+    var shaderCompiler                      : ShaderCompiler!
+    var luaCompiler                         : LuaCompiler!
+
     let browserIsMaximized                  = PassthroughSubject<Bool, Never>()
     
     init() {
@@ -41,7 +42,8 @@ class Model {
         
         selectedTree = project.objects[0]
 
-        compiler = ShaderCompiler(self)
+        shaderCompiler = ShaderCompiler(self)
+        luaCompiler = LuaCompiler(self)
     }
     
     /// Loaded from document
@@ -83,7 +85,7 @@ class Model {
     func build() {
         
         if let shaderTree = selectedTree {
-            project.compileTree(tree: shaderTree, compiler: compiler, finished: { () in
+            project.compileTree(tree: shaderTree, compiler: shaderCompiler, finished: { () in
         
                 self.nodeView.update()
                 print("finished compiling")
@@ -95,12 +97,20 @@ class Model {
     /// Add the node identified by the node type name, called after DnD
     func addNodeByName(_ nodeType: String) {
         
-        var brand : Node.Brand = .Tree
+        var brand : Node.Brand = .ShaderTree
         var name = ""
                 
-        if nodeType == "Tree" {
-            brand = .Tree
+        if nodeType == "ShaderTree" {
+            brand = .ShaderTree
             name = "New ShaderTree"
+        } else
+        if nodeType == "Shader" {
+            brand = .Shader
+            name = "New Shader"
+        } else
+        if nodeType == "LuaScript" {
+            brand = .LuaScript
+            name = "New Lua Script"
         }
         
         let tree = Node(brand: brand)

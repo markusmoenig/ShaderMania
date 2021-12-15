@@ -205,12 +205,11 @@ struct BrowserView: View {
             ZStack(alignment: .topLeading) {
                 
                 WebView(document.model, deviceColorScheme)
-                    //.animation(.default)
                     .onChange(of: deviceColorScheme) { newValue in
                         document.core.scriptEditor?.setTheme(newValue)
                     }
                     .opacity(mode == .editor ? 1 : 0)
-                    .disabled(selectedNode != nil && selectedNode!.brand == .Shader ? false : true)
+                    .disabled(selectedNode != nil && (selectedNode!.brand == .Shader || selectedNode!.brand == .LuaScript) ? false : true)
                 
                 NodeBrowserView(model: document.model)
                     .opacity(mode == .browser ? 1 : 0)

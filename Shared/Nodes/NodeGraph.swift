@@ -1658,10 +1658,10 @@ class NodeGraph
         node.data.borderRound = 24
         
         if !overviewIsOn {
-            if node.brand == .Tree {
+            if node.brand == .ShaderTree {
                 node.data.brandColor = mmView.skin.Node.behaviorColor
             } else
-            if node.brand == .Script {
+            if node.brand == .LuaScript {
                 node.data.brandColor = mmView.skin.Node.propertyColor
             } else
             if node.brand == .Shader {
@@ -2092,7 +2092,7 @@ class NodeGraph
             let treeScale = shaderTree.properties["treeScale"]!
             scale *= treeScale
         } else
-        if node.brand == .Tree {
+        if node.brand == .ShaderTree {
             let treeScale = node.properties["treeScale"]!
             scale *= treeScale
         }
@@ -2855,7 +2855,7 @@ class NodeGraph
                 if terminal.connector == .Top && terminal.connections.count > 0 {
                     if let destTerminal = terminal.connections[0].toTerminal {
                         rc = destTerminal.node!
-                        if rc?.brand != .Tree {
+                        if rc?.brand != .ShaderTree {
                             rc = getRootNode(destTerminal.node!)
                         }
                     }
@@ -2875,7 +2875,7 @@ class NodeGraph
             // Go up the tree to see if it is connected to a behavior tree and if yes link it
             if terminal.connector == .Top {
                 if let rootNode = getRootNode(node) {
-                    if rootNode.brand == .Tree {
+                    if rootNode.brand == .ShaderTree {
                         node.shaderTree = rootNode
                     }
                 }
@@ -3558,14 +3558,14 @@ class NodeGraph
                 disconnectConnection(conn, undo: false)
             }
         }
-        // Remove node from root subset
+        // Remove node from shaderTree
         if let root = model.selectedTree {
-            if let index = root.subset!.firstIndex(where: { $0 == node.uuid }) {
-                root.subset!.remove(at: index)
+            if let index = root.children!.firstIndex(where: { $0.uuid == node.uuid }) {
+                root.children!.remove(at: index)
             }
         }
         // Remove from nodes
-        nodes.remove(at: nodes.firstIndex(where: { $0.uuid == node.uuid })!)
+        //nodes.remove(at: nodes.firstIndex(where: { $0.uuid == node.uuid })!)
         
         // If node is an object, remove it from all instances in scenes
         /*

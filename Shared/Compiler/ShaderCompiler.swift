@@ -351,7 +351,7 @@ class ShaderCompiler
                         if errorArr.count > 0 {
                             errorText = String(errorArr[0])
                         }
-                        if arr.count >= 4 && Int32(arr[0]) != nil && Int32(arr[1]) != nil {
+                        if arr.count >= 4 && Int32(arr[0]) != nil {
                             var er = CompileError()
                             er.node = node
                             er.line = Int32(arr[0])! - lineNumbers - 1

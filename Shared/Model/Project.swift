@@ -34,7 +34,6 @@ class Project : Codable, Equatable
     var frame           = UInt32(0)
     var targetFPS       = Float(60)
 
-    //var assetFolder     : AssetFolder? = nil
     var renderTree      : Node? = nil
     
     var textureLoader   : MTKTextureLoader? = nil
@@ -47,7 +46,7 @@ class Project : Codable, Equatable
     }
 
     init() {
-        let object = Node(brand: .Tree)
+        let object = Node(brand: .ShaderTree)
         object.children = []
 
         object.name = "New Object"
@@ -272,6 +271,9 @@ class Project : Codable, Equatable
                                 collection.append(connectedNode)
                                 addConnectedNodes(connectedNode)
                             }
+                        } else
+                        if connectedNode.brand == .LuaScript {
+                            addConnectedNodes(connectedNode)
                         }
                     }
                 }
@@ -279,7 +281,7 @@ class Project : Codable, Equatable
         }
         
         for node in tree.children! {
-            if node.brand == .Tree {
+            if node.brand == .ShaderTree {
                 addConnectedNodes(node)
             }
         }

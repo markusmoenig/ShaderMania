@@ -41,8 +41,8 @@ struct NodeBrowserView: View {
         
         if folderType == .root {
 
-            let rootFolders = ["Core", "Shaders", "Scripts"]
-            let rootNodes = ["Tree"]
+            let rootFolders = ["Shaders", "Lua Scripts", "Examples"]
+            let rootNodes = ["Shader Tree", "Shader", "Lua Script"]
 
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 0) {
@@ -90,9 +90,9 @@ struct NodeBrowserView: View {
                                 })
                                 .onDrag {
                                     selectedName = node
-                                    return NSItemProvider(object: URL(string: "node://" + selectedName)! as NSURL)
+                                    let trimmed = selectedName.replacingOccurrences(of: " ", with: "")
+                                    return NSItemProvider(object: URL(string: "node://" + trimmed)! as NSURL)
                                 }
-
                             
                             Text(node)
                                 .onTapGesture(perform: {

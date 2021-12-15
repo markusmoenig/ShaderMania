@@ -8,7 +8,6 @@
 
 import MetalKit
 
-
 /// 2D Camera for Node system
 class Camera : Codable
 {
@@ -31,7 +30,7 @@ class Camera : Codable
 class Node : Codable, Equatable
 {
     enum Brand : Int, Codable {
-        case Shader, Script, Tree, Property, Behavior, Function, Arithmetic
+        case Shader, LuaScript, ShaderTree, Property, Behavior, Function, Arithmetic
     }
 
     enum Result {
@@ -63,6 +62,9 @@ class Node : Codable, Equatable
     
     /// The compiled shader if this is a shader node
     var shader          : Shader? = nil
+    
+    /// The Lua virtual machine if this is a script node
+    var vm              : VirtualMachine? = nil
     
     var texture         : MTLTexture? = nil
     
@@ -229,7 +231,7 @@ class Node : Codable, Equatable
     /// Setup the UI of the node
     func setupUI(mmView: MMView)
     {
-        if brand == .Tree {
+        if brand == .ShaderTree {
             uiItems = [
                 NodeUISelector(self, variable: "status", title: "Execute", items: ["Always", "On Startup", "On Demand"], index: 0),
                 NodeUINumber(self, variable: "treeScale", title: "Scale", range: SIMD2<Float>(0, 1), value: 1)
@@ -272,12 +274,12 @@ class Node : Codable, Equatable
     func setup()
     {
         if terminals.isEmpty == true {
-            if brand == .Tree {
+            if brand == .ShaderTree {
                 terminals = [
                     Terminal(name: "Behavior", connector: .Bottom, brand: .Behavior, node: self)
                 ]
             } else
-            if brand == .Shader {
+            if brand == .Shader || brand == .LuaScript {
                 terminals = [
                     Terminal(name: "Behavior", connector: .Top, brand: .Behavior, node: self),
                     Terminal(name: "Behavior", connector: .Bottom, brand: .Behavior, node: self)
@@ -317,7 +319,7 @@ class Node : Codable, Equatable
     func variableChanged(variable: String, oldValue: Float, newValue: Float, continuous: Bool = false, noUndo: Bool = false)
     {
         
-        if brand == .Tree && variable == "treeScale" {
+        if brand == .ShaderTree && variable == "treeScale" {
             properties[variable] = newValue
             uiItems[0].mmView.update()
         }

@@ -130,16 +130,30 @@ class ScriptEditor
             sessions += 1
         }
 
-        webView.evaluateJavaScript(
-            """
-            var \(node.scriptSessionId) = ace.createEditSession(`\(node.getCode())`)
-            editor.setSession(\(node.scriptSessionId))
-            editor.session.setMode("ace/mode/c_cpp");
-            """, completionHandler: { (value, error ) in
-                if let cb = cb {
-                    cb()
-                }
-         })
+        if node.brand == .Shader {
+            webView.evaluateJavaScript(
+                """
+                var \(node.scriptSessionId) = ace.createEditSession(`\(node.getCode())`)
+                editor.setSession(\(node.scriptSessionId))
+                editor.session.setMode("ace/mode/c_cpp");
+                """, completionHandler: { (value, error ) in
+                    if let cb = cb {
+                        cb()
+                    }
+             })
+        } else
+        if node.brand == .LuaScript {
+            webView.evaluateJavaScript(
+                """
+                var \(node.scriptSessionId) = ace.createEditSession(`\(node.getCode())`)
+                editor.setSession(\(node.scriptSessionId))
+                editor.session.setMode("ace/mode/lua");
+                """, completionHandler: { (value, error ) in
+                    if let cb = cb {
+                        cb()
+                    }
+             })
+        }
     }
     
     func setReadOnly(_ readOnly: Bool = false)
