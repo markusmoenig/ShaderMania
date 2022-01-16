@@ -221,16 +221,7 @@ class ShaderCompiler
         let code = getHeaderCode(noOp: false)//asset.type == .Common)
         
         node.uiItems = []
-        
-        /*
-        if asset.type != .Common {
-            for asset in core.assetFolder.assets {
-                if asset.type == .Common {
-                    code += asset.value
-                }
-            }
-        }*/
-                
+            
         var ns = code as NSString
         var lineNumbers  : Int32 = 0
         

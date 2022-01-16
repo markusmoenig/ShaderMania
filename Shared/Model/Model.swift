@@ -85,7 +85,7 @@ class Model {
     func build() {
         
         if let shaderTree = selectedTree {
-            project.compileTree(tree: shaderTree, compiler: shaderCompiler, finished: { () in
+            project.compileTree(tree: shaderTree, shaderCompiler: shaderCompiler, luaCompiler: luaCompiler, finished: { () in
         
                 self.nodeView.update()
                 print("finished compiling")

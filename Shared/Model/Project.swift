@@ -180,6 +180,7 @@ class Project : Codable, Equatable
             print("no shader for \(node.name)")
             return
         }
+        
         let rect = MMRect( 0, 0, Float(size.x), Float(size.y))
         
         let texture = preview == false ? node.texture! : node.previewTexture!
@@ -203,6 +204,7 @@ class Project : Codable, Equatable
         metalData.frame = frame
         renderEncoder.setFragmentBytes(&metalData, length: MemoryLayout<MetalData>.stride, index: 0)
         
+        /*
         for index in 1..<5 {
             var hasBeenSet = false
             
@@ -221,7 +223,7 @@ class Project : Codable, Equatable
             if hasBeenSet == false {
                 renderEncoder.setFragmentTexture(black, index: index)
             }
-        }
+        }*/
 
         /// Update the parameter data for the shader
         if let shader = node.shader {
@@ -266,14 +268,11 @@ class Project : Codable, Equatable
             for t in node.terminals {
                 for c in t .connections {
                     if let connectedNode = c.toTerminal?.node {
-                        if connectedNode.brand == .Shader {
+                        if connectedNode.brand == .Shader || connectedNode.brand == .LuaScript {
                             if collection.contains(connectedNode) == false {
                                 collection.append(connectedNode)
                                 addConnectedNodes(connectedNode)
                             }
-                        } else
-                        if connectedNode.brand == .LuaScript {
-                            addConnectedNodes(connectedNode)
                         }
                     }
                 }
@@ -281,37 +280,54 @@ class Project : Codable, Equatable
         }
         
         for node in tree.children! {
-            if node.brand == .ShaderTree {
+            if node.brand == .ShaderTree || node.brand == .LuaScript {
                 addConnectedNodes(node)
             }
         }
     }
     
     /// Compiles the given shader tree
-    func compileTree(tree: Node, compiler: ShaderCompiler, finished: @escaping () -> ())
+    func compileTree(tree: Node, shaderCompiler: ShaderCompiler, luaCompiler: LuaCompiler, finished: @escaping () -> ())
     {
         var collected : [Node] = []
         collectShadersForTree(tree: tree, collection: &collected)
         
         var toCompile = collected.count
         
-        for node in collected {
-            compiler.compile(node: node, cb: { (shader, errors) in
-                    
-                node.shader = shader
-                node.errors = errors
-                    
-                toCompile -= 1
-
-                if toCompile == 0 {
-                    DispatchQueue.main.async {
-                        for node in collected {
-                            node.setupUI(mmView: self.model.nodeView)
-                        }
-                        finished()
+        // Compilation has finished ?
+        func checkForEnd() {
+            if toCompile == 0 {
+                DispatchQueue.main.async {
+                    for node in collected {
+                        node.setupUI(mmView: self.model.nodeView)
                     }
+                    finished()
                 }
-            })
+            }
+        }
+        
+        for node in collected {
+            
+            if node.brand == .Shader {
+                shaderCompiler.compile(node: node, cb: { (shader, errors) in
+                        
+                    node.shader = shader
+                    node.errors = errors
+                        
+                    toCompile -= 1
+                    checkForEnd()
+                })
+            } else
+            if node.brand == .LuaScript {
+                luaCompiler.compile(node: node, cb: { (vm, errors) in
+
+                    node.vm = nil
+                    node.vm = vm
+                    
+                    toCompile -= 1
+                    checkForEnd()
+                })
+            }
         }
     }
     
