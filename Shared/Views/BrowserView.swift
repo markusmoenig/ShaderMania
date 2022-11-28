@@ -124,7 +124,7 @@ struct BrowserView: View {
                 Divider()
 
                 Button(action: {
-                    
+                    document.model.browserGoUp.send()
                 })
                 {
                     Image(systemName: "arrowshape.turn.up.backward")
@@ -199,9 +199,7 @@ struct BrowserView: View {
                     .frame(minWidth: 200)
                 }.padding()
             }
-                
-            Divider()
-            
+
             ZStack(alignment: .topLeading) {
                 
                 WebView(document.model, deviceColorScheme)

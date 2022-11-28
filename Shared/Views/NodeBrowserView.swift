@@ -25,7 +25,7 @@ struct NodeBrowserView: View {
     
     var model                                   : Model
 
-    @State private var folderType                : FolderType = .root
+    @State private var folderType               : FolderType = .root
     
     @State private var selectedShader           : ShaderEntity? = nil
     @State private var IconSize                 : CGFloat = 80
@@ -231,6 +231,10 @@ struct NodeBrowserView: View {
                 }
                 .padding()
                 .padding(.top, 0)
+            }
+            
+            .onReceive(model.browserGoUp) { _ in
+                folderType = .root
             }
         }
     }

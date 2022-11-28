@@ -44,8 +44,6 @@
 		2B36F67725D4DE84001611BE /* OpenSans.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 2B36F67425D4DE84001611BE /* OpenSans.tiff */; };
 		2B36F67825D4DE84001611BE /* OpenSans.json in Resources */ = {isa = PBXBuildFile; fileRef = 2B36F67525D4DE84001611BE /* OpenSans.json */; };
 		2B36F67925D4DE84001611BE /* OpenSans.json in Resources */ = {isa = PBXBuildFile; fileRef = 2B36F67525D4DE84001611BE /* OpenSans.json */; };
-		2B3D4C7925A68ECA00D2F8EA /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D4C7825A68ECA00D2F8EA /* Views.swift */; };
-		2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D4C7825A68ECA00D2F8EA /* Views.swift */; };
 		2B6B9C7625E0BC6000F266DF /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B6B9C7525E0BC6000F266DF /* CloudKit.framework */; };
 		2B77B7BB25773978002D99C0 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B77B7BA25773978002D99C0 /* File.swift */; };
 		2B77B7BC25773978002D99C0 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B77B7BA25773978002D99C0 /* File.swift */; };
@@ -293,7 +291,6 @@
 		2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDrawables.swift; sourceTree = "<group>"; };
 		2B36F67425D4DE84001611BE /* OpenSans.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = OpenSans.tiff; sourceTree = "<group>"; };
 		2B36F67525D4DE84001611BE /* OpenSans.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = OpenSans.json; sourceTree = "<group>"; };
-		2B3D4C7825A68ECA00D2F8EA /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		2B6B9C7225E0BC4E00F266DF /* iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iOS.entitlements; sourceTree = "<group>"; };
 		2B6B9C7525E0BC6000F266DF /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.4.sdk/System/Library/Frameworks/CloudKit.framework; sourceTree = DEVELOPER_DIR; };
 		2B77B7BA25773978002D99C0 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
@@ -485,7 +482,6 @@
 				2B995CD1274C6FD1009E976C /* Views */,
 				2BC6A3A4274F341400F8A500 /* Nodes */,
 				DD81287F276972DA0041C75A /* Compiler */,
-				2B3D4C7825A68ECA00D2F8EA /* Views.swift */,
 				2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */,
 				2B7C7EEB25DCB5D400727BC0 /* Library.swift */,
 				2B0EEA7D2565DF7800C84C6C /* MathLibrary.swift */,
@@ -950,7 +946,6 @@
 				2B7C7EEC25DCB5D400727BC0 /* Library.swift in Sources */,
 				DD81284527696D830041C75A /* loadlib.c in Sources */,
 				DD81283B27696D830041C75A /* ltm.c in Sources */,
-				2B3D4C7925A68ECA00D2F8EA /* Views.swift in Sources */,
 				2BC6A3B9274F342A00F8A500 /* Node.swift in Sources */,
 				2B995D02274E1C7C009E976C /* MMFile.swift in Sources */,
 				DD81286927696D830041C75A /* lutf8lib.c in Sources */,
@@ -1061,7 +1056,6 @@
 				2B995D01274E1C7C009E976C /* MMColorWidget.swift in Sources */,
 				2B995D17274E1C7C009E976C /* MMSliderWidget.swift in Sources */,
 				2B7C7EED25DCB5D400727BC0 /* Library.swift in Sources */,
-				2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */,
 				2BC6A3BA274F342A00F8A500 /* Node.swift in Sources */,
 				DD81287627696D890041C75A /* VirtualMachine.swift in Sources */,
 				2B995D03274E1C7C009E976C /* MMFile.swift in Sources */,

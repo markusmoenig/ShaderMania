@@ -27,7 +27,9 @@ class Model {
 
     let selectedObjectChanged               = PassthroughSubject<Node?, Never>()
     let selectedNodeChanged                 = PassthroughSubject<Node?, Never>()
-    
+
+    let browserGoUp                         = PassthroughSubject<Void, Never>()
+
     /// The script editor
     var scriptEditor                        : ScriptEditor? = nil
     
