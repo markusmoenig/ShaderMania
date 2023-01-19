@@ -22,9 +22,12 @@ class Model {
     
     var device                              : MTLDevice!
     
+    /// The currently selected scene
+    var selectedScene                       : SceneNode? = nil
+
     /// The currently selected shader tree
     var selectedTree                        : Node? = nil
-
+    
     let selectedObjectChanged               = PassthroughSubject<Node?, Never>()
     let selectedNodeChanged                 = PassthroughSubject<Node?, Never>()
 
@@ -42,7 +45,8 @@ class Model {
         project = Project()
         project.model = self
         
-        selectedTree = project.objects[0]
+        selectedScene = project.scenes[0]
+        selectedTree = project.scenes[0].nodes[0]
 
         shaderCompiler = ShaderCompiler(self)
         luaCompiler = LuaCompiler(self)
@@ -53,7 +57,9 @@ class Model {
         self.project = project
         self.project.model = self
         
-        selectedTree = project.objects[0]
+        selectedScene = project.scenes[0]
+        selectedTree = project.scenes[0].nodes[0]
+
         nodeGraph?.updateNodes()
     }
     
@@ -67,7 +73,7 @@ class Model {
         
         nodeGraph = NodeGraph(model: self)
         nodeGraph.setup()
-        nodeGraph.setCurrentTree(node: selectedTree)
+        nodeGraph.setCurrentTree(node: selectedScene!.nodes[0])
         nodeGraph.updateNodes()
         
         nodeRegion = EditorRegion(view, model: self)
@@ -102,10 +108,11 @@ class Model {
         var brand : Node.Brand = .ShaderTree
         var name = ""
                 
+        /*
         if nodeType == "ShaderTree" {
             brand = .ShaderTree
             name = "New ShaderTree"
-        } else
+        } else*/
         if nodeType == "Shader" {
             brand = .Shader
             name = "New Shader"

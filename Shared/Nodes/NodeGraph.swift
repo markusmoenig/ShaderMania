@@ -3432,9 +3432,11 @@ class NodeGraph
     {
         //if let rootNode = model.selectedTree, let toDraw = rootNode.children, let camera = rootNode.camera {
 
-        for tree in model.project.objects {
-            for node in tree.children! {
-                updateNode(node)
+        if let scene = model.selectedScene {
+            for tree in scene.nodes {
+                for node in tree.children! {
+                    updateNode(node)
+                }
             }
         }
         maximizedNode = nil
@@ -3484,10 +3486,12 @@ class NodeGraph
     /// Get the node for the given uuid
     func getNodeForUUID(_ uuid: UUID) -> Node?
     {
-        for tree in model.project.objects {
-            for node in tree.children! {
-                if node.uuid == uuid {
-                    return node
+        if let scene = model.selectedScene {
+            for tree in scene.nodes {
+                for node in tree.children! {
+                    if node.uuid == uuid {
+                        return node
+                    }
                 }
             }
         }
@@ -3498,11 +3502,13 @@ class NodeGraph
     /// Returns the terminal of the given UUID
     func getTerminalOfUUID(_ uuid: UUID) -> Terminal?
     {
-        for tree in model.project.objects {
-            for node in tree.children! {
-                for terminal in node.terminals {
-                    if terminal.uuid == uuid {
-                        return terminal
+        if let scene = model.selectedScene {
+            for tree in scene.nodes {
+                for node in tree.children! {
+                    for terminal in node.terminals {
+                        if terminal.uuid == uuid {
+                            return terminal
+                        }
                     }
                 }
             }

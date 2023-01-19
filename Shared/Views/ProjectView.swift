@@ -16,7 +16,7 @@ struct ProjectView: View {
     @State private var showProjectNamePopover   : Bool = false
     @State private var projectName              : String = ""
     
-    @State private var selected                 : Node? = nil
+    @State private var selected                 : SceneNode? = nil
 
     @State var updateView                       : Bool = false
     
@@ -29,7 +29,7 @@ struct ProjectView: View {
     init(_ model: Model)
     {
         self.model = model
-        _selected = State(initialValue: model.selectedTree)
+        _selected = State(initialValue: model.selectedScene)
     }
     
     var body: some View {
@@ -37,9 +37,9 @@ struct ProjectView: View {
         ZStack(alignment: .bottomLeading) {
 
             List {
-                Section(header: Text("Objects")) {
+                Section(header: Text("Scenes")) {
                     
-                    ForEach(model.project.objects, id: \.uuid) { object in
+                    ForEach(model.project.scenes, id: \.uuid) { object in
 
                         Button(action: {
                             /*

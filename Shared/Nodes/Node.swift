@@ -30,7 +30,7 @@ class Camera : Codable
 class Node : Codable, Equatable
 {
     enum Brand : Int, Codable {
-        case Shader, LuaScript, ShaderTree, Property, Behavior, Function, Arithmetic
+        case Object, Shader, LuaScript, ShaderTree, Property, Behavior, Function, Arithmetic
     }
 
     enum Result {

@@ -19,7 +19,7 @@ class Project : Codable, Equatable
     
     var uuid            : UUID = UUID()
     
-    var objects         : [Node] = []
+    var scenes          : [SceneNode] = []
     
     var black           : MTLTexture? = nil
     var temp            : MTLTexture? = nil
@@ -42,26 +42,13 @@ class Project : Codable, Equatable
     
     private enum CodingKeys: String, CodingKey {
         case uuid
-        case objects
+        case scenes
     }
 
     init() {
-        let object = Node(brand: .ShaderTree)
-        object.children = []
-
-        object.name = "New Object"
-        //tree.sequences.append( MMTlSequence() )
-        //tree.currentSequence = object.sequences[0]
-        object.setupTerminals()
-        objects.append(object)
         
-        let node = Node(brand: .Shader)
-
-        node.name = "Shader"
-        //node.sequences.append( MMTlSequence() )
-        //node.currentSequence = object.sequences[0]
-        node.setupTerminals()
-        object.children!.append(node)
+        let scene = SceneNode()
+        scenes.append(scene)
     }
     
     deinit
@@ -73,14 +60,14 @@ class Project : Codable, Equatable
     {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         uuid = try container.decode(UUID.self, forKey: .uuid)
-        objects = try container.decode([Node].self, forKey: .objects)
+        scenes = try container.decode([SceneNode].self, forKey: .scenes)
     }
 
     func encode(to encoder: Encoder) throws
     {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(uuid, forKey: .uuid)
-        try container.encode(objects, forKey: .objects)
+        try container.encode(scenes, forKey: .scenes)
     }
     
     /// Start playback

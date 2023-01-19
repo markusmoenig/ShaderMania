@@ -47,12 +47,13 @@ struct ShaderManiaDocument: FileDocument {
             throw CocoaError(.fileReadCorruptFile)
         }
         
-        if let project = try? JSONDecoder().decode(Project.self, from: data) {            model.setProject(project)
+        if let project = try? JSONDecoder().decode(Project.self, from: data) {
+            model.setProject(project)
         } else
         if let folder = try? JSONDecoder().decode(AssetFolder.self, from: data) {
             /// Backwards compatibility to ShaderMania v1.x            
 
-            model.project.objects[0].children = []
+            model.project.scenes[0].nodes[0].children = []
             for asset in folder.assets {
                 // Create a node for the asset
                 if asset.type == .Shader {
@@ -60,7 +61,7 @@ struct ShaderManiaDocument: FileDocument {
                     node.name =  asset.name
                     node.setCode(asset.value)
                     node.setupTerminals()
-                    model.project.objects[0].children?.append(node)
+                    model.project.scenes[0].nodes[0].children?.append(node)
                 }
             }
         }
