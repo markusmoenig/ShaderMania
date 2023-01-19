@@ -914,16 +914,17 @@ class NodeGraph
         
         if nodeHoverMode == .Terminal {
             
+            /*
             if hoverTerminal!.0.connections.count != 0 {
                 for conn in hoverTerminal!.0.connections {
                     disconnectConnection(conn)
                 }
-            } else {
+            } else {*/
                 nodeHoverMode = .TerminalConnection
                 mousePos.x = event.x
                 mousePos.y = event.y
                 setCurrentNode(hoverNode!)
-            }
+            //}
         } else
         if let selectedNode = nodeAt(event.x, event.y) {
             setCurrentNode(selectedNode)
@@ -3553,6 +3554,19 @@ class NodeGraph
         return nil
     }*/
     
+    /// Disconnect the given node
+    func disconnectNode(_ node: Node,_ undo: Bool = true)
+    {
+        let before = encodeJSON()
+        
+        // Remove connections
+        for t in node.terminals {
+            for conn in t.connections {
+                disconnectConnection(conn, undo: true)
+            }
+        }
+    }
+    
     /// Deletes the given node
     func deleteNode(_ node: Node,_ undo: Bool = true)
     {
@@ -3694,6 +3708,14 @@ class NodeGraph
             } )
             items.append(duplicateNodeItem)
         }*/
+        
+        let disconnectNodeItem =  MMMenuItem( text: "Disconnect", cb: {
+            self.disconnectNode(node)
+            self.nodeHoverMode = .None
+            self.hoverNode = nil
+            self.updateNodes()
+        } )
+        items.append(disconnectNodeItem)
 
         let renameNodeItem =  MMMenuItem( text: "Rename", cb: {
             getStringDialog(view: self.mmView, title: "Rename Node", message: "Node name", defaultValue: node.name, cb: { (name) -> Void in
@@ -3716,7 +3738,7 @@ class NodeGraph
             } )
         } )
         items.append(renameNodeItem)
-            
+        
         let deleteNodeItem =  MMMenuItem( text: "Delete", cb: {
             self.deleteNode(node)
             self.nodeHoverMode = .None
