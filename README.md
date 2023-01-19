@@ -6,6 +6,8 @@
 
 ShaderMania v2 is now under active development (now under the MIT license instead of GPL).
 
+The below text references v1 which is right now still in the AppStore.
+
 ![screenshot](images/screen.png)
 
 ## Create, edit, share and learn about Metal shaders on macOS and iOS
