@@ -2,6 +2,10 @@
 
 [![AppStore](images/appstore.svg)](https://apps.apple.com/us/app/shadermania/id1541065830)
 
+## 2023 Update
+
+ShaderMania v2 is now under active development (now under the MIT license instead of GPL).
+
 ![screenshot](images/screen.png)
 
 ## Create, edit, share and learn about Metal shaders on macOS and iOS
