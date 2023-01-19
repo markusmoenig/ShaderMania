@@ -16,9 +16,7 @@ ShaderMania features live coding of Metal fragment shaders with realtime preview
 
 ShaderMania features a database of public shaders including tutorial shaders with links to explanation videos.
 
-ShaderMania is 100% free, optionally you can make a small donation to the author (in the AppStore or via [PayPal](https://paypal.me/markusmoenig)).
-
-A physical keyboard is recommended for coding shaders.
+For the iOS version a physical keyboard is recommended for coding shaders.
 
 Features
 
@@ -35,10 +33,6 @@ Database
 * Upload your shaders to the public shader database
 * Browse shaders in the Database and learn / experiment.
 * Add the nodes of shaders in the database to your project.
-
-## How to help
-
-As mentioned above, a small donation to the author (in the AppStore or via [PayPal](https://paypal.me/markusmoenig)) helps. But simply rating or reviewing ShaderMania in the AppStore is also a great help as it improves visibility.
 
 ## Acknowledgements
 
