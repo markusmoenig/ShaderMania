@@ -4,9 +4,11 @@
 
 ## 2023 Update
 
-ShaderMania v2 is now under active development (now under the MIT license instead of GPL).
+I worked on ShaderMania v2 for some time, the partly finished product is in the master branch of this repo (now under the MIT license instead of GPL).
 
-The below text references v1 which is right now still in the AppStore.
+However at the moment I believe that [Render-Z](https://github.com/markusmoenig/Render-Z) has more potential as it offers a new approach to shader development. I might go back to ShaderMania v2 later this year or the next.
+
+The below text references v1 which is the version in the AppStore.
 
 ![screenshot](images/screen.png)
 
