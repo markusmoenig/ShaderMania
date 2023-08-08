@@ -2,15 +2,16 @@
 
 [![AppStore](images/appstore.svg)](https://apps.apple.com/us/app/shadermania/id1541065830)
 
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) [![Version](https://img.shields.io/badge/version-1.5.2-green.svg)](https://shields.io/) [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/BMStWPhByj) [![Twitter](https://badgen.net/badge/icon/twitter?icon=twitter&label)](https://twitter.com/markusmoenig)
+
+
 ![screenshot](images/screen.png)
 
-## Create, edit, share and learn about Metal shaders on macOS and iOS
+## Create, edit, share Metal shaders on macOS and iPadOS
 
 ShaderMania features live coding of Metal fragment shaders with realtime preview and playback. Shaders are displayed as nodes which can be connected as needed.
 
 ShaderMania features a database of public shaders including tutorial shaders with links to explanation videos.
-
-ShaderMania is 100% free, optionally you can make a small donation to the author (in the AppStore or via [PayPal](https://paypal.me/markusmoenig)).
 
 A physical keyboard is recommended for coding shaders.
 
@@ -28,11 +29,19 @@ Database
 
 * Upload your shaders to the public shader database
 * Browse shaders in the Database and learn / experiment.
-* Add the nodes of shaders in the database to your project.
+* Add the shader nodes from the database to your project.
 
 ## How to help
 
-As mentioned above, a small donation to the author (in the AppStore or via [PayPal](https://paypal.me/markusmoenig)) helps. But simply rating or reviewing ShaderMania in the AppStore is also a great help as it improves visibility.
+Rating or reviewing ShaderMania in the AppStore is a great help as it improves visibility.
+
+## Render-Z
+
+If you like ShaderMania, try out [Render-Z](https://github.com/markusmoenig/Render-Z), my visual Metal editor.
+
+## Get Involved
+
+Join my [Discord](https://discord.gg/BMStWPhByj) and get involved in everything ShaderMania.
 
 ## Acknowledgements
 
