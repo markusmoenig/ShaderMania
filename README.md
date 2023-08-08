@@ -4,9 +4,9 @@
 
 ## 2023 Update
 
-I am currently working on v2 which should come out later this year.
+I worked on ShaderMania v2 for some time, the partly finished product is in the master branch of this repo (now under the MIT license instead of GPL).
 
-Please also check out my other Metal shader related product: [Render-Z](https://github.com/markusmoenig/Render-Z). 
+However at the moment I believe that [Render-Z](https://github.com/markusmoenig/Render-Z) has more potential as it offers a new approach to shader development. I might go back to ShaderMania v2 later this year or the next.
 
 The below text references v1 which is the version in the AppStore.
 
