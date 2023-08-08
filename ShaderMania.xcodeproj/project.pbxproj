@@ -168,6 +168,8 @@
 		DD17D2762768264C00F9DE5F /* Variables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6A3AF274F342A00F8A500 /* Variables.swift */; };
 		DD28F93D2979108B0003766F /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD28F93C2979108B0003766F /* Scene.swift */; };
 		DD28F93E2979108B0003766F /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD28F93C2979108B0003766F /* Scene.swift */; };
+		DD28F9432979392C0003766F /* AssetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD28F9422979392C0003766F /* AssetData.swift */; };
+		DD28F9442979392C0003766F /* AssetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD28F9422979392C0003766F /* AssetData.swift */; };
 		DD8127D82768723A0041C75A /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8127D72768723A0041C75A /* Project.swift */; };
 		DD8127D92768723A0041C75A /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8127D72768723A0041C75A /* Project.swift */; };
 		DD8127E727696D5E0041C75A /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8127DC27696D5E0041C75A /* String.swift */; };
@@ -365,6 +367,7 @@
 		2BC6A3FD2754C46400F8A500 /* ProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectView.swift; sourceTree = "<group>"; };
 		DD17D27027672BCB00F9DE5F /* NodeBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeBrowserView.swift; sourceTree = "<group>"; };
 		DD28F93C2979108B0003766F /* Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
+		DD28F9422979392C0003766F /* AssetData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetData.swift; sourceTree = "<group>"; };
 		DD8127D72768723A0041C75A /* Project.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 		DD8127DA27687B280041C75A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		DD8127DC27696D5E0041C75A /* String.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
@@ -582,6 +585,7 @@
 			children = (
 				2B0EEA782565DF7800C84C6C /* Asset.swift */,
 				2B995CD3274CA305009E976C /* AssetFolder.swift */,
+				DD28F9422979392C0003766F /* AssetData.swift */,
 				2B0EEA7C2565DF7800C84C6C /* Core.swift */,
 				DD28F93C2979108B0003766F /* Scene.swift */,
 				DD8127D72768723A0041C75A /* Project.swift */,
@@ -927,6 +931,7 @@
 				2B0EEA8D2565DF7800C84C6C /* MathLibrary.swift in Sources */,
 				DD28F93D2979108B0003766F /* Scene.swift in Sources */,
 				DD81287127696D830041C75A /* lcode.c in Sources */,
+				DD28F9432979392C0003766F /* AssetData.swift in Sources */,
 				2BC6A3B1274F342A00F8A500 /* NodeGraph.swift in Sources */,
 				DD81283127696D830041C75A /* lstate.c in Sources */,
 				2B995D12274E1C7C009E976C /* MMUtils.swift in Sources */,
@@ -1041,6 +1046,7 @@
 				2B0EEA942565DF7800C84C6C /* MetalStates.swift in Sources */,
 				DD28F93E2979108B0003766F /* Scene.swift in Sources */,
 				DD81284C27696D830041C75A /* lgc.c in Sources */,
+				DD28F9442979392C0003766F /* AssetData.swift in Sources */,
 				DD81284E27696D830041C75A /* lzio.c in Sources */,
 				2BC6A3CB27506B3200F8A500 /* NodeRegion.swift in Sources */,
 				DD81284427696D830041C75A /* LuaSource.m in Sources */,

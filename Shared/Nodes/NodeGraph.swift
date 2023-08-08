@@ -3556,9 +3556,7 @@ class NodeGraph
     
     /// Disconnect the given node
     func disconnectNode(_ node: Node,_ undo: Bool = true)
-    {
-        let before = encodeJSON()
-        
+    {        
         // Remove connections
         for t in node.terminals {
             for conn in t.connections {
@@ -3740,7 +3738,7 @@ class NodeGraph
         items.append(renameNodeItem)
         
         let deleteNodeItem =  MMMenuItem( text: "Delete", cb: {
-            self.deleteNode(node)
+            self.deleteNode(node, true)
             self.nodeHoverMode = .None
             self.hoverNode = nil
             self.updateNodes()

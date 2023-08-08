@@ -5,6 +5,8 @@
 //  Created by Markus Moenig on 23/11/21.
 //
 
+// ONLY INCLUDED FOR BACKWARD COMPATIBILITY FOR v1
+
 import MetalKit
 
 /// Base64 extension for string

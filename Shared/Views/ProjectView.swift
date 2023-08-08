@@ -15,11 +15,17 @@ struct ProjectView: View {
 
     @State private var showProjectNamePopover   : Bool = false
     @State private var projectName              : String = ""
-    
+
+    @State private var showAssetNamePopover     : Bool = false
+    @State private var assetName                : String = ""
+
     @State private var selected                 : SceneNode? = nil
+    @State private var selectedAsset            : AssetData? = nil
 
     @State var updateView                       : Bool = false
     
+    @State private var importingImage           : Bool = false
+
     #if os(macOS)
     let TopRowPadding                           : CGFloat = 2
     #else
@@ -67,6 +73,27 @@ struct ProjectView: View {
                         .buttonStyle(PlainButtonStyle())
                     }
                 }
+                Section(header: Text("Assets")) {
+                    
+                    ForEach(model.project.assets, id: \.uuid) { object in
+
+                        Button(action: {
+                            selectedAsset = object
+                        })
+                        {
+                            Label(object.name, systemImage: selected === object ? "s.square.fill" :  "s.square")
+                                .foregroundColor(selected == nil ? .accentColor : .primary)
+                        }
+                        .contextMenu {
+                            Button("Rename", action: {
+                                assetName = object.name
+                                showAssetNamePopover = true
+                            })
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+
             }
             
             // Edit object name
@@ -87,10 +114,30 @@ struct ProjectView: View {
                 }.padding()
             }
             
+            // Edit asset name
+            .popover(isPresented: self.$showAssetNamePopover,
+                     arrowEdge: .top
+            ) {
+                VStack(alignment: .leading) {
+                    Text("Name:")
+                    TextField("Name", text: $assetName, onEditingChanged: { (changed) in
+                        if let selected = selectedAsset {
+                            let select = selected
+                            self.selectedAsset = nil
+                            self.selectedAsset = select
+                            self.selectedAsset!.name = assetName
+                            assetName = ""
+                        }
+                    })
+                    .frame(minWidth: 200)
+                }.padding()
+            }
+            
             HStack {
                 Menu {
                     
-                    Button("Object", action: {
+                    Button("Image", action: {
+                        importingImage = true
                         /*
                         let object = SignedObject("New Object")
                         object.code = "-- Object\n\nfunction buildObject(index, bbox, options)\n\nend\n\n-- Used for preview\nfunction defaultSize()\n    return vec3(1, 1, 1)\nend\n".data(using: .utf8)
@@ -109,6 +156,36 @@ struct ProjectView: View {
                 .padding(.leading, 10)
                 .padding(.bottom, 6)
                 Spacer()
+            }
+            // Import Image
+            .fileImporter(
+                isPresented: $importingImage,
+                allowedContentTypes: [.item],
+                allowsMultipleSelection: false
+            ) { result in
+                do {
+                    let selectedFiles = try result.get()
+                    
+                    if let imageData: Data = try? Data(contentsOf: selectedFiles[0]) {
+                        let asset = AssetData(type: .Image, name: selectedFiles[0].deletingPathExtension().lastPathComponent, data: imageData)
+                        model.project.assets.append(asset)
+                    }
+                    
+                    /*
+                    document.core.assetFolder.addImages("New", [selectedFiles[0]])
+                    if selectedFiles.count > 0 {
+                        if let asset = document.core.assetFolder.current {
+                            asset.name = selectedFiles[0].deletingPathExtension().lastPathComponent
+                            /*
+                            document.core.nodesWidget.selectNode(asset)
+                            document.core.nodesWidget.update()*/
+                            document.core.contentChanged.send()
+                            updateView.toggle()
+                        }
+                    }*/
+                } catch {
+                    // Handle failure.
+                }
             }
              
             /*

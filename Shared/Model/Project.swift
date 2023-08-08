@@ -20,6 +20,7 @@ class Project : Codable, Equatable
     var uuid            : UUID = UUID()
     
     var scenes          : [SceneNode] = []
+    var assets          : [AssetData] = []
     
     var black           : MTLTexture? = nil
     var temp            : MTLTexture? = nil
@@ -43,6 +44,7 @@ class Project : Codable, Equatable
     private enum CodingKeys: String, CodingKey {
         case uuid
         case scenes
+        case assets
     }
 
     init() {
@@ -61,6 +63,9 @@ class Project : Codable, Equatable
         let container = try decoder.container(keyedBy: CodingKeys.self)
         uuid = try container.decode(UUID.self, forKey: .uuid)
         scenes = try container.decode([SceneNode].self, forKey: .scenes)
+        if let a = try container.decodeIfPresent([AssetData].self, forKey: .assets) {
+            assets = a
+        }
     }
 
     func encode(to encoder: Encoder) throws
@@ -68,6 +73,7 @@ class Project : Codable, Equatable
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(uuid, forKey: .uuid)
         try container.encode(scenes, forKey: .scenes)
+        try container.encode(assets, forKey: .assets)
     }
     
     /// Start playback
@@ -310,7 +316,7 @@ class Project : Codable, Equatable
 
                     node.vm = nil
                     node.vm = vm
-                    
+                                        
                     toCompile -= 1
                     checkForEnd()
                 })

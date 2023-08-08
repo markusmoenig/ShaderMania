@@ -5,6 +5,8 @@
 //  Created by Markus Moenig on 26/8/20.
 //
 
+// ONLY INCLUDED FOR BACKWARD COMPATIBILITY FOR v1
+
 import MetalKit
 
 /// A general purpose class representing an asset in the project

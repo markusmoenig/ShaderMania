@@ -108,18 +108,17 @@ class Model {
         var brand : Node.Brand = .ShaderTree
         var name = ""
                 
-        /*
         if nodeType == "ShaderTree" {
             brand = .ShaderTree
             name = "New ShaderTree"
-        } else*/
+        } else
         if nodeType == "Shader" {
             brand = .Shader
-            name = "New Shader"
+            name = "Shader"
         } else
         if nodeType == "LuaScript" {
             brand = .LuaScript
-            name = "New Lua Script"
+            name = "Lua Script"
         }
         
         let tree = Node(brand: brand)
