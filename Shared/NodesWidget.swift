@@ -74,7 +74,7 @@ public class NodesWidget    : ObservableObject
     var connectingNode      : Asset? = nil
     var connectingTerminalId: Int? = nil
 
-    var graphZoom           : Float = 0.63
+    var graphZoom           : Float = 0.8
     var graphOffset         = float2(0, 0)
 
     var dragStart           = float2(0, 0)
@@ -101,7 +101,9 @@ public class NodesWidget    : ObservableObject
                 }
             }
             
-            selectNode(currentNode!)
+            if let currentNode = currentNode {
+                selectNode(currentNode)
+            }
             firstDraw = false
         }
         

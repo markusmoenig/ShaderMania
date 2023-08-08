@@ -72,7 +72,7 @@
 		2B0EEA592565DF3A00C84C6C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2B0EEA5E2565DF3A00C84C6C /* ShaderMania.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShaderMania.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B0EEA602565DF3A00C84C6C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2B0EEA612565DF3A00C84C6C /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
+		2B0EEA612565DF3A00C84C6C /* ShaderMania.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShaderMania.entitlements; sourceTree = "<group>"; };
 		2B0EEA762565DF7800C84C6C /* MetalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalView.swift; sourceTree = "<group>"; };
 		2B0EEA772565DF7800C84C6C /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		2B0EEA782565DF7800C84C6C /* Asset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
@@ -127,7 +127,6 @@
 		2B0EEA482565DF3900C84C6C = {
 			isa = PBXGroup;
 			children = (
-				2B6B9C7225E0BC4E00F266DF /* ShaderMania.entitlements */,
 				2B0EEA4D2565DF3900C84C6C /* Shared */,
 				2B0EEA582565DF3A00C84C6C /* iOS */,
 				2B0EEA5F2565DF3A00C84C6C /* macOS */,
@@ -180,6 +179,7 @@
 			isa = PBXGroup;
 			children = (
 				2B0EEA592565DF3A00C84C6C /* Info.plist */,
+				2B6B9C7225E0BC4E00F266DF /* ShaderMania.entitlements */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -188,7 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				2B0EEA602565DF3A00C84C6C /* Info.plist */,
-				2B0EEA612565DF3A00C84C6C /* macOS.entitlements */,
+				2B0EEA612565DF3A00C84C6C /* ShaderMania.entitlements */,
 			);
 			path = macOS;
 			sourceTree = "<group>";
@@ -498,7 +498,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = ShaderMania.entitlements;
+				CODE_SIGN_ENTITLEMENTS = iOS/ShaderMania.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G6R6L3VH62;
@@ -525,7 +525,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = ShaderMania.entitlements;
+				CODE_SIGN_ENTITLEMENTS = iOS/ShaderMania.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G6R6L3VH62;
@@ -553,7 +553,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_ENTITLEMENTS = macOS/ShaderMania.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -581,7 +581,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_ENTITLEMENTS = macOS/ShaderMania.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;

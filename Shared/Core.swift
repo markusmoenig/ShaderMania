@@ -340,7 +340,8 @@ public class Core       : ObservableObject
     func stopDrawing(deleteQueue: Bool = false)
     {
         coreCmdBuffer?.commit()
-
+        coreCmdBuffer?.waitUntilCompleted()
+        
         if deleteQueue {
             self.coreCmdQueue = nil
         }

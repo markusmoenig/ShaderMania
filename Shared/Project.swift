@@ -134,7 +134,7 @@ class Project
         if preview == false {
             lastSize = size
         }
-        
+                
         if collected.count == 0 {
             return nil
         } else {
@@ -285,7 +285,7 @@ class Project
         resChanged = false
     }
     
-    func stopDrawing(syncTexture: MTLTexture? = nil, waitUntilCompleted: Bool = false)
+    func stopDrawing(syncTexture: MTLTexture? = nil, waitUntilCompleted: Bool = true)
     {
         #if os(OSX)
         if let texture = syncTexture {

@@ -130,6 +130,29 @@ class ScriptEditor
          })
     }
     
+    func decreaseFontSize()
+    {
+        webView.evaluateJavaScript(
+            """
+            var size = editor.getFontSize();
+            size -= 2;
+            size = Math.max(2, size);
+            editor.setFontSize(size);
+            """, completionHandler: { (value, error) in
+         })
+    }
+    
+    func increaseFontSize()
+    {
+        webView.evaluateJavaScript(
+            """
+            var size = editor.getFontSize();
+            size += 2;
+            editor.setFontSize(size);
+            """, completionHandler: { (value, error) in
+         })
+    }
+    
     func setSilentMode(_ silent: Bool = false)
     {
         webView.evaluateJavaScript(

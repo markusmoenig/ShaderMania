@@ -30,7 +30,7 @@ struct ContentView: View {
     @State private var userNickName         : String = ""
     @State private var userDescription      : String = ""
 
-    @State private var showLibrary          : Bool = true
+    @State private var showLibrary          : Bool = false
 
     @State private var showAssetNamePopover : Bool = false
     @State private var assetName            : String = ""
@@ -78,7 +78,7 @@ struct ContentView: View {
                                         if document.core.assetFolder.assets.isEmpty == false {
                                             WebView(document.core, deviceColorScheme).tabItem {
                                             }
-                                                .animation(.default)
+                                                //.animation(.default)
                                             
                                                 .frame(height: geometry.size.height)
                                                 .tag(1)
@@ -90,7 +90,7 @@ struct ContentView: View {
                                     .zIndex(0)
                                     .frame(maxWidth: .infinity)
                                     .layoutPriority(2)
-                                    .animation(.default)
+                                    //.animation(.default)
 
                                     .onReceive(self.document.core.contentChanged) { state in
                                         document.updated.toggle()
@@ -124,6 +124,7 @@ struct ContentView: View {
                 ToolbarItemGroup(placement: .automatic) {
                     
                     toolNodeMenu
+                        .frame(width: 80)
                     
                     Divider()
                         .padding(.horizontal, 2)
@@ -340,6 +341,16 @@ struct ContentView: View {
                     editingStateText = "Source & Nodes"
                 })
                 .keyboardShortcut("5")
+            }
+            Section(header: Text("Font Size")) {
+                Button("Bigger", action: {
+                    document.core.scriptEditor?.increaseFontSize()
+                })
+                .keyboardShortcut("+")
+                Button("Smaller", action: {
+                    document.core.scriptEditor?.decreaseFontSize()
+                })
+                .keyboardShortcut("-")
             }
         }
         label: {
