@@ -2,7 +2,7 @@
 
 [![AppStore](images/appstore.svg)](https://apps.apple.com/us/app/shadermania/id1541065830)
 
-[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) [![Version](https://img.shields.io/badge/version-1.5.2-green.svg)](https://shields.io/) [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/BMStWPhByj) [![Twitter](https://badgen.net/badge/icon/twitter?icon=twitter&label)](https://twitter.com/markusmoenig)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) [![Version](https://img.shields.io/badge/version-1.5.5-green.svg)](https://shields.io/) [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/BMStWPhByj) [![Twitter](https://badgen.net/badge/icon/twitter?icon=twitter&label)](https://twitter.com/markusmoenig)
 
 
 ![screenshot](images/screen.png)
