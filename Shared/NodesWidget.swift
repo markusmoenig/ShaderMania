@@ -407,13 +407,14 @@ public class NodesWidget    : ObservableObject
         if action == .Connecting && connectingNode != nil {
             // Create Connection
             
-            if currentTerminalId != -1 {
-                currentNode!.slots[currentTerminalId!] = connectingNode!.id
-            } else {
-                connectingNode!.slots[connectingTerminalId!] = currentNode!.id
+            if connectingNode!.id != currentNode!.id {
+                if currentTerminalId != -1 {
+                    currentNode!.slots[currentTerminalId!] = connectingNode!.id
+                } else {
+                    connectingNode!.slots[connectingTerminalId!] = currentNode!.id
+                }
+                core.contentChanged.send()
             }
-            
-            core.contentChanged.send()
         }
 
         action = .None

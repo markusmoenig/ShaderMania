@@ -44,9 +44,9 @@ class Project
         for (_, connectedToId) in asset.slots {
             
             if let conAsset = assetFolder.getAssetById(connectedToId) {
-                collectShadersFor(assetFolder: assetFolder, asset: conAsset, &collected)
                 if collected.contains(conAsset) == false {
                     collected.append(conAsset)
+                    collectShadersFor(assetFolder: assetFolder, asset: conAsset, &collected)
                 }
             }
         }
