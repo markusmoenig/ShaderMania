@@ -35,13 +35,9 @@ Database
 
 Rating or reviewing ShaderMania in the AppStore is a great help as it improves visibility.
 
-## Render-Z
+## See also
 
-If you like ShaderMania, try out [Render-Z](https://github.com/markusmoenig/Render-Z), my visual Metal editor.
-
-## Get Involved
-
-Join my [Discord](https://discord.gg/BMStWPhByj) and get involved in everything ShaderMania.
+If you like ShaderMania, try out my other apps at [Denrim.com](https://denrim.com).
 
 ## Acknowledgements
 
