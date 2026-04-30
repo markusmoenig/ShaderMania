@@ -5,8 +5,8 @@ const config = {
   tagline: 'Create, edit, and share Metal shaders on macOS and iPadOS.',
   favicon: 'img/logo_trans.png',
 
-  url: 'https://markusmoenig.github.io',
-  baseUrl: '/ShaderMania/',
+  url: 'https://shadermania.com',
+  baseUrl: '/',
 
   organizationName: 'markusmoenig',
   projectName: 'ShaderMania',

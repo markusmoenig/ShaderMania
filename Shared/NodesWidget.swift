@@ -738,7 +738,7 @@ public class NodesWidget    : ObservableObject
         if asset.type == .Shader && asset.shader == nil {
             compileAndUpdatePreview(asset)
         } else {
-            core.createPreview(asset)
+            update()
         }
     }
     
