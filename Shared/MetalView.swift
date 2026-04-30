@@ -63,6 +63,11 @@ public class DMTKView       : MTKView
     
     override public func keyDown(with event: NSEvent)
     {
+        if viewType == .Nodes && shouldDeleteNode(for: event) {
+            core.nodesWidget.deleteCurrentNodeWithUndo()
+            return
+        }
+
         keysDown.append(Float(event.keyCode))
     }
     
@@ -72,8 +77,20 @@ public class DMTKView       : MTKView
     }
         
     override public func mouseDown(with event: NSEvent) {
+        window?.makeFirstResponder(self)
+        core.nodesWidget.receivesKeyboardCommands = viewType == .Nodes
         setMousePos(event)
         core.nodesWidget.touchDown(mousePos)
+    }
+
+    private func shouldDeleteNode(for event: NSEvent) -> Bool
+    {
+        let hasDeletionModifier = event.modifierFlags.contains(.command) ||
+            event.modifierFlags.contains(.control) ||
+            event.modifierFlags.contains(.option) ||
+            event.modifierFlags.contains(.shift)
+
+        return hasDeletionModifier == false && (event.keyCode == 51 || event.keyCode == 117)
     }
     
     override public func mouseDragged(with event: NSEvent) {
@@ -153,7 +170,9 @@ public class DMTKView       : MTKView
                 lastY = 0
             }
             
-            let delta = float3(Float(translation.x) - lastX!, Float(translation.y) - lastY!, Float(recognizer.numberOfTouches))
+            let previousX = lastX ?? 0
+            let previousY = lastY ?? 0
+            let delta = float3(Float(translation.x) - previousX, Float(translation.y) - previousY, Float(recognizer.numberOfTouches))
             
             lastX = Float(translation.x)
             lastY = Float(translation.y)
@@ -309,6 +328,7 @@ struct MetalView: NSViewRepresentable {
         } else
         if viewType == .Nodes {
             core.setupNodesView(mtkView)
+            context.coordinator.installDeleteKeyMonitor()
         }
         
         return mtkView
@@ -319,16 +339,51 @@ struct MetalView: NSViewRepresentable {
     
     class Coordinator : NSObject, MTKViewDelegate {
         var parent: MetalView
-        var metalDevice: MTLDevice!
-        var metalCommandQueue: MTLCommandQueue!
+        var metalDevice: MTLDevice?
+        var metalCommandQueue: MTLCommandQueue?
+        var deleteKeyMonitor: Any?
         
         init(_ parent: MetalView) {
             self.parent = parent
             if let metalDevice = MTLCreateSystemDefaultDevice() {
                 self.metalDevice = metalDevice
+                self.metalCommandQueue = metalDevice.makeCommandQueue()
             }
-            self.metalCommandQueue = metalDevice.makeCommandQueue()!
             super.init()
+        }
+
+        deinit {
+            if let deleteKeyMonitor = deleteKeyMonitor {
+                NSEvent.removeMonitor(deleteKeyMonitor)
+            }
+        }
+
+        func installDeleteKeyMonitor() {
+            guard deleteKeyMonitor == nil else {
+                return
+            }
+
+            deleteKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+                guard let self = self,
+                      self.parent.core.nodesWidget.receivesKeyboardCommands,
+                      event.window === self.parent.core.nodesView.window,
+                      self.shouldDeleteNode(for: event) else {
+                    return event
+                }
+
+                self.parent.core.nodesWidget.deleteCurrentNodeWithUndo()
+                return nil
+            }
+        }
+
+        private func shouldDeleteNode(for event: NSEvent) -> Bool
+        {
+            let hasDeletionModifier = event.modifierFlags.contains(.command) ||
+                event.modifierFlags.contains(.control) ||
+                event.modifierFlags.contains(.option) ||
+                event.modifierFlags.contains(.shift)
+
+            return hasDeletionModifier == false && (event.keyCode == 51 || event.keyCode == 117)
         }
         
         func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
@@ -391,15 +446,15 @@ struct MetalView: UIViewRepresentable {
     
     class Coordinator : NSObject, MTKViewDelegate {
         var parent: MetalView
-        var metalDevice: MTLDevice!
-        var metalCommandQueue: MTLCommandQueue!
+        var metalDevice: MTLDevice?
+        var metalCommandQueue: MTLCommandQueue?
         
         init(_ parent: MetalView) {
             self.parent = parent
             if let metalDevice = MTLCreateSystemDefaultDevice() {
                 self.metalDevice = metalDevice
+                self.metalCommandQueue = metalDevice.makeCommandQueue()
             }
-            self.metalCommandQueue = metalDevice.makeCommandQueue()!
             super.init()
         }
         

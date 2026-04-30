@@ -1,0 +1,42 @@
+.features {
+  align-items: stretch;
+  background-color: var(--feature-surface);
+  border-bottom: 2px solid var(--ifm-table-border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 3rem 0;
+  width: 100%;
+}
+
+.featuresInner {
+  margin: 0 auto;
+  max-width: 1000px;
+  padding: 0 1rem;
+  text-align: left;
+  width: 100%;
+}
+
+.heroScreenshot {
+  border-radius: 12px;
+  display: block;
+  margin: 0 0 2rem;
+  width: 100%;
+}
+
+.storeLinks {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 0.5rem;
+}
+
+.storeBadge {
+  display: inline-flex;
+}
+
+.storeBadge img {
+  height: 48px;
+  width: auto;
+}

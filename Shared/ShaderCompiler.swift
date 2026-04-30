@@ -41,7 +41,7 @@ class ShaderParameter
     enum ParameterType {
         case Float, Float2, Float3, Float4, Text
     }
-    
+
     enum ParameterUIType {
         case Slider, Color, Button
     }
@@ -52,47 +52,47 @@ class ShaderParameter
 
     var name                = ""
     var index               : Int = 0
-    
+
     // Possible UI params
-    
+
     var min                 = Float(0)
     var max                 = Float(1)
 
     var step                = Float(0.1)
-    
+
     var defaultValue        = float4(0,0,0,0)
-    
+
     var url                 : URL? = nil
-    
+
     init(_ paramType: String, _ parameters: [String: String])
     {
         if let name = parameters["name"] {
             self.name = name
         }
-        
+
         if paramType == "ParamUrl" {
             type = .Text
             uiType = .Button
-            
+
             if let url = parameters["url"] {
                 self.url = URL(string: "https://" + url)
             }
         }
-        
+
         if paramType == "ParamFloat3" {
-            
+
             type = .Float3
-            
+
             if let uiType = parameters["ui"] {
                 if uiType.lowercased() == "color" {
                     self.uiType = .Color
                 }
             }
-            
+
             if uiType == .Color {
                 if let defaultValue = parameters["default"] {
                     let v = String(defaultValue)
-                        
+
                     func readHexString(_ hex:String) -> float3 {
                         var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
 
@@ -111,9 +111,9 @@ class ShaderParameter
                                 Float((rgbValue & 0x00FF00) >> 8) / 255.0,
                                 Float(rgbValue & 0x0000FF) / 255.0)
                     }
-                        
+
                     let v3 = readHexString(v)
-                    
+
                     self.defaultValue.x = v3.x
                     self.defaultValue.y = v3.y
                     self.defaultValue.z = v3.z
@@ -126,7 +126,7 @@ class ShaderParameter
                     self.uiType = .Slider
                 }
             }
-            
+
             if let uiType = parameters["ui"] {
                 if uiType.lowercased() == "slider" {
                     self.uiType = .Slider
@@ -157,20 +157,20 @@ class ShaderParameter
             }
         }
     }
-    
+
     func createShaderText(_ index: Int) -> String
     {
         self.index = index
-        
+
         var text = ""
-        
+
         if type == .Float {
             text = "data.parameters[\(index)].x"
         } else
         if type == .Float3 {
             text = "data.parameters[\(index)].xyz"
         }
-        
+
         return text
     }
 }
@@ -181,12 +181,12 @@ class Shader                : NSObject
     var isValid             : Bool = false
     var pipelineStateDesc   : MTLRenderPipelineDescriptor!
     var pipelineState       : MTLRenderPipelineState!
-    
+
     var inputs              : [String] = []
     var parameters          : [ShaderParameter] = []
-    
+
     var paramDataBuffer     : MTLBuffer? = nil
-    
+
     var compileTime         : Double = 0
     var executionTime       : Double = 0
 
@@ -194,7 +194,7 @@ class Shader                : NSObject
         pipelineStateDesc = nil
         pipelineState = nil
     }
-    
+
     override init()
     {
         super.init()
@@ -204,16 +204,17 @@ class Shader                : NSObject
 class ShaderCompiler
 {
     let core            : Core
-    
+    private let pipelineQueue = DispatchQueue(label: "ShaderMania.ShaderCompiler.pipeline")
+
     init(_ core: Core)
     {
         self.core = core
     }
-    
+
     func compile(asset: Asset, cb: @escaping (Shader?, [CompileError]) -> ())
     {
         var code = getHeaderCode(noOp: asset.type == .Common)
-        
+
         if asset.type != .Common {
             for asset in core.assetFolder.assets {
                 if asset.type == .Common {
@@ -221,14 +222,14 @@ class ShaderCompiler
                 }
             }
         }
-        
+
         var ns = code as NSString
         var lineNumbers  : Int32 = 0
-        
+
         ns.enumerateLines { (str, _) in
             lineNumbers += 1
         }
-                
+
         var parseErrors: [CompileError] = []
         let shader = Shader()
 
@@ -241,111 +242,109 @@ class ShaderCompiler
             error.type = "error"
             parseErrors.append(error)
         }
-        
+
         ns = (code + asset.value) as NSString
         var lineNr : Int32 = 0
-                
+
         var parsedCode = ""
 
         ns.enumerateLines { (str, _) in
             lineNr += 1
-            
+
             var processed = str
-            
-            // Substitute ParamInput (the input slots
-            
-            while processed.contains("ParamInput") {
-                if let range = processed.range(of: "ParamInput") {
-                    let startIndex : Int = range.lowerBound.utf16Offset(in: processed)
-                    var index : Int = range.upperBound.utf16Offset(in: processed) + 1
-                    var params = ""
-                    while processed[index] != ">" && processed[index] != "\n" {
-                        params.append(processed[index])
-                        index += 1
+
+            while let result = ShaderAnnotationScanner.next(in: processed, types: ["ParamInput"]) {
+                switch result {
+                case .annotation(let annotation):
+                    if let name = annotation.parameters["name"] {
+                        processed.replaceSubrange(annotation.range, with: "data.slot\(shader.inputs.count);")
+                        shader.inputs.append(name)
+                    } else {
+                        createError("ParamInput is missing a name.", line: lineNr)
+                        processed.replaceSubrange(annotation.range, with: "")
                     }
-                    if processed[index] == ">" {
-                        index += 1
-                        let pairs = self.splitParameters(params)
-                        if let name = pairs["name"] {
-                            let start = String.Index(utf16Offset: startIndex, in: processed)
-                            let end = String.Index(utf16Offset: index, in: processed)
-                            processed.replaceSubrange(start..<end, with: "data.slot\(shader.inputs.count);")
-                            shader.inputs.append(name)
-                        }
-                    }
-                } else { break }
-            }
-            
-            // Substitute UI parameters
-            
-            let paramTypes = ["ParamFloat3", "ParamFloat", "ParamUrl"]
-            
-            for type in paramTypes {
-                while processed.contains(type) {
-                    if let range = processed.range(of: type) {
-                        let startIndex : Int = range.lowerBound.utf16Offset(in: processed)
-                        var index : Int = range.upperBound.utf16Offset(in: processed) + 1
-                        var params = ""
-                        while processed[index] != ">" && processed[index] != "\n" {
-                            params.append(processed[index])
-                            index += 1
-                            if index > processed.count {
-                                break
-                            }
-                        }
-                        if processed[index] == ">" {
-                            index += 1
-                            let pairs = self.splitParameters(params)
-                                
-                            let parameter = ShaderParameter(type, pairs)
-                            let paramText = parameter.createShaderText(shader.parameters.count)
-                            if asset.shaderDataNames[shader.parameters.count] != parameter.name {
-                                asset.shaderData[shader.parameters.count] = parameter.defaultValue
-                                asset.shaderDataNames[shader.parameters.count] = parameter.name
-                            }
-                            shader.parameters.append(parameter)
-                            
-                            let start = String.Index(utf16Offset: startIndex, in: processed)
-                            let end = String.Index(utf16Offset: index, in: processed)
-                            processed.replaceSubrange(start..<end, with: "\(paramText);")
-                        } else {
-                            processed = processed.replacingOccurrences(of: type, with: "")
-                        }
-                    } else { break }
+                case .malformed(_, let range, let message):
+                    createError(message, line: lineNr)
+                    processed.replaceSubrange(range, with: "")
                 }
             }
-            
+
+            while let result = ShaderAnnotationScanner.next(in: processed, types: ["ParamFloat3", "ParamFloat", "ParamUrl"]) {
+                switch result {
+                case .annotation(let annotation):
+                    let parameter = ShaderParameter(annotation.type, annotation.parameters)
+                    let parameterIndex = shader.parameters.count
+
+                    if parameterIndex < asset.shaderData.count && parameterIndex < asset.shaderDataNames.count {
+                        let paramText = parameter.createShaderText(parameterIndex)
+                        if asset.shaderDataNames[parameterIndex] != parameter.name {
+                            asset.shaderData[parameterIndex] = parameter.defaultValue
+                            asset.shaderDataNames[parameterIndex] = parameter.name
+                        }
+                        shader.parameters.append(parameter)
+                        processed.replaceSubrange(annotation.range, with: "\(paramText);")
+                    } else {
+                        createError("Too many shader parameters. The current limit is \(asset.shaderData.count).", line: lineNr)
+                        processed.replaceSubrange(annotation.range, with: "")
+                    }
+                case .malformed(_, let range, let message):
+                    createError(message, line: lineNr)
+                    processed.replaceSubrange(range, with: "")
+                }
+            }
+
             parsedCode += processed + "\n"
         }
-        
-        if parseErrors.count > 0 {            
+
+        if parseErrors.count > 0 {
             cb(nil, parseErrors)
             return
         }
-                        
+
         let startTime =  NSDate().timeIntervalSince1970
 
         let compiledCB : MTLNewLibraryCompletionHandler = { (library, error) in
-            
+
             var errors: [CompileError] = []
-            
+
             shader.compileTime = (NSDate().timeIntervalSince1970 - startTime) * 1000
-            
+
+            func finish(_ shader: Shader?, _ errors: [CompileError]) {
+                DispatchQueue.main.async {
+                    cb(shader, errors)
+                }
+            }
+
+            func appendCompilerError(_ message: String, line: Int32 = 0) {
+                var er = CompileError()
+                er.asset = asset
+                er.line = line
+                er.column = 0
+                er.type = "error"
+                er.error = message
+                errors.append(er)
+            }
+
             if let error = error {
                 let str = error.localizedDescription
                 let arr = str.components(separatedBy: "program_source:")
                 for str in arr {
                     if str.starts(with: "Compilation failed:") == false && (str.contains("error:") || str.contains("warning:")) {
                         let arr = str.split(separator: ":")
-                        let errorArr = String(arr[3].trimmingCharacters(in: .whitespaces)).split(separator: "\n")
-                        var errorText = ""
-                        if errorArr.count > 0 {
-                            errorText = String(errorArr[0])
-                        }
                         if arr.count >= 4 {
+                            let errorArr = String(arr[3].trimmingCharacters(in: .whitespaces)).split(separator: "\n")
+                            var errorText = ""
+                            if errorArr.count > 0 {
+                                errorText = String(errorArr[0])
+                            }
+
+                            guard let line = Int32(arr[0]) else {
+                                continue
+                            }
+
                             var er = CompileError()
                             er.asset = asset
-                            er.line = Int32(arr[0])! - lineNumbers - 1
+                            er.line = line - lineNumbers - 1
                             er.column = Int32(arr[1])
                             er.type = arr[2].trimmingCharacters(in: .whitespaces)
                             er.error = errorText
@@ -356,47 +355,68 @@ class ShaderCompiler
                     }
                 }
             }
-            
+
             if let error = error, library == nil {
                 print(error.localizedDescription)
-                cb(nil, errors)
+                finish(nil, errors)
             } else
             if let library = library {
-                                
-                shader.pipelineStateDesc = MTLRenderPipelineDescriptor()
-                shader.pipelineStateDesc.vertexFunction = library.makeFunction(name: "__procVertex")
-                shader.pipelineStateDesc.fragmentFunction = library.makeFunction(name: "__shaderMain")
-                shader.pipelineStateDesc.colorAttachments[0].pixelFormat = MTLPixelFormat.bgra8Unorm
-                
-                shader.pipelineStateDesc.colorAttachments[0].isBlendingEnabled = true
-                shader.pipelineStateDesc.colorAttachments[0].rgbBlendOperation = .add
-                shader.pipelineStateDesc.colorAttachments[0].alphaBlendOperation = .add
-                shader.pipelineStateDesc.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
-                shader.pipelineStateDesc.colorAttachments[0].sourceAlphaBlendFactor = .sourceAlpha
-                shader.pipelineStateDesc.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
-                shader.pipelineStateDesc.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
-                
-                do {
-                    shader.pipelineState = try self.core.device.makeRenderPipelineState(descriptor: shader.pipelineStateDesc)
-                    shader.isValid = true
-                } catch {
-                    shader.isValid = false
+                guard let vertexFunction = library.makeFunction(name: "__procVertex") else {
+                    appendCompilerError("Pipeline creation failed: missing generated vertex function.")
+                    finish(nil, errors)
+                    return
                 }
 
-                if shader.isValid == true {
-                    cb(shader, errors)
+                guard let fragmentFunction = library.makeFunction(name: "__shaderMain") else {
+                    appendCompilerError("Pipeline creation failed: missing generated fragment function.")
+                    finish(nil, errors)
+                    return
                 }
+
+                self.pipelineQueue.async {
+                    var pipelineErrors = errors
+
+                    func appendPipelineError(_ message: String) {
+                        var er = CompileError()
+                        er.asset = asset
+                        er.line = 0
+                        er.column = 0
+                        er.type = "error"
+                        er.error = message
+                        pipelineErrors.append(er)
+                    }
+
+                    let descriptor = MTLRenderPipelineDescriptor()
+                    descriptor.vertexFunction = vertexFunction
+                    descriptor.fragmentFunction = fragmentFunction
+                    descriptor.colorAttachments[0].pixelFormat = MTLPixelFormat.bgra8Unorm
+                    descriptor.colorAttachments[0].isBlendingEnabled = false
+
+                    do {
+                        shader.pipelineStateDesc = descriptor
+                        shader.pipelineState = try self.core.device.makeRenderPipelineState(descriptor: descriptor)
+                        shader.isValid = true
+                        finish(shader, pipelineErrors)
+                    } catch {
+                        shader.isValid = false
+                        appendPipelineError("Pipeline creation failed: \(error.localizedDescription)")
+                        finish(nil, pipelineErrors)
+                    }
+                }
+            } else {
+                appendCompilerError("Shader compilation failed: Metal did not return a library.")
+                finish(nil, errors)
             }
         }
-        
+
         core.device.makeLibrary(source: parsedCode, options: nil, completionHandler: compiledCB)
     }
-    
+
     /// Splits the parameters into key and value pairs
     func splitParameters(_ parameters: String) -> [String: String]
     {
         var rc : [String: String] = [:]
-        
+
         let cArray = parameters.split(separator: ",")
         for param in cArray {
             let dArray = param.split(separator: ":")
@@ -408,11 +428,11 @@ class ShaderCompiler
         }
         return rc
     }
-    
+
     func getHeaderCode(noOp: Bool = false) -> String
     {
         return """
-        
+
         #include <metal_stdlib>
         #include <simd/simd.h>
         using namespace metal;
@@ -475,20 +495,20 @@ class ShaderCompiler
 
         {
             RasterizerData out;
-            
+
             float2 pixelSpacePosition = vertexArray[vertexID].position.xy;
             float2 viewportSize = float2(*viewportSizePointer);
-            
+
             out.clipSpacePosition.xy = pixelSpacePosition / (viewportSize / 2.0);
             out.clipSpacePosition.z = 0.0;
             out.clipSpacePosition.w = 1.0;
-            
+
             out.textureCoordinate = vertexArray[vertexID].textureCoordinate;
             out.viewportSize = viewportSize;
 
             return out;
         }
-        
+
         void mainImage(thread Data &data);
 
         fragment float4 __shaderMain( RasterizerData in [[stage_in]],
@@ -520,8 +540,7 @@ class ShaderCompiler
             \(noOp ? "//" : "")mainImage(data);
             return data.outColor;
         }
-        
+
         """
     }
 }
-

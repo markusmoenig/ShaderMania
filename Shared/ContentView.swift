@@ -6,14 +6,11 @@
 //
 
 import SwiftUI
-
-#if os(iOS)
-import MobileCoreServices
-#endif
+import UniformTypeIdentifiers
 
 struct ContentView: View {
     
-    enum EditingState {
+    enum EditingState: Equatable {
         case Source, Nodes, Both
     }
     
@@ -35,8 +32,6 @@ struct ContentView: View {
     @State private var showAssetNamePopover : Bool = false
     @State private var assetName            : String = ""
 
-    @State private var showDeleteAssetAlert : Bool = false
-
     @State private var showCustomResPopover : Bool = false
     @State private var customResWidth       : String = ""
     @State private var customResHeight      : String = ""
@@ -46,17 +41,29 @@ struct ContentView: View {
     @State private var updateView           : Bool = false
 
     @State private var helpIsVisible        : Bool = false
+    @State private var editorAnimationTick  : Bool = false
     
     @State private var importingImage       : Bool = false
     @State private var exportingImage       : Bool = false
 
     @Environment(\.colorScheme) var deviceColorScheme: ColorScheme
+    @Environment(\.undoManager) private var undoManager
 
     #if os(macOS)
     let leftPanelWidth                      : CGFloat = 200
+    let defaultWindowWidth                  : CGFloat = 1280
+    let defaultWindowHeight                 : CGFloat = 800
     #else
     let leftPanelWidth                      : CGFloat = 250
+    let defaultWindowWidth                  : CGFloat = 0
+    let defaultWindowHeight                 : CGFloat = 0
     #endif
+
+    private var editorBackgroundColor: Color {
+        deviceColorScheme == .dark
+        ? Color(red: 0.153, green: 0.157, blue: 0.137)
+        : Color(red: 0.984, green: 0.984, blue: 0.984)
+    }
     
     var body: some View {
         
@@ -76,13 +83,22 @@ struct ContentView: View {
                                     ScrollView {
 
                                         if document.core.assetFolder.assets.isEmpty == false {
-                                            WebView(document.core, deviceColorScheme).tabItem {
+                                            ZStack {
+                                                editorBackgroundColor
+                                                WebView(document.core, deviceColorScheme).tabItem {
+                                                }
                                             }
-                                                //.animation(.default)
-                                            
                                                 .frame(height: geometry.size.height)
                                                 .tag(1)
-                                                .onChange(of: deviceColorScheme) { newValue in
+                                                .background(editorBackgroundColor)
+                                                .compositingGroup()
+                                                .transition(.opacity)
+                                                .animation(.default, value: editorAnimationTick)
+                                                .animation(.default, value: editingState)
+                                                .animation(.default, value: document.updated)
+                                                .animation(.default, value: updateView)
+                                                .animation(.default, value: deviceColorScheme)
+                                                .onChange(of: deviceColorScheme) { _, newValue in
                                                     document.core.scriptEditor?.setTheme(newValue)
                                                 }
                                         }
@@ -90,10 +106,26 @@ struct ContentView: View {
                                     .zIndex(0)
                                     .frame(maxWidth: .infinity)
                                     .layoutPriority(2)
-                                    //.animation(.default)
+                                    .animation(.default, value: editingState)
+                                    .animation(.default, value: document.updated)
+                                    .animation(.default, value: updateView)
+                                    .animation(.default, value: editorAnimationTick)
+                                    .onAppear {
+                                        withAnimation(.default) {
+                                            editorAnimationTick.toggle()
+                                        }
+                                    }
 
                                     .onReceive(self.document.core.contentChanged) { state in
-                                        document.updated.toggle()
+                                        withAnimation(.default) {
+                                            document.updated.toggle()
+                                            editorAnimationTick.toggle()
+                                        }
+                                    }
+                                    .onReceive(self.document.core.selectionChanged) { _ in
+                                        withAnimation(.default) {
+                                            editorAnimationTick.toggle()
+                                        }
                                     }
                                 }
                             }
@@ -101,7 +133,7 @@ struct ContentView: View {
                             if editingState == .Nodes || editingState == .Both {
                                 MetalView(document.core, .Nodes)
                                     .zIndex(0)
-                                    .animation(.default)
+                                    .animation(.default, value: editingState)
                                     .allowsHitTesting(true)
                                     .frame(maxHeight: editingState == .Both ? geometry.size.height / 2.5 : geometry.size.height)
                             }
@@ -115,7 +147,10 @@ struct ContentView: View {
                                    maxHeight: geometry.size.height / document.core.previewFactor,
                                    alignment: .topTrailing)
                             .opacity(helpIsVisible ? 0 : (document.core.state == .Running ? 1 : document.core.previewOpacity))
-                            .animation(.default)
+                            .animation(.default, value: helpIsVisible)
+                            .animation(.default, value: document.core.state)
+                            .animation(.default, value: document.core.previewOpacity)
+                            .animation(.default, value: document.core.previewFactor)
                             .allowsHitTesting(false)
                     }
                 }
@@ -124,23 +159,17 @@ struct ContentView: View {
                 ToolbarItemGroup(placement: .automatic) {
                     
                     toolNodeMenu
-                        .frame(width: 80)
-                    
-                    Divider()
-                        .padding(.horizontal, 2)
-                        .opacity(0)
+                        .fixedSize()
                     
                     toolPreviewMenu
-                    
-                    Divider()
-                        .padding(.horizontal, 2)
-                        .opacity(0)
                     
                     // Core Controls
                     Button(action: {
                         document.core.stop()
                         document.core.start()
-                        helpIsVisible = false
+                        withAnimation(.default) {
+                            helpIsVisible = false
+                        }
                         updateView.toggle()
                     })
                     {
@@ -174,7 +203,9 @@ struct ContentView: View {
                     .keyboardShortcut("h")
                     
                     Button(action: {
-                        showLibrary.toggle()
+                        withAnimation(.easeInOut) {
+                            showLibrary.toggle()
+                        }
                     }) {
                         Label("Library", systemImage: "sidebar.right")
                     }
@@ -192,13 +223,15 @@ struct ContentView: View {
             
             .onReceive(self.document.help) { value in
                 if self.helpIsVisible == false {
-                    self.document.core.scriptEditor!.activateHelpSession()
+                    self.document.core.scriptEditor?.activateHelpSession()
                 } else {
                     if let asset = document.core.assetFolder.current {
                         self.document.core.assetFolder.select(asset.id)
                     }
                 }
-                self.helpIsVisible.toggle()
+                withAnimation(.default) {
+                    self.helpIsVisible.toggle()
+                }
             }
             
             .onReceive(self.document.exportImage) { value in
@@ -212,18 +245,66 @@ struct ContentView: View {
             if showLibrary == true {
                 LibraryView(document: document, updateView: $updateView)
                     .frame(minWidth: 220, idealWidth: 220, maxWidth: 220)
-                    .animation(.easeInOut)
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                    .animation(.easeInOut, value: showLibrary)
             }
         }
-        // For Mac Screenshots, 1440x900
-        //.frame(minWidth: 1440, minHeight: 806)
-        //.frame(maxWidth: 1440, maxHeight: 806)
-        // For Mac App Previews 1920x1080
-        //.frame(minWidth: 1920, minHeight: 978)
-        //.frame(maxWidth: 1920, maxHeight: 978)
+        .animation(.easeInOut, value: showLibrary)
+        .onAppear {
+            document.core.nodesWidget.undoManager = undoManager
+        }
+        #if os(macOS)
+        .frame(minWidth: defaultWindowWidth, minHeight: defaultWindowHeight)
+        #endif
     }
     
     // tool bar menus
+
+    private func deleteCurrentNode()
+    {
+        guard let asset = document.core.nodesWidget.currentNode else {
+            return
+        }
+
+        document.core.nodesWidget.deleteNodeWithUndo(asset, undoManager: undoManager)
+        updateView.toggle()
+    }
+
+    private func addShaderNode()
+    {
+        if let asset = document.core.assetFolder.addShader("New Shader") {
+            document.core.nodesWidget.selectNode(asset)
+            document.core.nodesWidget.compileAndUpdatePreview(asset)
+            document.core.nodesWidget.update()
+            document.core.contentChanged.send()
+            document.core.nodesWidget.registerAddedNodeUndo(asset, undoManager: undoManager, actionName: "Add Shader")
+            updateView.toggle()
+        }
+    }
+
+    private func addImageNode(from selectedFile: URL)
+    {
+        document.core.assetFolder.addImages("New", [selectedFile])
+        if let asset = document.core.assetFolder.current {
+            document.core.nodesWidget.setNodeName(asset, to: selectedFile.deletingPathExtension().lastPathComponent)
+            document.core.nodesWidget.selectNode(asset)
+            document.core.nodesWidget.update()
+            document.core.contentChanged.send()
+            document.core.nodesWidget.registerAddedNodeUndo(asset, undoManager: undoManager, actionName: "Add Image")
+            updateView.toggle()
+        }
+    }
+
+    private func setCustomResolutionFromFields()
+    {
+        guard let width = Int(customResWidth), width > 0,
+              let height = Int(customResHeight), height > 0 else {
+            return
+        }
+
+        document.core.nodesWidget.setCustomSize(SIMD2<Int>(width, height), undoManager: undoManager)
+        updateView.toggle()
+    }
     
     var toolShareMenu : some View {
 
@@ -248,8 +329,10 @@ struct ContentView: View {
                 Text("Shader Library Name")
                     .foregroundColor(Color.secondary)
                 TextField("Name", text: $libraryName, onEditingChanged: { (changed) in
-                    document.core.assetFolder.libraryName = libraryName
-                    updateView.toggle()
+                    if changed == false {
+                        document.core.nodesWidget.setLibraryName(libraryName, undoManager: undoManager)
+                        updateView.toggle()
+                    }
                 })
                 .frame(minWidth: 300)
                 
@@ -257,10 +340,21 @@ struct ContentView: View {
                     .foregroundColor(Color.secondary)
                     .padding(.top, 5)
                 TextEditor(text: $libraryDescription)
-                .onChange(of: libraryDescription) { value in
-                    document.core.assetFolder.libraryDescription = libraryDescription
+                .onChange(of: libraryDescription) { _, _ in
+                    document.core.nodesWidget.setLibraryDescription(libraryDescription, undoManager: undoManager)
                  }
                 .frame(minWidth: 300, minHeight: 60)
+
+                Text("Tags")
+                    .foregroundColor(Color.secondary)
+                    .padding(.top, 5)
+                TextField("metal, raymarching, noise", text: $libraryTags, onEditingChanged: { (changed) in
+                    if changed == false {
+                        document.core.nodesWidget.setLibraryTags(libraryTags, undoManager: undoManager)
+                        updateView.toggle()
+                    }
+                })
+                .frame(minWidth: 300)
 
                 Divider()
                 
@@ -276,7 +370,7 @@ struct ContentView: View {
                     .foregroundColor(Color.secondary)
                     .padding(.top, 5)
                 TextEditor(text: $userDescription)
-                .onChange(of: userDescription) { value in
+                .onChange(of: userDescription) { _, _ in
                     document.core.library.userDescription = userDescription
                  }
                 .frame(minWidth: 300, minHeight: 60)
@@ -299,13 +393,7 @@ struct ContentView: View {
                 })
                 .keyboardShortcut("1")
                 Button("Add Shader", action: {
-                    if let asset = document.core.assetFolder.addShader("New Shader") {
-                        document.core.nodesWidget.selectNode(asset)
-                        document.core.nodesWidget.compileAndUpdatePreview(asset)
-                        document.core.nodesWidget.update()
-                        document.core.contentChanged.send()
-                        updateView.toggle()
-                    }
+                    addShaderNode()
                 })
                 .keyboardShortcut("2")
             }
@@ -314,31 +402,33 @@ struct ContentView: View {
                     if let node = document.core.nodesWidget.currentNode {
                         assetName = node.name
                         showAssetNamePopover = true
-                        document.core.contentChanged.send()
                     }
                 })
                 Button("Delete", action: {
-                    if document.core.nodesWidget.currentNode != nil {
-                        showDeleteAssetAlert = true
-                        document.core.nodesWidget.update()
-                        document.core.contentChanged.send()
-                    }
+                    deleteCurrentNode()
                 })
+                .keyboardShortcut(.delete, modifiers: [])
             }
             Section(header: Text("Show")) {
                 Button("Source Only", action: {
-                    editingState = .Source
-                    editingStateText = "Source Only"
+                    withAnimation(.default) {
+                        editingState = .Source
+                        editingStateText = "Source Only"
+                    }
                 })
                 .keyboardShortcut("3")
                 Button("Nodes Only", action: {
-                    editingState = .Nodes
-                    editingStateText = "Nodes Only"
+                    withAnimation(.default) {
+                        editingState = .Nodes
+                        editingStateText = "Nodes Only"
+                    }
                 })
                 .keyboardShortcut("4")
                 Button("Source & Nodes", action: {
-                    editingState = .Both
-                    editingStateText = "Source & Nodes"
+                    withAnimation(.default) {
+                        editingState = .Both
+                        editingStateText = "Source & Nodes"
+                    }
                 })
                 .keyboardShortcut("5")
             }
@@ -363,34 +453,13 @@ struct ContentView: View {
             VStack(alignment: .leading) {
                 Text("Name:")
                 TextField("Name", text: $assetName, onEditingChanged: { (changed) in
-                    if let node = document.core.nodesWidget.currentNode {
-                        node.name = assetName
+                    if changed == false, let node = document.core.nodesWidget.currentNode {
+                        document.core.nodesWidget.setNodeName(node, to: assetName, undoManager: undoManager)
                         updateView.toggle()
-                        document.core.nodesWidget.update()
                     }
                 })
                 .frame(minWidth: 200)
             }.padding()
-        }
-        // Delete an asset
-        .alert(isPresented: $showDeleteAssetAlert) {
-            Alert(
-                title: Text("Do you want to remove the node '\(document.core.nodesWidget.currentNode!.name)' ?"),
-                message: Text("This action cannot be undone!"),
-                primaryButton: .destructive(Text("Yes"), action: {
-                    if let asset = document.core.nodesWidget.currentNode {
-                        document.core.nodesWidget.nodeIsAboutToBeDeleted(asset)
-                        document.core.assetFolder.removeAsset(asset)
-                        for a in document.core.assetFolder.assets {
-                            document.core.nodesWidget.selectNode(a)
-                            break
-                        }
-                        self.updateView.toggle()
-                        document.core.nodesWidget.update()
-                    }
-                }),
-                secondaryButton: .cancel(Text("No"), action: {})
-            )
         }
         // Import Image
         .fileImporter(
@@ -400,16 +469,9 @@ struct ContentView: View {
         ) { result in
             do {
                 let selectedFiles = try result.get()
-                
-                document.core.assetFolder.addImages("New", [selectedFiles[0]])
-                if selectedFiles.count > 0 {
-                    if let asset = document.core.assetFolder.current {
-                        asset.name = selectedFiles[0].deletingPathExtension().lastPathComponent
-                        document.core.nodesWidget.selectNode(asset)
-                        document.core.nodesWidget.update()
-                        document.core.contentChanged.send()
-                        updateView.toggle()
-                    }
+
+                if let selectedFile = selectedFiles.first {
+                    addImageNode(from: selectedFile)
                 }
             } catch {
                 // Handle failure.
@@ -480,18 +542,24 @@ struct ContentView: View {
         Menu {
             Section(header: Text("Preview")) {
                 Button("Small", action: {
-                    document.core.previewFactor = 4
-                    updateView.toggle()
+                    withAnimation(.default) {
+                        document.core.previewFactor = 4
+                        updateView.toggle()
+                    }
                 })
                 .keyboardShortcut("6")
                 Button("Medium", action: {
-                    document.core.previewFactor = 2
-                    updateView.toggle()
+                    withAnimation(.default) {
+                        document.core.previewFactor = 2
+                        updateView.toggle()
+                    }
                 })
                 .keyboardShortcut("7")
                 Button("Large", action: {
-                    document.core.previewFactor = 1
-                    updateView.toggle()
+                    withAnimation(.default) {
+                        document.core.previewFactor = 1
+                        updateView.toggle()
+                    }
                 })
                 .keyboardShortcut("8")
                 Button("Set Custom", action: {
@@ -506,26 +574,28 @@ struct ContentView: View {
                 })
                 
                 Button("Clear Custom", action: {
-                    
-                    document.core.assetFolder.customSize = nil
-                    if let asset = document.core.assetFolder.current {
-                        document.core.createPreview(asset)
-                    }
+                    document.core.nodesWidget.setCustomSize(nil, undoManager: undoManager)
                     updateView.toggle()
                 })
             }
             Section(header: Text("Opacity")) {
                 Button("Opacity Off", action: {
-                    document.core.previewOpacity = 0
-                    updateView.toggle()
+                    withAnimation(.default) {
+                        document.core.previewOpacity = 0
+                        updateView.toggle()
+                    }
                 })
                 Button("Opacity Half", action: {
-                    document.core.previewOpacity = 0.5
-                    updateView.toggle()
+                    withAnimation(.default) {
+                        document.core.previewOpacity = 0.5
+                        updateView.toggle()
+                    }
                 })
                 Button("Opacity Full", action: {
-                    document.core.previewOpacity = 1.0
-                    updateView.toggle()
+                    withAnimation(.default) {
+                        document.core.previewOpacity = 1.0
+                        updateView.toggle()
+                    }
                 })
             }
             Section(header: Text("Export")) {
@@ -536,7 +606,9 @@ struct ContentView: View {
         }
         label: {
             Label("View", systemImage: "viewfinder")
-            Text("\(document.core.project!.size.x) x \(document.core.project!.size.y)")
+            if let project = document.core.project {
+                Text("\(project.size.x) x \(project.size.y)")
+            }
         }
         
         // Export Image
@@ -557,7 +629,7 @@ struct ContentView: View {
                             
                             if let cgiTexture = project.makeCGIImage(core.device, core.metalStates.getComputeState(state: .MakeCGIImage), texture) {
                                 if let image = makeCGIImage(texture: cgiTexture, forImage: true) {
-                                    if let imageDestination = CGImageDestinationCreateWithURL(url as CFURL, kUTTypePNG, 1, nil) {
+                                    if let imageDestination = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil) {
                                         CGImageDestinationAddImage(imageDestination, image, nil)
                                         CGImageDestinationFinalize(imageDestination)
                                     }
@@ -577,23 +649,13 @@ struct ContentView: View {
             VStack(alignment: .leading) {
                 Text("Resolution:")
                 TextField("Width", text: $customResWidth, onEditingChanged: { (changed) in
-                    if let width = Int(customResWidth), width > 0 {
-                        if let height = Int(customResHeight), height > 0 {
-                            document.core.assetFolder.customSize = SIMD2<Int>(width, height)
-                            if let asset = document.core.assetFolder.current {
-                                document.core.createPreview(asset)
-                            }
-                        }
+                    if changed == false {
+                        setCustomResolutionFromFields()
                     }
                 })
                 TextField("Height", text: $customResHeight, onEditingChanged: { (changed) in
-                    if let width = Int(customResWidth), width > 0 {
-                        if let height = Int(customResHeight), height > 0 {
-                            document.core.assetFolder.customSize = SIMD2<Int>(width, height)
-                            if let asset = document.core.assetFolder.current {
-                                document.core.createPreview(asset)
-                            }
-                        }
+                    if changed == false {
+                        setCustomResolutionFromFields()
                     }
                 })
                 .frame(minWidth: 200)

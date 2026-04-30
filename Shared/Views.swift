@@ -15,6 +15,7 @@ struct Float3ColorParameterView: View {
     @State private var value                = Color.white
 
     @Binding var updateView                 : Bool
+    @Environment(\.undoManager) private var undoManager
 
     init(document: ShaderManiaDocument, parameter: ShaderParameter, updateView: Binding<Bool>)
     {
@@ -34,15 +35,19 @@ struct Float3ColorParameterView: View {
             HStack {
                 ColorPicker("", selection: $value, supportsOpacity: false)
                 Spacer()
-                    .onChange(of: value) { newValue in
-                        if let cgColor = newValue.cgColor {
-                            let v = float3(Float(cgColor.components![0]), Float(cgColor.components![1]), Float(cgColor.components![2]))
+                    .onChange(of: value) { _, newValue in
+                        if let colorSpace = CGColorSpace(name: CGColorSpace.sRGB),
+                           let cgColor = newValue.cgColor?.converted(to: colorSpace, intent: .defaultIntent, options: nil),
+                           let components = cgColor.components,
+                           components.count >= 3 {
+                            let v = float3(Float(components[0]), Float(components[1]), Float(components[2]))
                             if let node = document.core.nodesWidget.currentNode {
-                                node.shaderData[parameter.index].x = v.x
-                                node.shaderData[parameter.index].y = v.y
-                                node.shaderData[parameter.index].z = v.z
+                                var shaderValue = node.shaderData[parameter.index]
+                                shaderValue.x = v.x
+                                shaderValue.y = v.y
+                                shaderValue.z = v.z
+                                document.core.nodesWidget.setShaderParameter(node, index: parameter.index, to: shaderValue, undoManager: undoManager)
                             }
-                            document.core.nodesWidget.update()
                         }
                     }
             }
@@ -56,8 +61,10 @@ struct FloatSliderParameterView: View {
     @State var parameter                    : ShaderParameter
     @State var value                        : Double = 0
     @State var valueText                    : String = ""
+    @State private var editingStartValue    : Double? = nil
 
     @Binding var updateView                 : Bool
+    @Environment(\.undoManager) private var undoManager
 
     init(document: ShaderManiaDocument, parameter: ShaderParameter, updateView: Binding<Bool>)
     {
@@ -84,7 +91,19 @@ struct FloatSliderParameterView: View {
                         node.shaderData[parameter.index].x = Float(v)
                         document.core.nodesWidget.update()
                     }
-                }), in: Double(parameter.min)...Double(parameter.max))//, step: Double(parameter.step))
+                }), in: Double(parameter.min)...Double(parameter.max), onEditingChanged: { editing in
+                    if editing {
+                        editingStartValue = value
+                    } else if let node = document.core.nodesWidget.currentNode {
+                        var oldShaderValue = node.shaderData[parameter.index]
+                        oldShaderValue.x = Float(editingStartValue ?? value)
+                        let newShaderValue = node.shaderData[parameter.index]
+
+                        node.shaderData[parameter.index] = oldShaderValue
+                        document.core.nodesWidget.setShaderParameter(node, index: parameter.index, to: newShaderValue, undoManager: undoManager)
+                        editingStartValue = nil
+                    }
+                })//, step: Double(parameter.step))
                 Text(valueText)
                     .frame(maxWidth: 40)
             }
@@ -186,59 +205,117 @@ struct ParameterListView: View {
 }
 
 /// ShaderList
+struct LibraryShaderThumbnail: View {
+    let shader: LibraryShader
+    let width: CGFloat
+    let height: CGFloat
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.35)
+
+            if let image = shader.cgiImage {
+                Image(image, scale: 1.0, label: Text(shader.name))
+                    .interpolation(.high)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: width, height: height)
+                    .clipped()
+            } else {
+                ProgressView()
+            }
+        }
+        .frame(width: width, height: height)
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .overlay(
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(Color.secondary.opacity(0.18), lineWidth: 1)
+        )
+    }
+}
+
+struct LibraryShaderCard: View {
+    let shader: LibraryShader
+
+    private var authorName: String? {
+        shader.userRecord?["nickName"] as? String
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            LibraryShaderThumbnail(shader: shader, width: 176, height: 117)
+
+            Text(shader.name)
+                .font(.headline)
+                .lineLimit(1)
+
+            if let authorName = authorName, authorName.isEmpty == false {
+                Text(authorName)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+            }
+        }
+        .padding(8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.secondary.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.secondary.opacity(0.12), lineWidth: 1)
+        )
+    }
+}
+
 struct ShaderList: View {
     @State var document                     : ShaderManiaDocument
     
     @Binding var updateView                 : Bool
     @Binding var shaders                    : LibraryShaderList?
+    var isLoading                           : Bool = false
+    var searchTerm                          : String = ""
 
     @State var detailedShader               : LibraryShader? = nil
     @State var authorOfShader               : LibraryShader? = nil
+    @Environment(\.undoManager) private var undoManager
 
     var body: some View {
         if let authorOfShader = authorOfShader {
-            VStack(alignment: .center) {
-                HStack() {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
                     Button(action: {
                         self.authorOfShader = nil
                     })
                     {
-                        Label("Back to Shader", systemImage: "arrowshape.turn.up.backward")
+                        Label("Back", systemImage: "chevron.left")
                     }
                     
                     Spacer()
                 }
                 
                 if let userRecord = authorOfShader.userRecord {
-                    Text((userRecord["nickName"] as! String))
-                        .padding(.top, 5)
-                    Text((userRecord["description"] as! String))
-                        .padding(.top, 4)
-                }
-                
-                HStack {
-                    Text("Shaders")
+                    Text((userRecord["nickName"] as? String) ?? "Unknown Author")
+                        .font(.headline)
+                    Text((userRecord["description"] as? String) ?? "")
+                        .font(.caption)
                         .foregroundColor(.secondary)
-                        .padding(.top, 4)
-                    
-                    Spacer()
                 }
-                
+
+                Text("Shaders")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
                 ScrollView {
-                    VStack {
+                    LazyVStack(spacing: 10) {
                         if let shaders = self.shaders {
                             ForEach(shaders.shaders, id: \.id) { shader in
-                                    
+
                                 Button(action: {
                                     detailedShader = shader
                                     self.authorOfShader = nil
                                 })
                                 {
-                                    VStack(alignment: .center, spacing: 2) {
-                                        Image(shader.cgiImage!, scale: 1.0, label: Text(shader.name))
-                                        Text(shader.name)
-                                    }
-
+                                    LibraryShaderCard(shader: shader)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
@@ -246,26 +323,27 @@ struct ShaderList: View {
                     }
                 }
             }
+            .padding(.horizontal, 8)
         } else
         if let detailedShader = detailedShader {
         
-            VStack(alignment: .center) {
-                HStack() {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
                     Button(action: {
                         self.detailedShader = nil
                     })
                     {
-                        Label("Back to List", systemImage: "arrowshape.turn.up.backward")
+                        Label("Back", systemImage: "chevron.left")
                     }
                     
                     Spacer()
                 }
                                     
-                if let image = detailedShader.cgiImage {
-                    Image(image, scale: 1.0, label: Text(detailedShader.name))
-                        .padding(.top, 10)
-                }
+                LibraryShaderThumbnail(shader: detailedShader, width: 188, height: 125)
+
                 Text(detailedShader.name)
+                    .font(.headline)
+                    .lineLimit(2)
                 
                 if let userRecord = detailedShader.userRecord {
                     Button(action: {
@@ -273,50 +351,94 @@ struct ShaderList: View {
                         document.core.library.requestShadersOfShaderAuthor(detailedShader)
                     })
                     {
-                        Text("Author: " + (userRecord["nickName"] as! String))
+                        Label((userRecord["nickName"] as? String) ?? "Unknown Author", systemImage: "person.crop.circle")
+                            .font(.caption)
                     }
+                    .buttonStyle(PlainButtonStyle())
+                    .foregroundColor(.secondary)
                 }
                 
-                HStack {
+                VStack(alignment: .leading, spacing: 4) {
                     Text("Description")
+                        .font(.caption)
                         .foregroundColor(Color.secondary)
-                    Spacer()
+
+                    Text(detailedShader.description.isEmpty ? "No description." : detailedShader.description)
+                        .font(.body)
+                        .foregroundColor(detailedShader.description.isEmpty ? .secondary : .primary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding(.top, 5)
-                HStack {
-                    Text(detailedShader.description)
-                    Spacer()
-                }
-                .padding(.top, 2)
                 
                 Button(action: {
-                    document.core.library.addShaderToProject(detailedShader)
+                    let importedAssets = document.core.library.addShaderToProject(detailedShader)
+                    document.core.nodesWidget.registerAddedNodesUndo(importedAssets, undoManager: undoManager, actionName: "Add Shader")
+                    updateView.toggle()
                 })
                 {
-                    Text("Add to Project")
+                    Label("Add to Project", systemImage: "plus")
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 6)
                 }
-                .padding(.top, 5)
+                .background(Color.accentColor)
+                .foregroundColor(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                Spacer()
             }
+            .padding(.horizontal, 8)
             
         } else {
-            ScrollView {
-                VStack {
-                    if let shaders = self.shaders {
-                        ForEach(shaders.shaders, id: \.id) { shader in
-                                
-                            Button(action: {
-                                detailedShader = shader
-                            })
-                            {
-                                VStack(alignment: .center, spacing: 2) {
-                                    Image(shader.cgiImage!, scale: 1.0, label: Text(shader.name))
-                                    Text(shader.name)
-                                }
+            if isLoading && shaders == nil {
+                VStack(spacing: 10) {
+                    Spacer()
+                    ProgressView()
+                    Text("Loading shaders")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+            } else if let shaders = shaders, shaders.shaders.isEmpty {
+                VStack(spacing: 10) {
+                    Spacer()
+                    Image(systemName: searchTerm.isEmpty ? "tray" : "magnifyingglass")
+                        .font(.title2)
+                        .foregroundColor(.secondary)
+                    Text(searchTerm.isEmpty ? "No shaders available" : "No matches")
+                        .font(.headline)
+                    Text(searchTerm.isEmpty ? "The public library did not return any displayable shaders." : "Try another search term.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                    Spacer()
+                }
+                .padding(.horizontal, 12)
+                .frame(maxWidth: .infinity)
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 10) {
+                        if let shaders = self.shaders {
+                            ForEach(shaders.shaders, id: \.id) { shader in
 
+                                Button(action: {
+                                    detailedShader = shader
+                                })
+                                {
+                                    LibraryShaderCard(shader: shader)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                .contextMenu {
+                                    Button("Add to Project") {
+                                        let importedAssets = document.core.library.addShaderToProject(shader)
+                                        document.core.nodesWidget.registerAddedNodesUndo(importedAssets, undoManager: undoManager, actionName: "Add Shader")
+                                        updateView.toggle()
+                                    }
+                                }
                             }
-                            .buttonStyle(PlainButtonStyle())
                         }
                     }
+                    .padding(.horizontal, 8)
+                    .padding(.top, 8)
                 }
             }
         }
@@ -332,18 +454,22 @@ struct LibraryView: View {
     @State var shaders                      : LibraryShaderList? = nil
     
     @State var searchTerm                   : String = ""
+    @State var isLoading                    : Bool = false
     
     var body: some View {
-        VStack {
+        VStack(spacing: 8) {
             
             Text("Shader Library")
+                .font(.headline)
                 .padding(.top, 2)
             
             HStack {
                 Image(systemName: "magnifyingglass").foregroundColor(.secondary)
-                TextField("Search", text: $searchTerm, onEditingChanged: { (changed) in
-                    document.core.library.requestShaders(searchTerm)
-                })
+                TextField("Search", text: $searchTerm)
+                    .textFieldStyle(.plain)
+                    .onChange(of: searchTerm) { _, _ in
+                        requestShaders()
+                    }
                 if searchTerm != "" {
                     Image(systemName: "xmark.circle.fill")
                         .imageScale(.medium)
@@ -352,15 +478,19 @@ struct LibraryView: View {
                         .onTapGesture {
                             withAnimation {
                                 searchTerm = ""
-                                document.core.library.requestShaders(searchTerm)
+                                requestShaders()
                               }
                         }
                 }
             }
-            .padding(2)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .background(Color.secondary.opacity(0.08))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .padding(.horizontal, 8)
             Divider()
             
-            ShaderList(document: document, updateView: $updateView, shaders: $shaders)
+            ShaderList(document: document, updateView: $updateView, shaders: $shaders, isLoading: isLoading, searchTerm: searchTerm)
             
             Spacer()
         }
@@ -374,7 +504,15 @@ struct LibraryView: View {
         .onReceive(self.document.core.libraryChanged) { list in
             shaders = nil
             shaders = list
+            isLoading = false
             updateView.toggle()
         }
+    }
+
+    private func requestShaders()
+    {
+        isLoading = true
+        shaders = nil
+        document.core.library.requestShaders(searchTerm)
     }
 }

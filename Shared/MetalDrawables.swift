@@ -91,7 +91,10 @@ class MetalDrawables
         viewportSize = vector_uint2( UInt32(metalView.bounds.width), UInt32(metalView.bounds.height) )
         viewSize = float2(Float(metalView.bounds.width), Float(metalView.bounds.height))
 
-        commandBuffer = commandQueue.makeCommandBuffer()!
+        guard let commandBuffer = commandQueue.makeCommandBuffer() else {
+            return nil
+        }
+        self.commandBuffer = commandBuffer
         if let renderPassDescriptor = metalView.currentRenderPassDescriptor {
                     
             renderPassDescriptor.colorAttachments[0].loadAction = .clear
@@ -106,7 +109,10 @@ class MetalDrawables
     
     func encodeRun( _ renderEncoder: MTLRenderCommandEncoder, pipelineState: MTLRenderPipelineState? )
     {
-        renderEncoder.setRenderPipelineState( pipelineState! )
+        guard let pipelineState = pipelineState else {
+            return
+        }
+        renderEncoder.setRenderPipelineState( pipelineState )
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
     }
     
@@ -244,12 +250,16 @@ class MetalDrawables
     /// Draws the given text
     func drawText(position: float2, text: String, size: Float, color: float4 = float4(1,1,1,1))
     {
+        guard let font = font, let atlas = font.atlas, let bmFont = font.bmFont else {
+            return
+        }
+
         func drawChar(char: BMChar, x: Float, y: Float, adjScale: Float)
         {
             var data = TextUniform()
             
-            data.atlasSize.x = Float(font!.atlas!.width)
-            data.atlasSize.y = Float(font!.atlas!.height)
+            data.atlasSize.x = Float(atlas.width)
+            data.atlasSize.y = Float(atlas.height)
             data.fontPos.x = char.x
             data.fontPos.y = char.y
             data.fontSize.x = char.width
@@ -263,26 +273,22 @@ class MetalDrawables
             renderEncoder.setVertexBytes(&viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
 
             renderEncoder.setFragmentBytes(&data, length: MemoryLayout<TextUniform>.stride, index: 0)
-            renderEncoder.setFragmentTexture(font!.atlas, index: 1)
+            renderEncoder.setFragmentTexture(atlas, index: 1)
 
             renderEncoder.setRenderPipelineState(metalView.core.metalStates.getState(state: .DrawTextChar))
             renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         }
-        
-        if let font = font {
-         
-            let scale : Float = (1.0 / font.bmFont!.common.lineHeight) * size
-            let adjScale : Float = scale// / 2
-            
-            var posX = position.x// / game.scaleFactor
-            let posY = position.y// / game.scaleFactor
 
-            for c in text {
-                let bmChar = font.getItemForChar( c )
-                if bmChar != nil {
-                    drawChar(char: bmChar!, x: posX + bmChar!.xoffset * adjScale, y: posY + bmChar!.yoffset * adjScale, adjScale: adjScale)
-                    posX += bmChar!.xadvance * adjScale;
-                }
+        let scale : Float = (1.0 / bmFont.common.lineHeight) * size
+        let adjScale : Float = scale// / 2
+
+        var posX = position.x// / game.scaleFactor
+        let posY = position.y// / game.scaleFactor
+
+        for c in text {
+            if let bmChar = font.getItemForChar(c) {
+                drawChar(char: bmChar, x: posX + bmChar.xoffset * adjScale, y: posY + bmChar.yoffset * adjScale, adjScale: adjScale)
+                posX += bmChar.xadvance * adjScale;
             }
         }
     }

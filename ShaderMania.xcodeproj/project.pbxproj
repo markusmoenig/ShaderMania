@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -62,6 +62,14 @@
 		2B7C7EFC25DD0E0900727BC0 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */; };
 		2B7C7EFD25DD0E0900727BC0 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */; };
 		2B7C7F0325DD0E6D00727BC0 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B7C7F0225DD0E6D00727BC0 /* StoreKit.framework */; };
+		C0DE00000000000000000002 /* ShaderAnnotationScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000001 /* ShaderAnnotationScanner.swift */; };
+		C0DE00000000000000000003 /* ShaderAnnotationScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000001 /* ShaderAnnotationScanner.swift */; };
+		C0DE00000000000000000005 /* GraphDependencyResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000004 /* GraphDependencyResolver.swift */; };
+		C0DE00000000000000000006 /* GraphDependencyResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000004 /* GraphDependencyResolver.swift */; };
+		C0DE00000000000000000008 /* LibraryQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000007 /* LibraryQuality.swift */; };
+		C0DE00000000000000000009 /* LibraryQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000007 /* LibraryQuality.swift */; };
+		C0DE0000000000000000000A /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C0DE0000000000000000000C /* AppIcon.icon */; };
+		C0DE0000000000000000000B /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C0DE0000000000000000000C /* AppIcon.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -101,6 +109,11 @@
 		2B7C7EEB25DCB5D400727BC0 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		2B7C7EFB25DD0E0900727BC0 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
 		2B7C7F0225DD0E6D00727BC0 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		C0DE00000000000000000001 /* ShaderAnnotationScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShaderAnnotationScanner.swift; sourceTree = "<group>"; };
+		C0DE00000000000000000004 /* GraphDependencyResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphDependencyResolver.swift; sourceTree = "<group>"; };
+		C0DE00000000000000000007 /* LibraryQuality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryQuality.swift; sourceTree = "<group>"; };
+		C0DE0000000000000000000C /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
+		C0DE0000000000000000000D /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +140,7 @@
 		2B0EEA482565DF3900C84C6C = {
 			isa = PBXGroup;
 			children = (
+				C0DE0000000000000000000D /* README.md */,
 				2B0EEA4D2565DF3900C84C6C /* Shared */,
 				2B0EEA582565DF3A00C84C6C /* iOS */,
 				2B0EEA5F2565DF3A00C84C6C /* macOS */,
@@ -154,6 +168,9 @@
 				2B36F66C25D3C8A0001611BE /* MetalDrawables.swift */,
 				2B36F66725D3BFCC001611BE /* NodesWidget.swift */,
 				2B0EEABA2566035700C84C6C /* Project.swift */,
+				C0DE00000000000000000004 /* GraphDependencyResolver.swift */,
+				C0DE00000000000000000007 /* LibraryQuality.swift */,
+				C0DE00000000000000000001 /* ShaderAnnotationScanner.swift */,
 				2B0EEA7A2565DF7800C84C6C /* ShaderCompiler.swift */,
 				2B0EEA7E2565DF7800C84C6C /* ScriptEditor.swift */,
 				2B0EEA7B2565DF7800C84C6C /* Utils.swift */,
@@ -162,6 +179,7 @@
 				2B36F67325D4DE53001611BE /* Fonts */,
 				2B0EEAA62565DFA800C84C6C /* Files */,
 				2B0EEA512565DF3A00C84C6C /* Assets.xcassets */,
+				C0DE0000000000000000000C /* AppIcon.icon */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -265,8 +283,9 @@
 		2B0EEA492565DF3900C84C6C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1220;
-				LastUpgradeCheck = 1230;
+				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					2B0EEA552565DF3A00C84C6C = {
 						CreatedOnToolsVersion = 12.2;
@@ -304,6 +323,7 @@
 				2B0EEAA72565DFA800C84C6C /* Files in Resources */,
 				2B36F67625D4DE84001611BE /* OpenSans.tiff in Resources */,
 				2B0EEA682565DF3A00C84C6C /* Assets.xcassets in Resources */,
+				C0DE0000000000000000000A /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,6 +335,7 @@
 				2B0EEAA82565DFA800C84C6C /* Files in Resources */,
 				2B36F67725D4DE84001611BE /* OpenSans.tiff in Resources */,
 				2B0EEA692565DF3A00C84C6C /* Assets.xcassets in Resources */,
+				C0DE0000000000000000000B /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,6 +357,9 @@
 				2B0EEA892565DF7800C84C6C /* Utils.swift in Sources */,
 				2B7C7EEC25DCB5D400727BC0 /* Library.swift in Sources */,
 				2B3D4C7925A68ECA00D2F8EA /* Views.swift in Sources */,
+				C0DE00000000000000000005 /* GraphDependencyResolver.swift in Sources */,
+				C0DE00000000000000000008 /* LibraryQuality.swift in Sources */,
+				C0DE00000000000000000002 /* ShaderAnnotationScanner.swift in Sources */,
 				2B0EEA872565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA02565DF9A00C84C6C /* Classes.swift in Sources */,
 				2B36F66D25D3C8A0001611BE /* MetalDrawables.swift in Sources */,
@@ -365,6 +389,9 @@
 				2B0EEA8A2565DF7800C84C6C /* Utils.swift in Sources */,
 				2B7C7EED25DCB5D400727BC0 /* Library.swift in Sources */,
 				2B3D4C7A25A68ECA00D2F8EA /* Views.swift in Sources */,
+				C0DE00000000000000000006 /* GraphDependencyResolver.swift in Sources */,
+				C0DE00000000000000000009 /* LibraryQuality.swift in Sources */,
+				C0DE00000000000000000003 /* ShaderAnnotationScanner.swift in Sources */,
 				2B0EEA882565DF7800C84C6C /* ShaderCompiler.swift in Sources */,
 				2B0EEAA12565DF9A00C84C6C /* Classes.swift in Sources */,
 				2B36F66E25D3C8A0001611BE /* MetalDrawables.swift in Sources */,
@@ -416,9 +443,12 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = G6R6L3VH62;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -436,6 +466,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -475,9 +506,12 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = G6R6L3VH62;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -488,6 +522,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
@@ -501,17 +536,16 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/ShaderMania.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = G6R6L3VH62;
+				CURRENT_PROJECT_VERSION = 0;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.55;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.moenig.shadermania;
 				PRODUCT_NAME = ShaderMania;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -530,17 +564,16 @@
 				CODE_SIGN_ENTITLEMENTS = iOS/ShaderMania.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = G6R6L3VH62;
+				CURRENT_PROJECT_VERSION = 0;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.55;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.moenig.shadermania;
 				PRODUCT_NAME = ShaderMania;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -561,8 +594,8 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
-				DEVELOPMENT_TEAM = G6R6L3VH62;
+				CURRENT_PROJECT_VERSION = 0;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = macOS/Info.plist;
@@ -571,8 +604,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.55;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.moenig.shadermania;
 				PRODUCT_NAME = ShaderMania;
 				SDKROOT = macosx;
@@ -590,8 +623,8 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
-				DEVELOPMENT_TEAM = G6R6L3VH62;
+				CURRENT_PROJECT_VERSION = 0;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = macOS/Info.plist;
@@ -600,8 +633,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.55;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.moenig.shadermania;
 				PRODUCT_NAME = ShaderMania;
 				SDKROOT = macosx;

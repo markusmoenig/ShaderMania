@@ -2,12 +2,12 @@
 
 [![AppStore](images/appstore.svg)](https://apps.apple.com/us/app/shadermania/id1541065830)
 
-[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) [![Version](https://img.shields.io/badge/version-1.5.5-green.svg)](https://shields.io/) [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/BMStWPhByj) [![Twitter](https://badgen.net/badge/icon/twitter?icon=twitter&label)](https://twitter.com/markusmoenig)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) [![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](https://shields.io/) [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/BMStWPhByj) [![Twitter](https://badgen.net/badge/icon/twitter?icon=twitter&label)](https://twitter.com/markusmoenig)
 
 
 ![screenshot](images/screen.png)
 
-## Create, edit, share Metal shaders on macOS and iPadOS
+## Create, edit, and share Metal shaders on macOS and iPadOS
 
 ShaderMania features live coding of Metal fragment shaders with realtime preview and playback. Shaders are displayed as nodes which can be connected as needed.
 
@@ -15,7 +15,7 @@ ShaderMania features a database of public shaders including tutorial shaders wit
 
 A physical keyboard is recommended for coding shaders.
 
-Features
+## Features
 
 * Flexible node system supporting Shaders and Images. Named input slots for shaders can be created inside the shader source code.
 * Connect shader nodes to be able to chain shaders.
@@ -24,20 +24,27 @@ Features
 * Realtime syntax check and compilation of your shaders with realtime preview.
 * Render to custom resolutions and export your shader output to PNG.
 * Display of syntax errors and warnings.
+* Undo and redo for common project edits such as adding, deleting, renaming, moving, and connecting nodes.
 
-Database
+## Shader Library
 
 * Upload your shaders to the public shader database
 * Browse shaders in the Database and learn / experiment.
 * Add the shader nodes from the database to your project.
 
+The public library is intended for useful, inspectable shader examples. Placeholder/default projects and incomplete metadata should not be uploaded.
+
+## Development
+
+The repository includes a small Swift Package test target for core non-UI logic:
+
+```sh
+swift test
+```
+
 ## How to help
 
 Rating or reviewing ShaderMania in the AppStore is a great help as it improves visibility.
-
-## See also
-
-If you like ShaderMania, try out my other apps at [Denrim.com](https://denrim.com).
 
 ## Acknowledgements
 

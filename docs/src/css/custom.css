@@ -1,0 +1,61 @@
+:root {
+  --ifm-color-primary: #0f766e;
+  --ifm-color-primary-dark: #0d665f;
+  --ifm-color-primary-darker: #0b5c56;
+  --ifm-color-primary-darkest: #08443f;
+  --ifm-color-primary-light: #11867d;
+  --ifm-color-primary-lighter: #13958b;
+  --ifm-color-primary-lightest: #17a99e;
+  --ifm-code-font-size: 95%;
+  --feature-surface: #f8fafc;
+}
+
+[data-theme="dark"] {
+  --feature-surface: #171717;
+}
+
+.navbar__logo img {
+  border-radius: 8px;
+}
+
+.navbar-icon {
+  align-items: center;
+  border-radius: 6px;
+  color: var(--ifm-navbar-link-color);
+  display: inline-flex;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 4px 2px;
+  transition: all 0.2s ease;
+}
+
+.navbar-icon:hover {
+  background-color: var(--ifm-background-surface-color);
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.navbar-icon i {
+  font-size: 18px;
+}
+
+.navbar-icon img {
+  display: inline-block;
+  filter: grayscale(20%);
+  margin-top: 4px;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+}
+
+.navbar-icon img:hover {
+  filter: grayscale(0%);
+  opacity: 0.9;
+}
+
+[data-theme="dark"] .navbar-icon img {
+  filter: brightness(0.9) grayscale(20%);
+}
+
+[data-theme="dark"] .navbar-icon img:hover {
+  filter: brightness(1) grayscale(0%);
+}

@@ -48,9 +48,12 @@ class Font
         self.core = core
                 
         atlas = loadTexture( name )
-        
-        let path = Bundle.main.path(forResource: name, ofType: "json")!
-        let data = NSData(contentsOfFile: path)! as Data
+
+        guard let path = Bundle.main.path(forResource: name, ofType: "json"),
+              let data = NSData(contentsOfFile: path) as Data? else {
+            print("Error: Could not load JSON of \(name)")
+            return
+        }
         
         guard let font = try? JSONDecoder().decode(BMFont.self, from: data) else {
             print("Error: Could not decode JSON of \(name)")
@@ -99,8 +102,11 @@ class Font
     
     func loadTexture(_ name: String, mipmaps: Bool = false, sRGB: Bool = false ) -> MTLTexture?
     {
-        let path = Bundle.main.path(forResource: name, ofType: "tiff")!
-        let data = NSData(contentsOfFile: path)! as Data
+        guard let path = Bundle.main.path(forResource: name, ofType: "tiff"),
+              let data = NSData(contentsOfFile: path) as Data? else {
+            print("Error: Could not load texture of \(name)")
+            return nil
+        }
         
         let options: [MTKTextureLoader.Option : Any] = [.generateMipmaps : mipmaps, .SRGB : sRGB]
         
@@ -109,14 +115,19 @@ class Font
     
     func getLineHeight(_ fontScale: Float) -> Float
     {
-        return (bmFont!.common.lineHeight * fontScale) / 2
+        guard let bmFont = bmFont else {
+            return 0
+        }
+        return (bmFont.common.lineHeight * fontScale) / 2
     }
     
     func getItemForChar(_ char: Character ) -> BMChar?
     {
-        let array = bmFont!.chars
+        guard let bmFont = bmFont else {
+            return nil
+        }
         
-        for item in array {
+        for item in bmFont.chars {
             if Character( item.char ) == char {
                 return item
             }
@@ -126,21 +137,15 @@ class Font
     
     @discardableResult func getTextRect(text: String, scale: Float = 1.0, rectToUse: MMRect? = nil) -> MMRect
     {
-        var rect : MMRect
-        if rectToUse == nil {
-            rect = MMRect()
-        } else {
-            rect = rectToUse!
-        }
+        let rect = rectToUse ?? MMRect()
         
         rect.width = 0
         rect.height = 0
         
         for c in text {
-            let bmChar = getItemForChar( c )
-            if bmChar != nil {
-                rect.width += bmChar!.xadvance * scale / 2;
-                rect.height = max( rect.height, (bmChar!.height /*- bmChar!.yoffset*/) * scale / 2)
+            if let bmChar = getItemForChar(c) {
+                rect.width += bmChar.xadvance * scale / 2;
+                rect.height = max( rect.height, (bmChar.height /*- bmChar.yoffset*/) * scale / 2)
             }
         }
         

@@ -1,0 +1,9 @@
+.DS_Store
+.build/
+.swiftpm/
+.xcode-derived/
+DerivedData/
+*.xcuserstate
+docs/.docusaurus/
+docs/build/
+docs/node_modules/

@@ -266,50 +266,70 @@ func start() {
                                                                   sourcePixelBufferAttributes: sourcePixelBufferAttributesDictionary)
     }
 
-    func createAssetWriter(outputURL: URL) -> AVAssetWriter {
+    func createAssetWriter(outputURL: URL) -> AVAssetWriter? {
         guard let assetWriter = try? AVAssetWriter(outputURL: outputURL, fileType: AVFileType.mp4) else {
-            fatalError("AVAssetWriter() failed")
+            print("AVAssetWriter() failed")
+            return nil
         }
 
         guard assetWriter.canApply(outputSettings: avOutputSettings, forMediaType: AVMediaType.video) else {
-            fatalError("canApplyOutputSettings() failed")
+            print("canApplyOutputSettings() failed")
+            return nil
         }
 
         return assetWriter
     }
 
-    videoWriter = createAssetWriter(outputURL: renderSettings.outputURL)
+    guard let outputURL = renderSettings.outputURL else {
+        print("VideoWriter.start() failed: missing output URL")
+        return
+    }
+
+    guard let assetWriter = createAssetWriter(outputURL: outputURL) else {
+        return
+    }
+
+    videoWriter = assetWriter
     videoWriterInput = AVAssetWriterInput(mediaType: AVMediaType.video, outputSettings: avOutputSettings)
 
     if videoWriter.canAdd(videoWriterInput) {
         videoWriter.add(videoWriterInput)
     }
     else {
-        fatalError("canAddInput() returned false")
+        print("canAddInput() returned false")
+        return
     }
 
     // The pixel buffer adaptor must be created before we start writing.
     createPixelBufferAdaptor()
 
     if videoWriter.startWriting() == false {
-        fatalError("startWriting() failed")
+        print("startWriting() failed")
+        return
     }
 
     videoWriter.startSession(atSourceTime: CMTime.zero)
 
-    precondition(pixelBufferAdaptor.pixelBufferPool != nil, "nil pixelBufferPool")
+    if pixelBufferAdaptor.pixelBufferPool == nil {
+        print("VideoWriter.start() failed: nil pixelBufferPool")
+    }
 }
 
 func render(appendPixelBuffers: ((VideoWriter)->Bool)?, completion: (()->Void)?) {
 
-    precondition(videoWriter != nil, "Call start() to initialze the writer")
+    guard let videoWriter = videoWriter, let videoWriterInput = videoWriterInput else {
+        DispatchQueue.main.async {
+            completion?()
+        }
+        return
+    }
 
     let queue = DispatchQueue(label: "mediaInputQueue")
     videoWriterInput.requestMediaDataWhenReady(on: queue) {
         let isFinished = appendPixelBuffers?(self) ?? false
         if isFinished {
-            self.videoWriterInput.markAsFinished()
-            self.videoWriter.finishWriting() {
+            videoWriterInput.markAsFinished()
+            videoWriter.finishWriting() {
                 DispatchQueue.main.async {
                     completion?()
                 }
@@ -323,23 +343,30 @@ func render(appendPixelBuffers: ((VideoWriter)->Bool)?, completion: (()->Void)?)
 
 func addImage(image: CGImage, withPresentationTime presentationTime: CMTime) -> Bool {
 
-    precondition(pixelBufferAdaptor != nil, "Call start() to initialze the writer")
+    guard let pixelBufferAdaptor = pixelBufferAdaptor else {
+        return false
+    }
 
     //let pixelBuffer = VideoWriter.pixelBufferFromImage(image: image, pixelBufferPool: pixelBufferAdaptor.pixelBufferPool!, size: renderSettings.size)
     
     //let pixelBuffer = pixelBufferFromCGImage(image: image)
 
     #if os(OSX)
-    let pixelBuffer = pixelBufferFromCGImage(image: image)
+    guard let pixelBuffer = pixelBufferFromCGImage(image: image) else {
+        return false
+    }
     #else
     let image = UIImage(cgImage: image)
-    let pixelBuffer = VideoWriter.pixelBufferFromImage(image: image, pixelBufferPool: pixelBufferAdaptor.pixelBufferPool!, size: renderSettings.size)
+    guard let pixelBufferPool = pixelBufferAdaptor.pixelBufferPool,
+          let pixelBuffer = VideoWriter.pixelBufferFromImage(image: image, pixelBufferPool: pixelBufferPool, size: renderSettings.size) else {
+        return false
+    }
     #endif
     
     return pixelBufferAdaptor.append(pixelBuffer, withPresentationTime: presentationTime)
 }
 
-func pixelBufferFromCGImage(image: CGImage) -> CVPixelBuffer {
+func pixelBufferFromCGImage(image: CGImage) -> CVPixelBuffer? {
     var pxbuffer: CVPixelBuffer? = nil
     let options: NSDictionary = [:]
 
@@ -347,34 +374,40 @@ func pixelBufferFromCGImage(image: CGImage) -> CVPixelBuffer {
     let height = image.height
     let bytesPerRow = image.bytesPerRow
 
-    let dataFromImageDataProvider = CFDataCreateMutableCopy(kCFAllocatorDefault, 0, image.dataProvider!.data)
-    let x = CFDataGetMutableBytePtr(dataFromImageDataProvider)
+    guard let imageData = image.dataProvider?.data,
+          let dataFromImageDataProvider = CFDataCreateMutableCopy(kCFAllocatorDefault, 0, imageData),
+          let bytes = CFDataGetMutableBytePtr(dataFromImageDataProvider) else {
+        return nil
+    }
 
     CVPixelBufferCreateWithBytes(
         kCFAllocatorDefault,
         width,
         height,
         kCVPixelFormatType_32BGRA,
-        x!,
+        bytes,
         bytesPerRow,
         nil,
         nil,
         options,
         &pxbuffer
     )
-    return pxbuffer!;
+    return pxbuffer
 }
 
 #if os(iOS)
-class func pixelBufferFromImage(image: UIImage, pixelBufferPool: CVPixelBufferPool, size: CGSize) -> CVPixelBuffer {
+class func pixelBufferFromImage(image: UIImage, pixelBufferPool: CVPixelBufferPool, size: CGSize) -> CVPixelBuffer? {
     var pixelBufferOut: CVPixelBuffer?
 
     let status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferPool, &pixelBufferOut)
     if status != kCVReturnSuccess {
-      fatalError("CVPixelBufferPoolCreatePixelBuffer() failed")
+        print("CVPixelBufferPoolCreatePixelBuffer() failed")
+        return nil
     }
 
-    let pixelBuffer = pixelBufferOut!
+    guard let pixelBuffer = pixelBufferOut else {
+        return nil
+    }
 
     CVPixelBufferLockBaseAddress(pixelBuffer, CVPixelBufferLockFlags(rawValue: 0))
 
@@ -383,7 +416,12 @@ class func pixelBufferFromImage(image: UIImage, pixelBufferPool: CVPixelBufferPo
     let context = CGContext(data: data, width: Int(size.width), height: Int(size.height),
                           bitsPerComponent: 8, bytesPerRow: CVPixelBufferGetBytesPerRow(pixelBuffer), space: rgbColorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue)
 
-    context!.clear(CGRect(x:0,y: 0,width: size.width,height: size.height))
+    guard let context = context else {
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, CVPixelBufferLockFlags(rawValue: 0))
+        return nil
+    }
+
+    context.clear(CGRect(x:0,y: 0,width: size.width,height: size.height))
 
     let horizontalRatio = size.width / image.size.width
     let verticalRatio = size.height / image.size.height
@@ -395,7 +433,9 @@ class func pixelBufferFromImage(image: UIImage, pixelBufferPool: CVPixelBufferPo
     let x = newSize.width < size.width ? (size.width - newSize.width) / 2 : 0
     let y = newSize.height < size.height ? (size.height - newSize.height) / 2 : 0
 
-    context?.draw(image.cgImage!, in: CGRect(x:x,y: y, width: newSize.width, height: newSize.height))
+    if let cgImage = image.cgImage {
+        context.draw(cgImage, in: CGRect(x:x,y: y, width: newSize.width, height: newSize.height))
+    }
     CVPixelBufferUnlockBaseAddress(pixelBuffer, CVPixelBufferLockFlags(rawValue: 0))
 
     return pixelBuffer

@@ -73,8 +73,11 @@ class AssetFolder       : Codable
     {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         assets = try container.decode([Asset].self, forKey: .assets)
-        if let id = try container.decodeIfPresent(UUID?.self, forKey: .currentId) {
-            select(id!)
+        if let id = try container.decodeIfPresent(UUID.self, forKey: .currentId) {
+            select(id)
+        } else {
+            current = assets.first
+            currentId = current?.id
         }
         if let libraryName = try container.decodeIfPresent(String.self, forKey: .libraryName) {
             self.libraryName = libraryName
@@ -118,8 +121,8 @@ class AssetFolder       : Codable
     {
         let asset: Asset
             
-        if existingAsset != nil {
-            asset = existingAsset!
+        if let existingAsset = existingAsset {
+            asset = existingAsset
         } else {
             asset = Asset(type: .Image, name: name)
             assets.append(asset)
@@ -160,8 +163,8 @@ class AssetFolder       : Codable
     {
         let asset: Asset
             
-        if existingAsset != nil {
-            asset = existingAsset!
+        if let existingAsset = existingAsset {
+            asset = existingAsset
         } else {
             asset = Asset(type: .Audio, name: name)
             assets.append(asset)
@@ -185,7 +188,7 @@ class AssetFolder       : Codable
                 
                 current = asset
 
-                if core != nil {
+                if let core = core {
                     if asset.scriptName.isEmpty {
                         core.scriptEditor?.createSession(asset)
                     }
@@ -233,8 +236,11 @@ class AssetFolder       : Codable
             if index >= 0 && index < asset.data.count {
                 let data = asset.data[index]
                 
-                let options: [MTKTextureLoader.Option : Any] = [.generateMipmaps : false, .SRGB : false]                
-                return try? core.textureLoader.newTexture(data: data, options: options)
+                let options: [MTKTextureLoader.Option : Any] = [.generateMipmaps : false, .SRGB : false]
+                guard let textureLoader = core?.textureLoader else {
+                    return nil
+                }
+                return try? textureLoader.newTexture(data: data, options: options)
             }
         }
         return nil
@@ -357,14 +363,14 @@ class Asset         : Codable, Equatable
         if let slots = try container.decodeIfPresent([Int:UUID].self, forKey: .slots) {
             self.slots = slots
         }
-        if let output = try container.decodeIfPresent(UUID?.self, forKey: .output) {
+        if let output = try container.decodeIfPresent(UUID.self, forKey: .output) {
             self.output = output
         }
         // Convert old projects
         if type == .Buffer || type == .Common {
             type = .Shader
         }
-        data = try container.decode([Data].self, forKey: .data)
+        data = try container.decodeIfPresent([Data].self, forKey: .data) ?? []
         if let nodeData = try container.decodeIfPresent(float4.self, forKey: .nodeData) {
             self.nodeData = nodeData
         }
@@ -393,14 +399,14 @@ class Asset         : Codable, Equatable
     
     deinit
     {
-        if texture != nil {
-            texture!.setPurgeableState(.empty)
-            texture = nil
+        if let texture = texture {
+            texture.setPurgeableState(.empty)
+            self.texture = nil
         }
         
-        if previewTexture != nil {
-            previewTexture!.setPurgeableState(.empty)
-            previewTexture = nil
+        if let previewTexture = previewTexture {
+            previewTexture.setPurgeableState(.empty)
+            self.previewTexture = nil
         }
     }
     

@@ -50,8 +50,14 @@ struct ShaderManiaDocument: FileDocument {
             core.assetFolder.core = core
             
             // Make sure there is a selected asset
-            if core.assetFolder.assets.count > 0 {
-                core.assetFolder.current = core.assetFolder.assets[0]
+            if core.assetFolder.current == nil {
+                if let currentId = core.assetFolder.currentId,
+                   let current = core.assetFolder.getAssetById(currentId) {
+                    core.assetFolder.current = current
+                } else if let firstAsset = core.assetFolder.assets.first {
+                    core.assetFolder.current = firstAsset
+                    core.assetFolder.currentId = firstAsset.id
+                }
             }
         }
     }

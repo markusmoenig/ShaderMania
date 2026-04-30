@@ -11,7 +11,7 @@ import AVFoundation
 
 public class Core       : ObservableObject
 {
-    enum State {
+    enum State: Equatable {
         case Idle, Running, Paused
     }
     
@@ -218,21 +218,25 @@ public class Core       : ObservableObject
     
     @discardableResult func checkTexture() -> Bool
     {
-        if texture == nil || texture!.texture.width != Int(view.frame.width) || texture!.texture.height != Int(view.frame.height) {
+        if texture == nil || texture?.texture?.width != Int(view.frame.width) || texture?.texture?.height != Int(view.frame.height) {
             
             if texture == nil {
                 texture = Texture2D(self)
             } else {
                 texture?.allocateTexture(width: Int(view.frame.width), height: Int(view.frame.height))
             }
+
+            guard let texture = texture, let metalTexture = texture.texture else {
+                return false
+            }
             
-            viewportSize.x = UInt32(texture!.width)
-            viewportSize.y = UInt32(texture!.height)
+            viewportSize.x = UInt32(texture.width)
+            viewportSize.y = UInt32(texture.height)
             
-            screenWidth = Float(texture!.width)
-            screenHeight = Float(texture!.height)
+            screenWidth = Float(texture.width)
+            screenHeight = Float(texture.height)
             
-            coreScissorRect = MTLScissorRect(x: 0, y: 0, width: texture!.texture.width, height: texture!.texture.height)
+            coreScissorRect = MTLScissorRect(x: 0, y: 0, width: metalTexture.width, height: metalTexture.height)
                         
             //if let map = currentMap?.map {
             //    map.setup(core: self)
@@ -257,12 +261,20 @@ public class Core       : ObservableObject
                         createPreview(asset, false)
                     }
             
-                    let renderPassDescriptor = view.currentRenderPassDescriptor
-                    renderPassDescriptor?.colorAttachments[0].loadAction = .load
-                    let renderEncoder = coreCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
-                    
-                    drawTexture(texture!.texture!, renderEncoder: renderEncoder!)
-                    renderEncoder?.endEncoding()
+                    guard let renderPassDescriptor = view.currentRenderPassDescriptor,
+                          let outputTexture = texture?.texture else {
+                        stopDrawing()
+                        return
+                    }
+
+                    renderPassDescriptor.colorAttachments[0].loadAction = .load
+                    guard let renderEncoder = coreCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else {
+                        stopDrawing()
+                        return
+                    }
+
+                    drawTexture(outputTexture, renderEncoder: renderEncoder)
+                    renderEncoder.endEncoding()
                     
                     coreCmdBuffer?.present(drawable)
                     stopDrawing()
@@ -282,20 +294,26 @@ public class Core       : ObservableObject
                 project?.stopDrawing()
                 startDrawing()
 
-                let renderPassDescriptor = view.currentRenderPassDescriptor
-                renderPassDescriptor?.colorAttachments[0].loadAction = .clear
-                renderPassDescriptor?.colorAttachments[0].clearColor = MTLClearColorMake(0,0,0,0)
+                guard let renderPassDescriptor = view.currentRenderPassDescriptor else {
+                    stopDrawing()
+                    return
+                }
 
-                let renderEncoder = coreCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
-                
-                drawTexture(texture, renderEncoder: renderEncoder!)
-                renderEncoder?.endEncoding()
+                renderPassDescriptor.colorAttachments[0].loadAction = .clear
+                renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0,0,0,0)
+                guard let renderEncoder = coreCmdBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else {
+                    stopDrawing()
+                    return
+                }
+
+                drawTexture(texture, renderEncoder: renderEncoder)
+                renderEncoder.endEncoding()
                 
                 coreCmdBuffer?.present(drawable)
 
                 stopDrawing()
 
-                if project!.resChanged {
+                if project?.resChanged == true {
                     if didSend == false {
                         didSend = true
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -317,7 +335,6 @@ public class Core       : ObservableObject
     {
         if let asset = nodesWidget.currentNode {
             if asset.type == .Shader {
-                project?.startDrawing(device)
                 project?.render(assetFolder: assetFolder, device: device, time: _Time.x, frame: _Frame, viewSize: SIMD2<Int>(80, 80), forAsset: asset, preview: true)
                 project?.stopDrawing()
             } else
@@ -357,6 +374,9 @@ public class Core       : ObservableObject
                 updateOnce()
             } else
             if asset.type == .Audio {
+                guard asset.data.isEmpty == false else {
+                    return
+                }
                 do {
                     let player = try AVAudioPlayer(data: asset.data[0])
                     localAudioPlayers[asset.name] = player
@@ -365,6 +385,9 @@ public class Core       : ObservableObject
                     print(error.localizedDescription)
                 }
             } else if asset.type == .Image {
+                guard asset.data.isEmpty == false else {
+                    return
+                }
                 if asset.dataIndex < asset.data.count {
                                     
                     if asset.texture == nil {
@@ -425,6 +448,9 @@ public class Core       : ObservableObject
                         }
                     }
                 } else {
+                    guard asset.data.isEmpty == false else {
+                        return
+                    }
                     let data = asset.data[0]
                     
                     let texOptions: [MTKTextureLoader.Option : Any] = [.generateMipmaps: false, .SRGB: false]

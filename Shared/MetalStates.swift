@@ -17,7 +17,7 @@ class MetalStates {
         case MakeCGIImage
     }
     
-    var defaultLibrary          : MTLLibrary!
+    var defaultLibrary          : MTLLibrary?
 
     let pipelineStateDescriptor : MTLRenderPipelineDescriptor
     
@@ -41,10 +41,8 @@ class MetalStates {
             defaultLibrary = core.device.makeDefaultLibrary()
         }
         
-        let vertexFunction = defaultLibrary!.makeFunction( name: "m4mQuadVertexShader" )
-
         pipelineStateDescriptor = MTLRenderPipelineDescriptor()
-        pipelineStateDescriptor.vertexFunction = vertexFunction
+        pipelineStateDescriptor.vertexFunction = defaultLibrary?.makeFunction( name: "m4mQuadVertexShader" )
         //        pipelineStateDescriptor.fragmentFunction = fragmentFunction
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormat.bgra8Unorm;
         
@@ -73,10 +71,15 @@ class MetalStates {
     {
         let function : MTLFunction?
             
-        if library != nil {
-            function = library!.makeFunction( name: name )
+        if let library = library {
+            function = library.makeFunction( name: name )
         } else {
-            function = defaultLibrary!.makeFunction( name: name )
+            function = defaultLibrary?.makeFunction( name: name )
+        }
+
+        guard let function = function, pipelineStateDescriptor.vertexFunction != nil else {
+            print("renderPipelineState failed: missing Metal function \(name)")
+            return nil
         }
         
         var renderPipelineState : MTLRenderPipelineState?
@@ -98,20 +101,21 @@ class MetalStates {
     {
         let function : MTLFunction?
             
-        if library != nil {
-            function = library!.makeFunction( name: name )
+        if let library = library {
+            function = library.makeFunction( name: name )
         } else {
-            function = defaultLibrary!.makeFunction( name: name )
+            function = defaultLibrary?.makeFunction( name: name )
         }
         
-        var computePipelineState : MTLComputePipelineState?
-        
-        if function == nil {
+        guard let function = function else {
+            print("computePipelineState failed: missing Metal function \(name)")
             return nil
         }
+
+        var computePipelineState : MTLComputePipelineState?
         
         do {
-            computePipelineState = try core.device.makeComputePipelineState( function: function! )
+            computePipelineState = try core.device.makeComputePipelineState( function: function )
         } catch {
             print( "computePipelineState failed" )
             return nil
@@ -125,8 +129,8 @@ class MetalStates {
         return states[state.rawValue]!
     }
     
-    func getComputeState(state: ComputeStates) -> MTLComputePipelineState
+    func getComputeState(state: ComputeStates) -> MTLComputePipelineState?
     {
-        return computeStates[state.rawValue]!
+        return computeStates[state.rawValue]
     }
 }

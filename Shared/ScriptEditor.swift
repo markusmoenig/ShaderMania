@@ -26,33 +26,49 @@ class ScriptEditor
     var core            : Core
     var sessions        : Int = 0
     var colorScheme     : ColorScheme
-    
+
     var helpText        : String = ""
-    
+
     init(_ view: WKWebView, _ core: Core,_ colorScheme: ColorScheme)
     {
         self.webView = view
         self.core = core
         self.colorScheme = colorScheme
-        
+
         if let asset = core.assetFolder.current {
             createSession(asset)
             setTheme(colorScheme)
         }
-        
+
         createHelpSession()
     }
-    
+
+    private func escapedTemplateLiteral(_ value: String) -> String {
+        value
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "`", with: "\\`")
+            .replacingOccurrences(of: "${", with: "\\${")
+    }
+
+    private func escapedJSONString(_ value: String) -> String {
+        if let data = try? JSONSerialization.data(withJSONObject: [value], options: []),
+           let json = String(data: data, encoding: .utf8),
+           json.count >= 2 {
+            return String(json.dropFirst().dropLast())
+        }
+        return "\"\""
+    }
+
     func createHelpSession()
     {
         guard let path = Bundle.main.path(forResource: "help", ofType: "cpp", inDirectory: "Files") else {
             return
         }
-        
+
         if let value = try? String(contentsOfFile: path, encoding: String.Encoding.utf8) {
             helpText = value
         }
-        
+
         webView.evaluateJavaScript(
             """
             var helpSession = ace.createEditSession(``)
@@ -60,18 +76,18 @@ class ScriptEditor
             """, completionHandler: { (value, error ) in
          })
     }
-    
+
     func activateHelpSession()
     {
         core.showingHelp = true
         webView.evaluateJavaScript(
             """
-            helpSession.setValue(`\(helpText)`)
+            helpSession.setValue(`\(escapedTemplateLiteral(helpText))`)
             editor.setSession(helpSession)
             """, completionHandler: { (value, error ) in
          })
     }
-    
+
     func setTheme(_ colorScheme: ColorScheme)
     {
         let theme: String
@@ -86,7 +102,7 @@ class ScriptEditor
             """, completionHandler: { (value, error ) in
          })
     }
-    
+
     /// Creates an editor session for the given asset
     func createSession(_ asset: Asset,_ cb: (()->())? = nil)
     {
@@ -98,7 +114,7 @@ class ScriptEditor
         if asset.type == .Shader || asset.type == .Common {
             webView.evaluateJavaScript(
                 """
-                var \(asset.scriptName) = ace.createEditSession(`\(asset.value)`)
+                var \(asset.scriptName) = ace.createEditSession(`\(escapedTemplateLiteral(asset.value))`)
                 editor.setSession(\(asset.scriptName))
                 editor.session.setMode("ace/mode/c_cpp");
                 """, completionHandler: { (value, error ) in
@@ -110,7 +126,7 @@ class ScriptEditor
         if asset.type == .Image || asset.type == .Audio || asset.type == .Texture {
             webView.evaluateJavaScript(
                 """
-                var \(asset.scriptName) = ace.createEditSession(`\(asset.value)`)
+                var \(asset.scriptName) = ace.createEditSession(`\(escapedTemplateLiteral(asset.value))`)
                 editor.setSession(\(asset.scriptName))
                 editor.session.setMode("ace/mode/text");
                 """, completionHandler: { (value, error ) in
@@ -120,7 +136,7 @@ class ScriptEditor
              })
         }
     }
-    
+
     func setReadOnly(_ readOnly: Bool = false)
     {
         webView.evaluateJavaScript(
@@ -129,7 +145,7 @@ class ScriptEditor
             """, completionHandler: { (value, error) in
          })
     }
-    
+
     func decreaseFontSize()
     {
         webView.evaluateJavaScript(
@@ -141,7 +157,7 @@ class ScriptEditor
             """, completionHandler: { (value, error) in
          })
     }
-    
+
     func increaseFontSize()
     {
         webView.evaluateJavaScript(
@@ -152,7 +168,7 @@ class ScriptEditor
             """, completionHandler: { (value, error) in
          })
     }
-    
+
     func setSilentMode(_ silent: Bool = false)
     {
         webView.evaluateJavaScript(
@@ -163,7 +179,7 @@ class ScriptEditor
             """, completionHandler: { (value, error) in
          })
     }
-    
+
     func getAssetValue(_ asset: Asset,_ cb: @escaping (String)->() )
     {
         webView.evaluateJavaScript(
@@ -175,16 +191,21 @@ class ScriptEditor
                 }
          })
     }
-    
+
     func setAssetValue(_ asset: Asset, value: String)
     {
         let cmd = """
-        \(asset.scriptName).setValue(`\(value)`)
+        var shaderManiaValue = `\(escapedTemplateLiteral(value))`;
+        if (\(asset.scriptName).getValue() !== shaderManiaValue) {
+            reportChanges = false;
+            \(asset.scriptName).setValue(shaderManiaValue);
+            reportChanges = true;
+        }
         """
         webView.evaluateJavaScript(cmd, completionHandler: { (value, error ) in
         })
     }
-    
+
     func setAssetSession(_ asset: Asset)
     {
         core.showingHelp = false
@@ -196,7 +217,7 @@ class ScriptEditor
             webView.evaluateJavaScript(cmd, completionHandler: { (value, error ) in
             })
         }
-        
+
         if asset.scriptName.isEmpty == true {
             createSession(asset, { () in
                 setSession()
@@ -206,47 +227,55 @@ class ScriptEditor
         }
 
     }
-    
+
     func setError(_ error: CompileError, scrollToError: Bool = false)
     {
+        guard let line = error.line, let column = error.column else {
+            clearAnnotations()
+            return
+        }
+
         webView.evaluateJavaScript(
             """
             editor.getSession().setAnnotations([{
-            row: \(error.line!-1),
-            column: \(error.column!),
-            text: "\(error.error!)",
+            row: \(line - 1),
+            column: \(column),
+            text: \(escapedJSONString(error.error ?? "")),
             type: "error" // also warning and information
             }]);
 
-            \(scrollToError == true ? "editor.scrollToLine(\(error.line!-1), true, true, function () {});" : "")
+            \(scrollToError == true ? "editor.scrollToLine(\(line - 1), true, true, function () {});" : "")
 
             """, completionHandler: { (value, error ) in
          })
     }
-    
+
     func setErrors(_ errors: [CompileError])
     {
         var str = "["
         for error in errors {
+            guard let line = error.line, let column = error.column else {
+                continue
+            }
             str +=
             """
             {
-                row: \(error.line!),
-                column: \(error.column!),
-                text: \"\(error.error!)\",
+                row: \(line - 1),
+                column: \(column),
+                text: \(escapedJSONString(error.error ?? "")),
                 type: \"\(error.type)\"
             },
             """
         }
         str += "]"
-        
+
         webView.evaluateJavaScript(
             """
             editor.getSession().setAnnotations(\(str));
             """, completionHandler: { (value, error ) in
          })
     }
-    
+
     func setFailures(_ lines: [Int32])
     {
         var str = "["
@@ -262,14 +291,14 @@ class ScriptEditor
             """
         }
         str += "]"
-        
+
         webView.evaluateJavaScript(
             """
             editor.getSession().setAnnotations(\(str));
             """, completionHandler: { (value, error ) in
          })
     }
-    
+
     func getSessionCursor(_ cb: @escaping (Int32)->() )
     {
         webView.evaluateJavaScript(
@@ -281,7 +310,7 @@ class ScriptEditor
                 }
          })
     }
-    
+
     func getChangeDelta(_ cb: @escaping (Int32, Int32)->() )
     {
         webView.evaluateJavaScript(
@@ -306,7 +335,7 @@ class ScriptEditor
                 }
          })
     }
-    
+
     func clearAnnotations()
     {
         webView.evaluateJavaScript(
@@ -315,10 +344,13 @@ class ScriptEditor
             """, completionHandler: { (value, error ) in
          })
     }
-    
+
     func updated()
     {
         if let asset = core.nodesWidget.currentNode {
+            guard asset.type == .Shader || asset.type == .Common else {
+                return
+            }
             getAssetValue(asset, { (value) in
                 self.core.nodesWidget.nodeChanged(value)
             })
@@ -328,9 +360,29 @@ class ScriptEditor
 
 class WebViewModel: ObservableObject {
     @Published var didFinishLoading: Bool = false
-    
+
     init () {
     }
+}
+
+private func configureEditorWebView(_ webView: WKWebView) {
+    webView.allowsBackForwardNavigationGestures = false
+
+    #if os(macOS)
+    webView.wantsLayer = true
+    webView.layer?.backgroundColor = NSColor.clear.cgColor
+    webView.setValue(false, forKey: "drawsBackground")
+    if #available(macOS 12.0, *) {
+        webView.underPageBackgroundColor = .clear
+    }
+    #else
+    webView.isOpaque = false
+    webView.backgroundColor = .clear
+    webView.scrollView.backgroundColor = .clear
+    if #available(iOS 15.0, *) {
+        webView.underPageBackgroundColor = .clear
+    }
+    #endif
 }
 
 #if os(OSX)
@@ -341,17 +393,16 @@ struct SwiftUIWebView: NSViewRepresentable {
 
     private let webView: WKWebView = WKWebView()
     public func makeNSView(context: NSViewRepresentableContext<SwiftUIWebView>) -> WKWebView {
+        configureEditorWebView(webView)
         webView.navigationDelegate = context.coordinator
         webView.uiDelegate = context.coordinator as? WKUIDelegate
         webView.configuration.userContentController.add(context.coordinator, name: "jsHandler")
-        
+
         if let url = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "Files") {
             webView.isHidden = true
             webView.loadFileURL(url, allowingReadAccessTo: url)
-            let request = URLRequest(url: url)
-            webView.load(request)
         }
-        
+
         return webView
     }
 
@@ -360,9 +411,9 @@ struct SwiftUIWebView: NSViewRepresentable {
     public func makeCoordinator() -> Coordinator {
         return Coordinator(core, colorScheme)
     }
-    
+
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
-        
+
         private var core        : Core
         private var colorScheme : ColorScheme
 
@@ -370,15 +421,24 @@ struct SwiftUIWebView: NSViewRepresentable {
             self.core = core
             self.colorScheme = colorScheme
         }
-        
+
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if message.name == "jsHandler" {
+                if let command = message.body as? String {
+                    if command == "editorFocus" {
+                        core.nodesWidget?.receivesKeyboardCommands = false
+                        return
+                    } else if command == "editorBlur" {
+                        return
+                    }
+                }
+
                 if let scriptEditor = core.scriptEditor {
                     scriptEditor.updated()
                 }
             }
         }
-        
+
         public func webView(_: WKWebView, didFail: WKNavigation!, withError: Error) { }
 
         public func webView(_: WKWebView, didFailProvisionalNavigation: WKNavigation!, withError: Error) { }
@@ -401,20 +461,19 @@ struct SwiftUIWebView: UIViewRepresentable {
     public typealias UIViewType = WKWebView
     var core        : Core!
     var colorScheme : ColorScheme
-    
+
     private let webView: WKWebView = WKWebView()
     public func makeUIView(context: UIViewRepresentableContext<SwiftUIWebView>) -> WKWebView {
+        configureEditorWebView(webView)
         webView.navigationDelegate = context.coordinator
         webView.uiDelegate = context.coordinator as? WKUIDelegate
         webView.configuration.userContentController.add(context.coordinator, name: "jsHandler")
-        
+
         if let url = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "Files") {
-            
+
             webView.loadFileURL(url, allowingReadAccessTo: url)
-            let request = URLRequest(url: url)
-            webView.load(request)
         }
-        
+
         return webView
     }
 
@@ -423,25 +482,34 @@ struct SwiftUIWebView: UIViewRepresentable {
     public func makeCoordinator() -> Coordinator {
         return Coordinator(core, colorScheme)
     }
-    
+
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
-        
+
         private var core        : Core
         private var colorScheme : ColorScheme
-        
+
         init(_ core: Core,_ colorScheme: ColorScheme) {
             self.core = core
             self.colorScheme = colorScheme
         }
-        
+
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if message.name == "jsHandler" {
+                if let command = message.body as? String {
+                    if command == "editorFocus" {
+                        core.nodesWidget?.receivesKeyboardCommands = false
+                        return
+                    } else if command == "editorBlur" {
+                        return
+                    }
+                }
+
                 if let scriptEditor = core.scriptEditor {
                     scriptEditor.updated()
                 }
             }
         }
-        
+
         public func webView(_: WKWebView, didFail: WKNavigation!, withError: Error) { }
 
         public func webView(_: WKWebView, didFailProvisionalNavigation: WKNavigation!, withError: Error) { }
@@ -470,7 +538,7 @@ struct WebView  : View {
         self.core = core
         self.colorScheme = colorScheme
     }
-    
+
     var body: some View {
         SwiftUIWebView(core: core, colorScheme: colorScheme)
     }
@@ -482,23 +550,23 @@ class ScriptEditor
 {
     var mapHelpText     : String = "## Available:\n\n"
     var behaviorHelpText: String = "## Available:\n\n"
-    
+
     func createSession(_ asset: Asset,_ cb: (()->())? = nil) {}
-    
+
     func setAssetValue(_ asset: Asset, value: String) {}
     func setAssetSession(_ asset: Asset) {}
-    
+
     func setError(_ error: CompileError, scrollToError: Bool = false) {}
     func setErrors(_ errors: [CompileError]) {}
     func clearAnnotations() {}
-    
+
     func getSessionCursor(_ cb: @escaping (Int32)->() ) {}
-    
+
     func setReadOnly(_ readOnly: Bool = false) {}
     func setDebugText(text: String) {}
-    
+
     func setFailures(_ lines: [Int32]) {}
-    
+
     func getBehaviorHelpForKey(_ key: String) -> String? { return nil }
     func getMapHelpForKey(_ key: String) -> String? { return nil }
 }

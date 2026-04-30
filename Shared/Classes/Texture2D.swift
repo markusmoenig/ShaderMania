@@ -55,9 +55,9 @@ class Texture2D                 : NSObject
 
     func allocateTexture(width: Int, height: Int)
     {
-        if texture != nil {
-            texture!.setPurgeableState(.empty)
-            texture = nil
+        if let texture = texture {
+            texture.setPurgeableState(.empty)
+            self.texture = nil
         }
             
         let textureDescriptor = MTLTextureDescriptor()
@@ -69,9 +69,25 @@ class Texture2D                 : NSObject
         self.width = Float(width)
         self.height = Float(height)
         
-        textureDescriptor.usage = MTLTextureUsage.unknown
+        textureDescriptor.usage = [.renderTarget, .shaderRead, .shaderWrite]
         
         texture = core.device.makeTexture(descriptor: textureDescriptor)
+    }
+
+    private func makeRenderEncoder(loadAction: MTLLoadAction = .load, clearColor: MTLClearColor? = nil) -> MTLRenderCommandEncoder?
+    {
+        guard let texture = texture, let commandBuffer = core.coreCmdBuffer else {
+            return nil
+        }
+
+        let renderPassDescriptor = MTLRenderPassDescriptor()
+        renderPassDescriptor.colorAttachments[0].texture = texture
+        renderPassDescriptor.colorAttachments[0].loadAction = loadAction
+        renderPassDescriptor.colorAttachments[0].storeAction = .store
+        if let clearColor = clearColor {
+            renderPassDescriptor.colorAttachments[0].clearColor = clearColor
+        }
+        return commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
     }
     
     /*
@@ -125,12 +141,12 @@ class Texture2D                 : NSObject
     {
         let color : SIMD4<Float>; if let v = clearColor { color = v.toSIMD() } else { color = SIMD4<Float>(0,0,0,1) }
 
-        let renderPassDescriptor = MTLRenderPassDescriptor()
-
-        renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(Double(color.x), Double(color.y), Double(color.z), Double(color.w))
-        renderPassDescriptor.colorAttachments[0].texture = texture
-        renderPassDescriptor.colorAttachments[0].loadAction = .clear
-        let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+        guard let renderEncoder = makeRenderEncoder(
+            loadAction: .clear,
+            clearColor: MTLClearColorMake(Double(color.x), Double(color.y), Double(color.z), Double(color.w))
+        ) else {
+            return
+        }
         renderEncoder.endEncoding()
     }
     
@@ -158,11 +174,9 @@ class Texture2D                 : NSObject
         data.fillColor = fillColor
         data.borderColor = borderColor
         
-        let renderPassDescriptor = MTLRenderPassDescriptor()
-        renderPassDescriptor.colorAttachments[0].texture = texture
-        renderPassDescriptor.colorAttachments[0].loadAction = .load
-        
-        let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+        guard let renderEncoder = makeRenderEncoder() else {
+            return
+        }
 
         data.pos.x = x
         data.pos.y = y
@@ -205,11 +219,9 @@ class Texture2D                 : NSObject
         let rect = MMRect(position.x - data.borderSize / 2, position.y - data.borderSize / 2, data.radius * 2 + data.borderSize * 2, data.radius * 2 + data.borderSize * 2, scale: core.scaleFactor )
         let vertexData = core.createVertexData(texture: self, rect: rect)
         
-        let renderPassDescriptor = MTLRenderPassDescriptor()
-        renderPassDescriptor.colorAttachments[0].texture = texture
-        renderPassDescriptor.colorAttachments[0].loadAction = .load
-        
-        let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+        guard let renderEncoder = makeRenderEncoder() else {
+            return
+        }
                 
         renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
         renderEncoder.setVertexBytes(&core.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
@@ -243,11 +255,9 @@ class Texture2D                 : NSObject
         data.fillColor = fillColor
         data.borderColor = borderColor
         
-        let renderPassDescriptor = MTLRenderPassDescriptor()
-        renderPassDescriptor.colorAttachments[0].texture = texture
-        renderPassDescriptor.colorAttachments[0].loadAction = .load
-        
-        let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+        guard let renderEncoder = makeRenderEncoder() else {
+            return
+        }
 
         if rotation == 0 {
             let rect = MMRect(position.x, position.y, data.size.x, data.size.y, scale: core.scaleFactor)
@@ -313,18 +323,16 @@ class Texture2D                 : NSObject
             let rect = MMRect( position.x, position.y, width, height, scale: core.scaleFactor )
             let vertexData = core.createVertexData(texture: self, rect: rect)
             
-            let renderPassDescriptor = MTLRenderPassDescriptor()
-            renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0, 0, 0, 1)
-            renderPassDescriptor.colorAttachments[0].texture = texture
-            renderPassDescriptor.colorAttachments[0].loadAction = .clear
-            
-            let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+            guard let sourceMetalTexture = sourceTexture.texture,
+                  let renderEncoder = makeRenderEncoder(loadAction: .clear, clearColor: MTLClearColorMake(0, 0, 0, 1)) else {
+                return
+            }
 
             renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
             renderEncoder.setVertexBytes(&core.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
             
             renderEncoder.setFragmentBytes(&data, length: MemoryLayout<TextureUniform>.stride, index: 0)
-            renderEncoder.setFragmentTexture(sourceTexture.texture, index: 1)
+            renderEncoder.setFragmentTexture(sourceMetalTexture, index: 1)
 
             renderEncoder.setRenderPipelineState(core.metalStates.getState(state: .DrawTexture))
             renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
@@ -336,11 +344,9 @@ class Texture2D                 : NSObject
     {
         let vertexData = core.createVertexData(texture: self, rect: rect)
         
-        let renderPassDescriptor = MTLRenderPassDescriptor()
-        renderPassDescriptor.colorAttachments[0].texture = texture
-        renderPassDescriptor.colorAttachments[0].loadAction = .load
-        
-        let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+        guard let renderEncoder = makeRenderEncoder() else {
+            return
+        }
 
         renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
         renderEncoder.setVertexBytes(&core.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
@@ -381,6 +387,10 @@ class Texture2D                 : NSObject
         let font : Font?; if let v = options["font"] as? Font { font = v } else { font = nil }
         let color : SIMD4<Float>; if let v = options["color"] as? Float4 { color = v.toSIMD() } else { color = SIMD4<Float>(1,1,1,1) }
 
+        guard let font = font, let atlas = font.atlas, let bmFont = font.bmFont else {
+            return
+        }
+
         position.y = -position.y;
         let scaleFactor : Float = core.scaleFactor
         
@@ -388,8 +398,8 @@ class Texture2D                 : NSObject
         {
             var data = TextUniform()
             
-            data.atlasSize.x = Float(font!.atlas!.width) * scaleFactor
-            data.atlasSize.y = Float(font!.atlas!.height) * scaleFactor
+            data.atlasSize.x = Float(atlas.width) * scaleFactor
+            data.atlasSize.y = Float(atlas.height) * scaleFactor
             data.fontPos.x = char.x * scaleFactor
             data.fontPos.y = char.y * scaleFactor
             data.fontSize.x = char.width * scaleFactor
@@ -399,37 +409,31 @@ class Texture2D                 : NSObject
             let rect = MMRect(x, y, char.width * adjScale, char.height * adjScale, scale: scaleFactor)
             let vertexData = core.createVertexData(texture: self, rect: rect)
             
-            let renderPassDescriptor = MTLRenderPassDescriptor()
-            renderPassDescriptor.colorAttachments[0].texture = texture
-            renderPassDescriptor.colorAttachments[0].loadAction = .load
-            
-            let renderEncoder = core.coreCmdBuffer!.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+            guard let renderEncoder = makeRenderEncoder() else {
+                return
+            }
 
             renderEncoder.setVertexBytes(vertexData, length: vertexData.count * MemoryLayout<Float>.stride, index: 0)
             renderEncoder.setVertexBytes(&core.viewportSize, length: MemoryLayout<vector_uint2>.stride, index: 1)
 
             renderEncoder.setFragmentBytes(&data, length: MemoryLayout<TextUniform>.stride, index: 0)
-            renderEncoder.setFragmentTexture(font!.atlas, index: 1)
+            renderEncoder.setFragmentTexture(atlas, index: 1)
 
             renderEncoder.setRenderPipelineState(core.metalStates.getState(state: .DrawTextChar))
             renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
             renderEncoder.endEncoding()
         }
-        
-        if let font = font {
-         
-            let scale : Float = (1.0 / font.bmFont!.common.lineHeight) * size
-            let adjScale : Float = scale// / 2
-            
-            var posX = position.x / core.scaleFactor
-            let posY = position.y / core.scaleFactor
 
-            for c in text {
-                let bmChar = font.getItemForChar( c )
-                if bmChar != nil {
-                    drawChar(char: bmChar!, x: posX + bmChar!.xoffset * adjScale, y: posY + bmChar!.yoffset * adjScale, adjScale: adjScale)
-                    posX += bmChar!.xadvance * adjScale;
-                }
+        let scale : Float = (1.0 / bmFont.common.lineHeight) * size
+        let adjScale : Float = scale// / 2
+        
+        var posX = position.x / core.scaleFactor
+        let posY = position.y / core.scaleFactor
+
+        for c in text {
+            if let bmChar = font.getItemForChar( c ) {
+                drawChar(char: bmChar, x: posX + bmChar.xoffset * adjScale, y: posY + bmChar.yoffset * adjScale, adjScale: adjScale)
+                posX += bmChar.xadvance * adjScale;
             }
         }
     }

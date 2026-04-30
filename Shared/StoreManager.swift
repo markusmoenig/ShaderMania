@@ -8,6 +8,70 @@
 import Foundation
 import StoreKit
 
+#if os(macOS)
+
+@MainActor
+class StoreManager: ObservableObject {
+
+    enum PurchaseState {
+        case purchasing
+        case purchased
+        case failed
+    }
+
+    let productIDs = [
+        "com.moenig.ShaderMania.IAP.Tip2",
+        "com.moenig.ShaderMania.IAP.Tip5",
+        "com.moenig.ShaderMania.IAP.Tip10"
+    ]
+
+    @Published var myProducts       = [Product]()
+    @Published var transactionState : PurchaseState?
+
+    func getProducts() {
+        Task {
+            do {
+                myProducts = try await Product.products(for: productIDs)
+            } catch {
+                print("Product request failed: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func purchaseId(_ id: String)
+    {
+        guard let product = myProducts.first(where: { $0.id == id }) else {
+            return
+        }
+
+        Task {
+            transactionState = .purchasing
+            do {
+                let result = try await product.purchase()
+                switch result {
+                case .success(let verification):
+                    if case .verified(let transaction) = verification {
+                        UserDefaults.standard.setValue(true, forKey: product.id)
+                        await transaction.finish()
+                        transactionState = .purchased
+                    } else {
+                        transactionState = .failed
+                    }
+                case .userCancelled, .pending:
+                    transactionState = nil
+                @unknown default:
+                    transactionState = .failed
+                }
+            } catch {
+                print("Payment Error: \(error.localizedDescription)")
+                transactionState = .failed
+            }
+        }
+    }
+}
+
+#else
+
 class StoreManager: NSObject, ObservableObject, SKProductsRequestDelegate, SKPaymentTransactionObserver {
     
     let productIDs = [
@@ -86,3 +150,5 @@ class StoreManager: NSObject, ObservableObject, SKProductsRequestDelegate, SKPay
         }
     }
 }
+
+#endif
