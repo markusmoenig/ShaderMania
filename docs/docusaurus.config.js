@@ -67,11 +67,6 @@ const config = {
           position: 'left'
         },
         {
-          href: 'https://apps.apple.com/us/app/shadermania/id1541065830',
-          label: 'App Store',
-          position: 'right'
-        },
-        {
           type: 'html',
           position: 'right',
           value: `
@@ -88,11 +83,6 @@ const config = {
               <img src="https://img.shields.io/github/stars/markusmoenig/ShaderMania?style=flat&color=458588&logo=github" alt="GitHub stars"/>
             </a>
           `
-        },
-        {
-          href: 'https://github.com/markusmoenig/ShaderMania',
-          label: 'GitHub',
-          position: 'right'
         }
       ]
     },
@@ -133,12 +123,12 @@ const config = {
           title: 'Links',
           items: [
             {
-              label: 'Shader Format',
-              to: '/docs/getting-started'
+              label: 'ShaderMania Pro',
+              to: '/docs/shadermania-pro/overview'
             },
             {
-              label: 'App Store',
-              to: 'https://apps.apple.com/us/app/shadermania/id1541065830'
+              label: 'ShaderMania Shader Format',
+              to: '/docs/shadermania/shader-format'
             },
             {
               label: 'GitHub',

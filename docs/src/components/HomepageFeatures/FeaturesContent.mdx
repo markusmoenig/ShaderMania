@@ -1,27 +1,66 @@
 import styles from './styles.module.css';
 
+# ShaderMania Pro
+
+<section className={styles.productSectionStack}>
+  <img
+    src="/img/screenshots/shadermania-pro.png"
+    alt="ShaderMania Pro timeline, editor, and path traced preview"
+    className={styles.productScreenshot}
+  />
+  <div className={styles.productText}>
+    <h2>Path-traced procedural scene building</h2>
+    <p>
+      ShaderMania Pro turns Metal shader coding into a full timeline-based scene workflow.
+      Build path-traced procedural scenes from SDF objects, analytical objects, full
+      OpenPBR materials, lights, cameras, images, shaders, and post effects.
+    </p>
+    <ul>
+      <li><strong>Timeline scene assembly</strong> for objects, materials, lights, cameras, images, shaders, environments, and post nodes.</li>
+      <li><strong>Full OpenPBR path tracer</strong> with physically based materials for metal, roughness, emission, transmission, and subsurface-style shading.</li>
+      <li><strong>Procedural SDF objects</strong> with editable distance, normal, and surface sampling code.</li>
+      <li><strong>Procedural materials</strong> with displacement and hit-aware material evaluation.</li>
+      <li><strong>Image access</strong> from shaders, SDFs, displacement, and materials.</li>
+      <li><strong>Progressive path tracing</strong> with custom preview resolution, still export, and frame-accurate video output.</li>
+      <li><strong>Private and public asset libraries</strong> for projects and reusable timeline nodes.</li>
+    </ul>
+    <div className={styles.screenshotStrip} aria-label="ShaderMania Pro screenshots">
+      <img src="/img/screenshots/smp-starter.png" alt="ShaderMania Pro starter project" />
+      <img src="/img/screenshots/smp-material.png" alt="ShaderMania Pro procedural material editing" />
+    </div>
+  </div>
+</section>
+
+<div className={styles.productSeparator} />
+
 # ShaderMania
 
-<img src="/img/screenshots/screen.png" alt="ShaderMania editor" className={styles.heroScreenshot} />
+<section className={`${styles.productSection} ${styles.productSectionReverse}`}>
+  <img
+    src="/img/screenshots/screen.png"
+    alt="ShaderMania editor"
+    className={styles.productScreenshot}
+  />
+  <div className={styles.productText}>
+    <h2>Live Metal shader editing</h2>
+    <p>
+      ShaderMania is a focused creative tool for live Metal shader editing, visual node
+      graph composition, shader library exploration, and still image rendering on macOS
+      and iPadOS.
+    </p>
+    <ul>
+      <li><strong>Live Metal editing</strong> with realtime syntax feedback, warnings, and errors.</li>
+      <li><strong>Node-based projects</strong> with shader and image nodes.</li>
+      <li><strong>Named shader inputs</strong> for reusable visual pipelines.</li>
+      <li><strong>Interactive parameters</strong> for sliders, colors, and quick iteration.</li>
+      <li><strong>Still image export</strong> at custom resolutions.</li>
+      <li><strong>Shader library</strong> for browsing, reusing, and sharing shader work.</li>
+    </ul>
 
-**Create, edit, render, and share Metal shaders on macOS and iPadOS.**
-
-ShaderMania combines live Metal shader editing with a visual node graph. Build shader projects from shader and image nodes, connect named inputs, adjust parameters, preview changes in realtime, and export the rendered result.
-
-## Main Features
-
-- **Live Metal editing** - Write fragment shaders with realtime syntax feedback, warnings, and errors.
-- **Node-based projects** - Connect shader and image nodes to build reusable visual pipelines.
-- **Shader inputs** - Declare named input slots in shader source and wire them directly in the graph.
-- **Interactive parameters** - Expose shader values as UI controls for fast visual iteration.
-- **Rendering and export** - Render to custom resolutions and export shader output as PNG.
-- **Shader library** - Browse public shader examples, add them to projects, and share useful shader work.
-- **macOS and iPadOS** - Work on desktop or iPad with a workflow designed for creative shader exploration.
-
-ShaderMania is useful for learning Metal shader programming, experimenting with procedural visuals, creating still shader renders, and building small reusable shader graphs.
-
-<div className={styles.storeLinks}>
-  <a href="https://apps.apple.com/us/app/shadermania/id1541065830" className={styles.storeBadge}>
-    <img src="/img/appstore.svg" alt="Download on the App Store" />
-  </a>
-</div>
+    <div className={styles.storeLinks}>
+      <a href="https://apps.apple.com/us/app/shadermania/id1541065830" className={styles.storeBadge}>
+        <img src="/img/appstore.svg" alt="Download on the App Store" />
+      </a>
+    </div>
+  </div>
+</section>

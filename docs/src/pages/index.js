@@ -15,9 +15,9 @@ export default function Home() {
           <div className={styles.introText}>
             <h1>Metal Shader Creation</h1>
             <p>
-              ShaderMania is a focused creative tool for live Metal shader editing,
-              visual node graph composition, shader library exploration, and still
-              image rendering on macOS and iPadOS.
+              ShaderMania is a family of creative Metal shader tools, from fast
+              fragment shader sketching to timeline-based path-traced scene building
+              with procedural SDFs, materials, images, and post effects.
             </p>
           </div>
           <img className={styles.logo} src={logoSrc} alt="ShaderMania logo" />

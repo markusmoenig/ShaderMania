@@ -2,7 +2,20 @@
 
 const sidebars = {
   tutorialSidebar: [
-    'getting-started'
+    {
+      type: 'category',
+      label: 'ShaderMania Pro',
+      items: [
+        'shadermania-pro/overview'
+      ]
+    },
+    {
+      type: 'category',
+      label: 'ShaderMania',
+      items: [
+        'shadermania/shader-format'
+      ]
+    }
   ]
 };
 

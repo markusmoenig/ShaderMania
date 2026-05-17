@@ -3,9 +3,13 @@ sidebar_position: 1
 title: Shader format
 ---
 
-# Shader format
+# ShaderMania shader format
 
 ShaderMania shaders are Metal fragment-style programs. Each shader provides a `mainImage` function that receives a mutable `Data` structure.
+
+<a href="https://apps.apple.com/us/app/shadermania/id1541065830">
+  <img src="/img/appstore.svg" alt="Download ShaderMania on the App Store" width="160" />
+</a>
 
 ```cpp
 void mainImage(thread Data &data)
