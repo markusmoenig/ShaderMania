@@ -15,6 +15,12 @@ ShaderMania features a database of public shaders including tutorial shaders wit
 
 A physical keyboard is recommended for coding shaders.
 
+## ShaderMania Pro
+
+ShaderMania Pro is the paid, timeline-based path tracing version for macOS. It adds procedural SDF objects, full OpenPBR materials, cameras, lights, image tracks, post effects, still export, and frame-accurate video export.
+
+[Download ShaderMania Pro on the App Store](https://apps.apple.com/th/app/shadermania-pro/id6764767974?mt=12)
+
 ## Features
 
 * Flexible node system supporting Shaders and Images. Named input slots for shaders can be created inside the shader source code.

@@ -7,6 +7,10 @@ title: Overview
 
 ShaderMania Pro projects are timeline scenes. Tracks can contain shaders, SDF objects, analytical objects, materials, images, lights, cameras, renderers, environments, and post effects. A project is built into a render graph and rendered progressively with the path tracer.
 
+<a href="https://apps.apple.com/th/app/shadermania-pro/id6764767974?mt=12">
+  <img src="/img/appstore.svg" alt="Download ShaderMania Pro on the App Store" width="160" />
+</a>
+
 ## Timeline tracks
 
 Each visible timeline item contributes to the current frame:
